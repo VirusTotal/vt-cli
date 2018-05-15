@@ -1,0 +1,25 @@
+language: go
+
+go:
+  - "1.9.x"
+  - "1.10.x"
+  - master
+
+before_install:
+  - git config --global url."git@github.com:".insteadOf "https://github.com/"
+  - go get github.com/mitchellh/gox
+  - go get github.com/golang/dep/cmd/dep
+  - dep ensure
+
+before_deploy:
+  - go get github.com/tcnksm/ghr
+
+script: make all
+
+deploy:
+  - provider: script
+    script: ./deploy.sh
+    skip_cleanup: true
+    on:
+      go: "1.10.x"
+      tags: true

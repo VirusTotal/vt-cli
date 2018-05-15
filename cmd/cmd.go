@@ -1,0 +1,259 @@
+// Copyright © 2017 The VirusTotal CLI authors. All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package cmd
+
+import (
+	"fmt"
+	"io/ioutil"
+	"net/url"
+	"os"
+	"regexp"
+	"strings"
+
+	"github.com/k0kubun/go-ansi"
+
+	"github.com/fatih/color"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
+
+	"github.com/VirusTotal/vt-cli/utils"
+	"github.com/VirusTotal/vt-cli/yaml"
+	"github.com/VirusTotal/vt-go/vt"
+)
+
+var colorScheme = yaml.Colors{
+	KeyColor:     color.New(color.FgYellow),
+	ValueColor:   color.New(color.FgHiGreen),
+	CommentColor: color.New(color.Faint)}
+
+func addAPIKeyFlag(flags *pflag.FlagSet) {
+	flags.StringP(
+		"apikey", "k", "",
+		"api key")
+}
+
+func addIncludeExcludeFlags(flags *pflag.FlagSet) {
+	flags.StringSliceP(
+		"include", "i", []string{"**"},
+		"include fields matching the provided pattern")
+
+	flags.StringSliceP(
+		"exclude", "x", []string{},
+		"exclude fields matching the provided pattern")
+}
+
+func addThreadsFlag(flags *pflag.FlagSet) {
+	flags.IntP(
+		"threads", "t", 5,
+		"number of threads working in parallel")
+}
+
+func addIDOnlyFlag(flags *pflag.FlagSet) {
+	flags.BoolP(
+		"identifiers-only", "I", false,
+		"print identifiers only")
+}
+
+func addLimitFlag(flags *pflag.FlagSet) {
+	flags.IntP(
+		"limit", "n", 10,
+		"maximum number of results")
+}
+
+func addCursorFlag(flags *pflag.FlagSet) {
+	flags.StringP(
+		"cursor", "c", "",
+		"cursor")
+}
+
+func addOutputFlag(flags *pflag.FlagSet) {
+	flags.StringP(
+		"output", "o", ".",
+		"directory where downloaded files are put")
+}
+
+func addFilterFlag(flags *pflag.FlagSet) {
+	flags.StringP(
+		"filter", "f", "",
+		"filter")
+}
+
+func addVerboseFlag(flags *pflag.FlagSet) {
+	flags.BoolP(
+		"verbose", "v", false,
+		"verbose output")
+}
+
+// ReadFile reads the specified file and returns its content. If filename is "-"
+// the data is read from stdin.
+func ReadFile(filename string) ([]byte, error) {
+	if filename == "-" {
+		return ioutil.ReadAll(os.Stdin)
+	}
+	return ioutil.ReadFile(filename)
+}
+
+// ObjectPrinter ...
+type ObjectPrinter struct {
+	client *utils.APIClient
+}
+
+// NewObjectPrinter ...
+func NewObjectPrinter() (*ObjectPrinter, error) {
+	client, err := utils.NewAPIClient()
+	if err != nil {
+		return nil, err
+	}
+	return &ObjectPrinter{client: client}, nil
+}
+
+// Print ...
+func (p *ObjectPrinter) Print(objType string, args []string, argRe *regexp.Regexp) error {
+
+	var argReader utils.StringReader
+
+	if len(args) == 1 && args[0] == "-" {
+		argReader = utils.NewStringIOReader(os.Stdin)
+	} else {
+		argReader = utils.NewStringArrayReader(args)
+	}
+
+	if argRe != nil {
+		argReader = utils.NewFilteredStringReader(argReader, argRe)
+	}
+
+	filteredArgs := make([]string, 0)
+	for s := argReader.ReadString(); s != ""; s = argReader.ReadString() {
+		filteredArgs = append(filteredArgs, s)
+	}
+
+	objectsCh := make(chan *vt.Object)
+	errorsCh := make(chan error, len(filteredArgs))
+
+	go p.client.RetrieveObjects(objType, filteredArgs, objectsCh, errorsCh)
+
+	objs := make([]*vt.Object, 0)
+
+	for obj := range objectsCh {
+		if viper.GetBool("identifiers-only") {
+			fmt.Printf("%s\n", obj.ID)
+		} else {
+			objs = append(objs, obj)
+		}
+	}
+
+	if len(objs) > 0 {
+		if err := p.PrintObjects(objs); err != nil {
+			return err
+		}
+	}
+
+	for err := range errorsCh {
+		fmt.Fprintln(os.Stderr, err)
+	}
+
+	return nil
+}
+
+func (p *ObjectPrinter) PrintCollection(collection *url.URL) error {
+	options := vt.IteratorOptions{
+		Limit:  viper.GetInt("limit"),
+		Cursor: viper.GetString("cursor"),
+		Filter: viper.GetString("filter"),
+	}
+	it, err := p.client.Iterator(collection, options)
+	if err != nil {
+		return err
+	}
+	return p.PrintIter(it)
+}
+
+func (p *ObjectPrinter) PrintIter(it *vt.Iterator) error {
+
+	objs := make([]*vt.Object, 0)
+	for it.Next() {
+		obj := it.Get()
+		if viper.GetBool("identifiers-only") {
+			fmt.Printf("%s\n", obj.ID)
+		} else {
+			objs = append(objs, obj)
+		}
+	}
+
+	if err := it.Error(); err != nil {
+		return err
+	}
+
+	if len(objs) > 0 {
+		if err := p.PrintObjects(objs); err != nil {
+			return err
+		}
+	}
+
+	if cursor := it.Cursor(); cursor != "" {
+		args := os.Args
+		cursorFound := false
+		for i, arg := range args {
+			if arg == "-c" {
+				args[i+1] = cursor
+				cursorFound = true
+				break
+			} else if strings.HasPrefix(arg, "--cursor=") {
+				args[i] = fmt.Sprintf("--cursor=%s", cursor)
+				cursorFound = true
+				break
+			}
+		}
+		if !cursorFound {
+			args = append(args, fmt.Sprintf("--cursor=%s", cursor))
+		}
+		color.New(color.Faint).Fprintf(ansi.NewAnsiStderr(), "\n%s\n", strings.Join(args, " "))
+	}
+
+	return nil
+}
+
+func (p *ObjectPrinter) PrintObject(obj *vt.Object) error {
+	objs := make([]*vt.Object, 1)
+	objs[0] = obj
+	return p.PrintObjects(objs)
+}
+
+func (p *ObjectPrinter) PrintObjects(objs []*vt.Object) error {
+
+	list := make([]map[string]interface{}, 0)
+
+	for _, obj := range objs {
+		m := obj.Attributes
+		if viper.IsSet("include") && viper.IsSet("exclude") {
+			m = utils.FilterMap(
+				m, viper.GetStringSlice("include"), viper.GetStringSlice("exclude"))
+		}
+		for name, r := range obj.Relationships {
+			if r.IsOneToOne && len(r.RelatedObjects) > 0 {
+				m[name] = r.RelatedObjects[0].ID
+			} else {
+				l := make([]string, 0)
+				for _, obj := range r.RelatedObjects {
+					l = append(l, obj.ID)
+				}
+				m[name] = l
+			}
+		}
+		key := fmt.Sprintf("%s <%s>", obj.Type, obj.ID)
+		list = append(list, map[string]interface{}{key: m})
+	}
+
+	return yaml.NewColorEncoder(ansi.NewAnsiStdout(), colorScheme).Encode(list)
+}

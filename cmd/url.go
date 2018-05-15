@@ -1,0 +1,59 @@
+// Copyright © 2017 The VirusTotal CLI authors. All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package cmd
+
+import (
+	"github.com/spf13/cobra"
+)
+
+var urlCmdHelp = `Get information about one or more URLs.
+
+This command receives one or more URLs and returns information about them. URL
+hashes as returned in the "object_id" field are also accepted. The information
+about each URL is returned in the same order as the URLs are passed to the
+command.
+
+If the URLs are not provided in the command line they will be read from the
+standard input, one per line.`
+
+var urlCmdExample = `  vt url https://www.virustotal.com
+  vt url f1177df4692356280844e1d5af67cc4a9eccecf77aa61c229d483b7082c70a8e
+  cat list_of_urls | vt url -`
+
+// NewURLCmd returns a new instance of the 'url' command.
+func NewURLCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "url [url]...",
+		Short:   "Get information about URLs",
+		Long:    urlCmdHelp,
+		Example: urlCmdExample,
+		Args:    cobra.MinimumNArgs(1),
+
+		RunE: func(cmd *cobra.Command, args []string) error {
+			p, err := NewObjectPrinter()
+			if err != nil {
+				return err
+			}
+			return p.Print("urls", args, nil)
+		},
+	}
+
+	addRelationshipCmds(cmd, "urls", "url", "[url]")
+
+	addThreadsFlag(cmd.Flags())
+	addIncludeExcludeFlags(cmd.Flags())
+	addIDOnlyFlag(cmd.Flags())
+
+	return cmd
+}
