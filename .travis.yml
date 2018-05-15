@@ -2,7 +2,7 @@ language: go
 
 go:
   - "1.9.x"
-  - "1.10.x"
+  - "1.10.1"
   - master
 
 before_install:
@@ -20,5 +20,5 @@ deploy:
     script: ./deploy.sh
     skip_cleanup: true
     on:
-      go: "1.10.x"
+      go: "1.10.1"
       tags: true
