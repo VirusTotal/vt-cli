@@ -6,7 +6,6 @@ go:
   - master
 
 before_install:
-  - git config --global url."git@github.com:".insteadOf "https://github.com/"
   - go get github.com/mitchellh/gox
   - go get github.com/golang/dep/cmd/dep
   - dep ensure
