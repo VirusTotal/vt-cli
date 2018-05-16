@@ -21,7 +21,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/k0kubun/go-ansi"
+	"github.com/plusvic/go-ansi"
 
 	"github.com/fatih/color"
 	"github.com/spf13/pflag"

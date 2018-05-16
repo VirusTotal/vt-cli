@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/k0kubun/go-ansi"
+	"github.com/plusvic/go-ansi"
 )
 
 // Coordinator coordinates the output of multiple threads to stdout.

@@ -76,12 +76,6 @@
   version = "v1.0"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/k0kubun/go-ansi"
-  packages = ["."]
-  revision = "3cb35d1bdc075b187d83aa78d040a7232378561b"
-
-[[projects]]
   name = "github.com/magiconair/properties"
   packages = ["."]
   revision = "c3beff4c2358b44d0493c7dda585e7db7ff28ae6"
@@ -116,6 +110,12 @@
   packages = ["."]
   revision = "acdc4509485b587f5e675510c4f2c63e90ff68a8"
   version = "v1.1.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/plusvic/go-ansi"
+  packages = ["."]
+  revision = "9879244c43401c4d76c6ae25af7835bb7d89826e"
 
 [[projects]]
   name = "github.com/pmezard/go-difflib"
