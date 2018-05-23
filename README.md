@@ -30,7 +30,7 @@ $ make install
 
 ### Configuring your API key
 
-Once you have installed the vt-cli tool you may want to configure it with your API key. This is not strictly necessary, as you can provide your API key every time you invoke the tool by using the `--apikey` option (`-k` in short form), but that's a bit of a hassle if you are going to use tool frequently (and we bet you'll do!). For configuring your API key just type:
+Once you have installed the vt-cli tool you may want to configure it with your API key. This is not strictly necessary, as you can provide your API key every time you invoke the tool by using the `--apikey` option (`-k` in short form), but that's a bit of a hassle if you are going to use the tool frequently (and we bet you'll do!). For configuring your API key just type:
 
 ```
 $ vt init
