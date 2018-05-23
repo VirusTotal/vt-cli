@@ -14,15 +14,69 @@
 package cmd
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"regexp"
+	"time"
+
+	humanize "github.com/dustin/go-humanize"
 
 	"github.com/VirusTotal/vt-cli/utils"
 	"github.com/VirusTotal/vt-cli/yaml"
 	"github.com/VirusTotal/vt-go/vt"
+	"github.com/gosuri/uitable"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
+
+func retrohuntListTable() error {
+	client, err := utils.NewAPIClient()
+	if err != nil {
+		return err
+	}
+
+	options := vt.IteratorOptions{}
+	it, err := client.Iterator(vt.URL("intelligence/retrohunt_jobs"), options)
+	if err != nil {
+		return err
+	}
+	defer it.Close()
+
+	table := uitable.New()
+
+	table.AddRow(
+		"JOB ID", "CREATED", "STARTED", "STATUS", "SCANNED",
+		"MATCHES", "RULES")
+
+	table.RightAlign(4)
+	table.RightAlign(5)
+
+	for it.Next() {
+		job := it.Get()
+		status := job.Attributes["status"]
+		startDate := "not yet"
+		if s, ok := job.Attributes["start_date"].(int64); ok {
+			startDate = humanize.Time(time.Unix(s, 0))
+		}
+		if status == "queued" || status == "running" {
+			status = fmt.Sprintf("%s (%d%%)", status, job.Attributes["progress"])
+		}
+		table.AddRow(
+			job.ID,
+			humanize.Time(time.Unix(job.Attributes["creation_date"].(int64), 0)),
+			startDate,
+			status,
+			humanize.Bytes(uint64(job.Attributes["scanned_bytes"].(int64))),
+			humanize.Comma(job.Attributes["total_matches"].(int64)),
+			fmt.Sprintf("\"%s…\"", job.Attributes["rules"].(string)[0:50]),
+		)
+	}
+
+	fmt.Println(table)
+
+	return it.Error()
+}
 
 // NewRetrohuntListCmd returns a new instance of the 'list' command.
 func NewRetrohuntListCmd() *cobra.Command {
@@ -34,11 +88,14 @@ func NewRetrohuntListCmd() *cobra.Command {
 		Long:    `List retrohunt jobs.`,
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			p, err := NewObjectPrinter()
-			if err != nil {
-				return err
+			if viper.GetBool("yaml") {
+				p, err := NewObjectPrinter()
+				if err != nil {
+					return err
+				}
+				return p.PrintCollection(vt.URL("intelligence/retrohunt_jobs"))
 			}
-			return p.PrintCollection(vt.URL("intelligence/retrohunt_jobs"))
+			return retrohuntListTable()
 		},
 	}
 
@@ -46,6 +103,7 @@ func NewRetrohuntListCmd() *cobra.Command {
 	addFilterFlag(cmd.Flags())
 	addLimitFlag(cmd.Flags())
 	addCursorFlag(cmd.Flags())
+	addYAMLFlag(cmd.Flags())
 
 	return cmd
 }

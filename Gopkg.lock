@@ -5,7 +5,7 @@
   branch = "master"
   name = "github.com/VirusTotal/vt-go"
   packages = ["vt"]
-  revision = "b12b2fd37de810898753ab1c9da5251791e0cdb5"
+  revision = "ea84d3e0e9d683a117c3ce524f6be1605d4ebe57"
 
 [[projects]]
   name = "github.com/cavaliercoder/grab"
@@ -24,6 +24,12 @@
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
   version = "v1.1.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/dustin/go-humanize"
+  packages = ["."]
+  revision = "02af3965c54e8cacf948b97fef38925c4120652c"
 
 [[projects]]
   name = "github.com/fatih/color"
@@ -51,6 +57,16 @@
   ]
   revision = "5ccd90ef52e1e632236f7326478d4faa74f99438"
   version = "v0.2.3"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/gosuri/uitable"
+  packages = [
+    ".",
+    "util/strutil",
+    "util/wordwrap"
+  ]
+  revision = "36ee7e946282a3fb1cfecd476ddc9b35d8847e42"
 
 [[projects]]
   branch = "master"
@@ -94,10 +110,16 @@
   version = "v0.0.3"
 
 [[projects]]
+  name = "github.com/mattn/go-runewidth"
+  packages = ["."]
+  revision = "9e777a8366cce605130a531d2cd6363d07ad7317"
+  version = "v0.0.2"
+
+[[projects]]
   branch = "master"
   name = "github.com/mitchellh/go-homedir"
   packages = ["."]
-  revision = "b8bc1bf767474819792c23f32d8286a45736f1c6"
+  revision = "3864e76763d94a6df2f9960b16a20a33da9f9a66"
 
 [[projects]]
   branch = "master"
@@ -181,7 +203,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "7c87d13f8e835d2fb3a70a2912c811ed0c1d241b"
+  revision = "88eb85aaee56831ad49eaf7aa80d73de9814cde2"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -205,6 +227,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6996ac3b1c57d1ff42421b730776b5d20a9ee3a0266ea0a737c33caeb7636911"
+  inputs-digest = "6d10b26203b536c01a4096fada9c92745a505d12eb928ce4b37653738b75f59d"
   solver-name = "gps-cdcl"
   solver-version = 1
