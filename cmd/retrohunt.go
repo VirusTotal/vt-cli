@@ -114,6 +114,25 @@ func NewRetrohuntAbortCmd() *cobra.Command {
 	}
 }
 
+// NewRetrohuntDeleteCmd returns a new instance of the 'delete' command.
+func NewRetrohuntDeleteCmd() *cobra.Command {
+	return &cobra.Command{
+		Aliases: []string{"del", "rm"},
+		Use:     "delete [job id]",
+		Short:   "Delete a retrohunt job",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client, err := utils.NewAPIClient()
+			if err != nil {
+				return err
+			}
+			url := vt.URL("intelligence/retrohunt_jobs/%s", args[0])
+			_, err = client.Delete(url)
+			return err
+		},
+	}
+}
+
 // NewRetrohuntMatchesCmd returns a new instance of the 'matches' command.
 func NewRetrohuntMatchesCmd() *cobra.Command {
 	return &cobra.Command{
@@ -155,10 +174,11 @@ func NewRetrohuntCmd() *cobra.Command {
 
 	addThreadsFlag(cmd.Flags())
 
-	cmd.AddCommand(NewRetrohuntListCmd())
-	cmd.AddCommand(NewRetrohuntStartCmd())
 	cmd.AddCommand(NewRetrohuntAbortCmd())
+	cmd.AddCommand(NewRetrohuntDeleteCmd())
+	cmd.AddCommand(NewRetrohuntListCmd())
 	cmd.AddCommand(NewRetrohuntMatchesCmd())
+	cmd.AddCommand(NewRetrohuntStartCmd())
 
 	return cmd
 }
