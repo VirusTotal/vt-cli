@@ -19,6 +19,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 
 	humanize "github.com/dustin/go-humanize"
@@ -47,7 +48,6 @@ func retrohuntListTable(cmd *cobra.Command) error {
 	}
 
 	options := vt.IteratorOptions{
-		Limit:  viper.GetInt("limit"),
 		Filter: viper.GetString("filter"),
 	}
 
@@ -204,15 +204,27 @@ func NewRetrohuntDeleteCmd() *cobra.Command {
 		Aliases: []string{"del", "rm"},
 		Use:     "delete [job id]",
 		Short:   "Delete a retrohunt job",
-		Args:    cobra.ExactArgs(1),
+		Args:    cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := utils.NewAPIClient()
 			if err != nil {
 				return err
 			}
-			url := vt.URL("intelligence/retrohunt_jobs/%s", args[0])
-			_, err = client.Delete(url)
-			return err
+
+			var wg sync.WaitGroup
+			for _, arg := range args {
+				wg.Add(1)
+				go func(jobID string) {
+					url := vt.URL("intelligence/retrohunt_jobs/%s", jobID)
+					if _, err := client.Delete(url); err != nil {
+						fmt.Fprintf(os.Stderr, "%v\n", err)
+					}
+					wg.Done()
+				}(arg)
+			}
+
+			wg.Wait()
+			return nil
 		},
 	}
 }
