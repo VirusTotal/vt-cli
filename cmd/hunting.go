@@ -17,6 +17,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"sync"
 
 	"github.com/VirusTotal/vt-cli/utils"
 	"github.com/VirusTotal/vt-go/vt"
@@ -216,13 +217,20 @@ func NewHuntingRulesetsDeleteCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
+
+			var wg sync.WaitGroup
 			for _, arg := range args {
-				url := vt.URL("intelligence/hunting_rulesets/%s", arg)
-				_, err = client.Delete(url)
-				if err != nil {
-					fmt.Fprintln(os.Stderr, err)
-				}
+				wg.Add(1)
+				go func(rulesetID string) {
+					url := vt.URL("intelligence/hunting_rulesets/%s", rulesetID)
+					if _, err := client.Delete(url); err != nil {
+						fmt.Fprintf(os.Stderr, "%v\n", err)
+					}
+					wg.Done()
+				}(arg)
 			}
+
+			wg.Wait()
 			return nil
 		},
 	}

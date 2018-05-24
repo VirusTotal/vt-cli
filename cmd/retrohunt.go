@@ -202,9 +202,10 @@ func NewRetrohuntAbortCmd() *cobra.Command {
 func NewRetrohuntDeleteCmd() *cobra.Command {
 	return &cobra.Command{
 		Aliases: []string{"del", "rm"},
-		Use:     "delete [job id]",
+		Use:     "delete [job id]...",
 		Short:   "Delete a retrohunt job",
 		Args:    cobra.MinimumNArgs(1),
+
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := utils.NewAPIClient()
 			if err != nil {
