@@ -47,7 +47,13 @@ func retrohuntListTable(cmd *cobra.Command) error {
 		return err
 	}
 
+	limit := 0
+	if cmd.Flag("limit").Changed {
+		limit = viper.GetInt("limit")
+	}
+
 	options := vt.IteratorOptions{
+		Limit:  limit,
 		Filter: viper.GetString("filter"),
 	}
 
