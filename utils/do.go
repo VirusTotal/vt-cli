@@ -172,10 +172,9 @@ Loop:
 			time.Sleep(time.Millisecond * 250)
 			if lines > 0 {
 				// Move cursor up, to the line it was before printing worker's progress
-				ansi.CursorNextLine(lines)
+				ansi.CursorPreviousLine(lines)
 			}
 		}
 	}
-	ansi.Printf("%c[0J", 27)
 	wg.Done()
 }
