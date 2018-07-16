@@ -66,11 +66,11 @@ func retrohuntListTable(cmd *cobra.Command) error {
 	table := uitable.New()
 
 	table.AddRow(
-		"JOB ID", "CREATED", "STARTED", "STATUS", "SCANNED",
+		"JOB ID", "CREATED", "STARTED", "STATUS", "ETA", "SCANNED",
 		"MATCHES", "RULES")
 
-	table.RightAlign(4)
 	table.RightAlign(5)
+	table.RightAlign(6)
 
 	for it.Next() {
 		job := it.Get()
@@ -80,8 +80,14 @@ func retrohuntListTable(cmd *cobra.Command) error {
 		if s, ok := job.Attributes["start_date"].(int64); ok {
 			startDate = humanize.Time(time.Unix(s, 0))
 		}
+
 		if status == "queued" || status == "running" {
 			status = fmt.Sprintf("%s (%d%%)", status, job.Attributes["progress"])
+		}
+
+		eta := "-"
+		if e, ok := job.Attributes["eta"].(int64); ok {
+			eta = fmt.Sprintf("%ds", e)
 		}
 
 		matches := rulesPattern.FindAllStringSubmatch(job.Attributes["rules"].(string), 5)
@@ -102,6 +108,7 @@ func retrohuntListTable(cmd *cobra.Command) error {
 			humanize.Time(time.Unix(job.Attributes["creation_date"].(int64), 0)),
 			startDate,
 			status,
+			eta,
 			humanize.Bytes(uint64(job.Attributes["scanned_bytes"].(int64))),
 			humanize.Comma(job.Attributes["total_matches"].(int64)),
 			rules)
