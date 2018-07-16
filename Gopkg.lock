@@ -5,12 +5,12 @@
   branch = "master"
   name = "github.com/VirusTotal/vt-go"
   packages = ["vt"]
-  revision = "ea84d3e0e9d683a117c3ce524f6be1605d4ebe57"
+  revision = "f31b82edd399707338378dcf2381ee9fb67e275f"
 
 [[projects]]
   name = "github.com/cavaliercoder/grab"
   packages = ["."]
-  revision = "94177710b7005a1bc795e6805f2f7481f4120189"
+  revision = "466b5c0dd1d077be6de521d4e753734b17899a4d"
   version = "v2.0.0"
 
 [[projects]]
@@ -29,7 +29,7 @@
   branch = "master"
   name = "github.com/dustin/go-humanize"
   packages = ["."]
-  revision = "02af3965c54e8cacf948b97fef38925c4120652c"
+  revision = "9f541cc9db5d55bce703bd99987c9d5cb8eea45e"
 
 [[projects]]
   name = "github.com/fatih/color"
@@ -125,13 +125,13 @@
   branch = "master"
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
-  revision = "bb74f1db0675b241733089d5a1faa5dd8b0ef57b"
+  revision = "f15292f7a699fcc1a38a80977f80a046874ba8ac"
 
 [[projects]]
   name = "github.com/pelletier/go-toml"
   packages = ["."]
-  revision = "acdc4509485b587f5e675510c4f2c63e90ff68a8"
-  version = "v1.1.0"
+  revision = "c01d1270ff3e442a8a57cddc1c92dc1138598194"
+  version = "v1.2.0"
 
 [[projects]]
   branch = "master"
@@ -157,8 +157,8 @@
     ".",
     "mem"
   ]
-  revision = "63644898a8da0bc22138abf860edaf5277b6102e"
-  version = "v1.1.0"
+  revision = "787d034dfe70e44075ccc060d346146ef53270ad"
+  version = "v1.1.1"
 
 [[projects]]
   name = "github.com/spf13/cast"
@@ -196,14 +196,14 @@
 [[projects]]
   name = "github.com/stretchr/testify"
   packages = ["assert"]
-  revision = "12b6f73e6084dad08a7c6e575284b177ecafbc71"
-  version = "v1.2.1"
+  revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
+  version = "v1.2.2"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "88eb85aaee56831ad49eaf7aa80d73de9814cde2"
+  revision = "ac767d655b305d4e9612f5f6e33120b9176c4ad4"
 
 [[projects]]
   name = "golang.org/x/text"
