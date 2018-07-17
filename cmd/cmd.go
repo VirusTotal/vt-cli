@@ -220,6 +220,9 @@ func (p *ObjectPrinter) PrintIter(it *vt.Iterator) error {
 				cursorFound = true
 				break
 			}
+			if strings.Contains(arg, " ") {
+				args[i] = fmt.Sprintf("\"%s\"", arg)
+			}
 		}
 		if !cursorFound {
 			args = append(args, fmt.Sprintf("--cursor=%s", cursor))
