@@ -166,10 +166,9 @@ func (enc *Encoder) encodeValue(v reflect.Value, indent int, prefix string) (err
 			//   adipiscing elit potenti, ante taciti montes
 			//   risus mollis
 			enc.Colors.ValueColor.Fprint(enc.w, " |")
-			enc.lineBreak(2 + indent)
 			for _, line := range strings.Split(s, "\n") {
-				enc.Colors.ValueColor.Fprintf(enc.w, "%s", line)
 				enc.lineBreak(2 + indent)
+				enc.Colors.ValueColor.Fprintf(enc.w, "%s", line)
 			}
 		} else {
 			_, err = enc.Colors.ValueColor.Fprintf(enc.w, "%#v", v)
