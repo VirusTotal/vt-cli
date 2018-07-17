@@ -156,6 +156,24 @@ func (enc *Encoder) encodeValue(v reflect.Value, indent int, prefix string) (err
 		} else {
 			err = enc.encodeValue(v.Elem(), indent, prefix)
 		}
+	case reflect.String:
+		s := v.String()
+		if strings.Contains(s, "\n") {
+			// If string contains new line characters lets encode it as a
+			// literal block. Example:
+			// literal_block : |
+			//   Lorem ipsum dolor sit amet consectetur
+			//   adipiscing elit potenti, ante taciti montes
+			//   risus mollis
+			enc.Colors.ValueColor.Fprint(enc.w, " |")
+			enc.lineBreak(2 + indent)
+			for _, line := range strings.Split(s, "\n") {
+				enc.Colors.ValueColor.Fprintf(enc.w, "%s", line)
+				enc.lineBreak(2 + indent)
+			}
+		} else {
+			_, err = enc.Colors.ValueColor.Fprintf(enc.w, "%#v", v)
+		}
 	default:
 		_, err = enc.Colors.ValueColor.Fprintf(enc.w, "%#v", v)
 	}
