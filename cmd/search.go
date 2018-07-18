@@ -15,6 +15,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/viper"
 
@@ -49,24 +50,24 @@ func runSearchCmd(cmd *cobra.Command, args []string) error {
 		batchSize = viper.GetInt("limit")
 	}
 
-	options := vt.SearchOptions{}
-	options.Limit = viper.GetInt("limit")
-	options.Cursor = viper.GetString("cursor")
-	options.BatchSize = batchSize
-	options.DescriptorsOnly = viper.GetBool("identifiers-only") || viper.GetBool("download")
+	opts := vt.SearchOptions{}
+	opts.Limit = viper.GetInt("limit")
+	opts.Cursor = viper.GetString("cursor")
+	opts.BatchSize = batchSize
+	opts.DescriptorsOnly = viper.GetBool("identifiers-only") || viper.GetBool("download")
 
 	client, err := utils.NewAPIClient()
 	if err != nil {
 		return err
 	}
 
-	it, err := client.Search(args[0], options)
+	it, err := client.Search(args[0], opts)
 	if err != nil {
 		return err
 	}
 
 	if viper.GetBool("download") {
-		ch := make(chan string)
+		ch := make(chan interface{})
 		go func() {
 			for it.Next() {
 				obj := it.Get()
@@ -74,18 +75,16 @@ func runSearchCmd(cmd *cobra.Command, args []string) error {
 			}
 			close(ch)
 		}()
-		d := &downloader{client: client}
 		c := utils.NewCoordinator(viper.GetInt("threads"))
-		c.DoWithArgCh(d, ch)
-	} else {
-		p, err := NewObjectPrinter()
-		if err != nil {
-			return err
-		}
-		return p.PrintIter(it)
+		c.DoWithItemsFromChannel(&downloader{client: client}, ch)
+		return it.Error()
 	}
 
-	return nil
+	p, err := NewObjectPrinter()
+	if err != nil {
+		return err
+	}
+	return p.PrintIter(it)
 }
 
 var cmdSearchHelp = `Search for files using VirusTotal Intelligence's query language.`
@@ -114,6 +113,126 @@ func NewSearchCmd() *cobra.Command {
 	addLimitFlag(cmd.Flags())
 	addCursorFlag(cmd.Flags())
 	addOutputFlag(cmd.Flags())
+
+	cmd.AddCommand(NewContentSearchCmd())
+
+	return cmd
+}
+
+type matchPrinter struct {
+	client *utils.APIClient
+	idOnly bool
+}
+
+func (m *matchPrinter) Do(fileObj interface{}, ds *utils.DoerState) string {
+	f := fileObj.(*vt.Object)
+	var line string
+	if m.idOnly {
+		line = f.ID
+	} else {
+		var s string
+		confidence := f.ContextAttributes["confidence"].(float64)
+		snippetID := f.ContextAttributes["snippet"].(string)
+		snippets := make([]string, 0)
+		_, err := m.client.GetData(vt.URL("intelligence/search/snippets/%s", snippetID), &snippets)
+		if err == nil {
+			s = strings.Join(snippets, "\n\n")
+			s = strings.Replace(s, "\x1c", "\033[1m", -1)
+			s = strings.Replace(s, "\x1d", "\033[0m", -1)
+		} else {
+			s = "<no snippet available>"
+		}
+		line = fmt.Sprintf(
+			"%s\n\nsha256  : %s\nscore   : %03.1f \n\n%s\n",
+			strings.Repeat("_", 76), f.ID, confidence, s)
+	}
+	return line
+}
+
+func getIgnoredSubstrings(meta map[string]interface{}) []string {
+	if i, ok := meta["ignored_substrings"]; ok {
+		ii := i.([]interface{})
+		ss := make([]string, len(ii))
+		for i := range ss {
+			ss[i] = ii[i].(string)
+		}
+		return ss
+	}
+	return nil
+}
+
+func runContentSearchCmd(cmd *cobra.Command, args []string) error {
+
+	batchSize := 10
+	if viper.GetInt("limit") < batchSize {
+		batchSize = viper.GetInt("limit")
+	}
+
+	opts := vt.SearchOptions{}
+	opts.Limit = viper.GetInt("limit")
+	opts.Cursor = viper.GetString("cursor")
+	opts.BatchSize = batchSize
+	opts.DescriptorsOnly = viper.GetBool("identifiers-only") || viper.GetBool("download")
+
+	client, err := utils.NewAPIClient()
+	if err != nil {
+		return err
+	}
+
+	query := fmt.Sprintf("content:%s", args[0])
+
+	it, err := client.Search(query, opts)
+	if err != nil {
+		return err
+	}
+
+	c := utils.NewCoordinator(viper.GetInt("threads"))
+
+	var doer utils.Doer
+	if viper.GetBool("download") {
+		doer = &downloader{client: client}
+	} else {
+		doer = &matchPrinter{client, viper.GetBool("identifiers-only")}
+		c.EnableSpinner()
+	}
+
+	c.DoWithObjectsFromIterator(doer, it)
+
+	if ignored := getIgnoredSubstrings(it.Meta()); ignored != nil {
+		colorScheme.CommentColor.Printf(
+			"IGNORED SUBSTRINGS:\n%s\n",
+			strings.Join(ignored, ", "))
+	}
+
+	PrintCommandLineWithCursor(it)
+	return it.Error()
+}
+
+var cmdContentSearchHelp = `Search for content within files in VirusTotal`
+
+var cmdContentSearchExample = `  vt search content '{cafebabe}'
+  vt search content '{70 6C 75 73 76 69 63 [1] 79 61 72 61}'
+  vt search content '/virustotal(.org|.com)/'`
+
+// NewContentSearchCmd returns a new instance of the 'search content' command.
+func NewContentSearchCmd() *cobra.Command {
+
+	cmd := &cobra.Command{
+		Args:    cobra.ExactArgs(1),
+		Use:     "content [query]",
+		Short:   "Search for patterns within files in VirusTotal Intelligence",
+		Long:    cmdContentSearchHelp,
+		Example: cmdContentSearchExample,
+		RunE:    runContentSearchCmd,
+	}
+
+	cmd.Flags().BoolP("download", "d", false, "download files")
+	cmd.Flags().BoolP("exact-matches-only", "e", false, "exact matches only")
+
+	addThreadsFlag(cmd.Flags())
+	addIDOnlyFlag(cmd.Flags())
+	addLimitFlag(cmd.Flags())
+	addCursorFlag(cmd.Flags())
 
 	return cmd
 }

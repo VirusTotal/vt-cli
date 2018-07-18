@@ -117,6 +117,34 @@ func ReadFile(filename string) ([]byte, error) {
 	return ioutil.ReadFile(filename)
 }
 
+// PrintCommandLineWithCursor prints the same command-line that was used for
+// executing the program but adding or replacing the --cursor flag with
+// the current cursor for the given iterator.
+func PrintCommandLineWithCursor(it *vt.Iterator) {
+	if cursor := it.Cursor(); cursor != "" {
+		args := os.Args
+		cursorFound := false
+		for i, arg := range args {
+			if arg == "-c" {
+				args[i+1] = cursor
+				cursorFound = true
+				break
+			} else if strings.HasPrefix(arg, "--cursor=") {
+				args[i] = fmt.Sprintf("--cursor=%s", cursor)
+				cursorFound = true
+				break
+			}
+			if strings.Contains(arg, " ") {
+				args[i] = fmt.Sprintf("\"%s\"", arg)
+			}
+		}
+		if !cursorFound {
+			args = append(args, fmt.Sprintf("--cursor=%s", cursor))
+		}
+		color.New(color.Faint).Fprintf(ansi.NewAnsiStderr(), "\nMORE WITH:\n%s\n", strings.Join(args, " "))
+	}
+}
+
 // ObjectPrinter ...
 type ObjectPrinter struct {
 	client *utils.APIClient
@@ -214,29 +242,7 @@ func (p *ObjectPrinter) PrintIter(it *vt.Iterator) error {
 		}
 	}
 
-	if cursor := it.Cursor(); cursor != "" {
-		args := os.Args
-		cursorFound := false
-		for i, arg := range args {
-			if arg == "-c" {
-				args[i+1] = cursor
-				cursorFound = true
-				break
-			} else if strings.HasPrefix(arg, "--cursor=") {
-				args[i] = fmt.Sprintf("--cursor=%s", cursor)
-				cursorFound = true
-				break
-			}
-			if strings.Contains(arg, " ") {
-				args[i] = fmt.Sprintf("\"%s\"", arg)
-			}
-		}
-		if !cursorFound {
-			args = append(args, fmt.Sprintf("--cursor=%s", cursor))
-		}
-		color.New(color.Faint).Fprintf(ansi.NewAnsiStderr(), "\n%s\n", strings.Join(args, " "))
-	}
-
+	PrintCommandLineWithCursor(it)
 	return nil
 }
 
