@@ -103,6 +103,18 @@ var tests = []T{
 			`),
 	},
 	{
+		data: struct {
+			Foo string
+		}{
+			"uno\ndos",
+		},
+		yaml: Y(`
+			Foo: |
+			  uno
+			  dos
+			`),
+	},
+	{
 		data: map[string]interface{}{
 			"numbers": []interface{}{
 				map[string]string{

@@ -165,7 +165,7 @@ func (enc *Encoder) encodeValue(v reflect.Value, indent int, prefix string) (err
 			//   Lorem ipsum dolor sit amet consectetur
 			//   adipiscing elit potenti, ante taciti montes
 			//   risus mollis
-			enc.Colors.ValueColor.Fprint(enc.w, " |")
+			enc.Colors.ValueColor.Fprint(enc.w, "|")
 			for _, line := range strings.Split(s, "\n") {
 				enc.lineBreak(2 + indent)
 				enc.Colors.ValueColor.Fprintf(enc.w, "%s", line)
