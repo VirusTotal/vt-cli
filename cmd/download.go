@@ -68,7 +68,15 @@ type downloader struct {
 	client *utils.APIClient
 }
 
-func (d *downloader) Do(hash string, ds *utils.DoerState) string {
+func (d *downloader) Do(file interface{}, ds *utils.DoerState) string {
+
+	var hash string
+	if f, isObject := file.(*vt.Object); isObject {
+		hash = f.ID
+	} else {
+		hash = file.(string)
+	}
+
 	ds.Progress = fmt.Sprintf("%s %4.1f%%", hash, 0.0)
 	err := downloadFile(d.client, hash, func(resp *grab.Response) {
 		progress := 100 * resp.Progress()
@@ -77,6 +85,7 @@ func (d *downloader) Do(hash string, ds *utils.DoerState) string {
 				hash, progress, resp.BytesPerSecond()/1024)
 		}
 	})
+
 	msg := color.GreenString("ok")
 	if err != nil {
 		if apiErr, ok := err.(vt.Error); ok && apiErr.Code == "NotFoundError" {
@@ -86,6 +95,7 @@ func (d *downloader) Do(hash string, ds *utils.DoerState) string {
 			os.Exit(1)
 		}
 	}
+
 	return fmt.Sprintf("%s [%s]", hash, msg)
 }
 
@@ -127,7 +137,7 @@ func NewDownloadCmd() *cobra.Command {
 			}
 			d := &downloader{client: client}
 			re, _ := regexp.Compile(`^([[:xdigit:]]{64}|[[:xdigit:]]{40}|[[:xdigit:]]{32})$`)
-			c.DoWithArgReader(d, utils.NewFilteredStringReader(argReader, re))
+			c.DoWithStringsFromReader(d, utils.NewFilteredStringReader(argReader, re))
 			return nil
 		},
 	}

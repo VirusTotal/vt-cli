@@ -6,6 +6,11 @@
   name = "github.com/VirusTotal/vt-go"
   packages = ["vt"]
   revision = "f31b82edd399707338378dcf2381ee9fb67e275f"
+[[projects]]
+  name = "github.com/briandowns/spinner"
+  packages = ["."]
+  revision = "5b875a9171af19dbde37e70a8fcbe2ebd7285e05"
+  version = "1.1"
 
 [[projects]]
   name = "github.com/cavaliercoder/grab"

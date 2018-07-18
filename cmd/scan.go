@@ -27,7 +27,7 @@ type fileScanner struct {
 	scanner *vt.FileScanner
 }
 
-func (s *fileScanner) Do(path string, ds *utils.DoerState) string {
+func (s *fileScanner) Do(path interface{}, ds *utils.DoerState) string {
 
 	progressCh := make(chan float32)
 	defer close(progressCh)
@@ -42,7 +42,7 @@ func (s *fileScanner) Do(path string, ds *utils.DoerState) string {
 		}
 	}()
 
-	f, err := os.Open(path)
+	f, err := os.Open(path.(string))
 	if err != nil {
 		return fmt.Sprintf("%s", err)
 	}
@@ -53,7 +53,7 @@ func (s *fileScanner) Do(path string, ds *utils.DoerState) string {
 		return fmt.Sprintf("%s", err)
 	}
 
-	return fmt.Sprintf("%s %s", path, analysis.ID)
+	return fmt.Sprintf("%s %s", path.(string), analysis.ID)
 }
 
 var scanFileCmdHelp = `Scan one or more files.
@@ -92,7 +92,7 @@ func NewScanFileCmd() *cobra.Command {
 				return err
 			}
 			s := &fileScanner{scanner: client.NewFileScanner()}
-			c.DoWithArgReader(s, argReader)
+			c.DoWithStringsFromReader(s, argReader)
 			return nil
 		},
 	}
@@ -104,8 +104,8 @@ type urlScanner struct {
 	scanner *vt.URLScanner
 }
 
-func (s *urlScanner) Do(url string, ds *utils.DoerState) string {
-	analysis, err := s.scanner.Scan(url)
+func (s *urlScanner) Do(url interface{}, ds *utils.DoerState) string {
+	analysis, err := s.scanner.Scan(url.(string))
 	if err != nil {
 		return fmt.Sprintf("%s", err)
 	}
@@ -148,7 +148,7 @@ func NewScanURLCmd() *cobra.Command {
 				return err
 			}
 			s := &urlScanner{scanner: client.NewURLScanner()}
-			c.DoWithArgReader(s, argReader)
+			c.DoWithStringsFromReader(s, argReader)
 			return nil
 		},
 	}

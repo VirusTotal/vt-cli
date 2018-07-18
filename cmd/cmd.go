@@ -127,20 +127,20 @@ func NewObjectPrinter() (*ObjectPrinter, error) {
 // Print ...
 func (p *ObjectPrinter) Print(objType string, args []string, argRe *regexp.Regexp) error {
 
-	var argReader utils.StringReader
+	var r utils.StringReader
 
 	if len(args) == 1 && args[0] == "-" {
-		argReader = utils.NewStringIOReader(os.Stdin)
+		r = utils.NewStringIOReader(os.Stdin)
 	} else {
-		argReader = utils.NewStringArrayReader(args)
+		r = utils.NewStringArrayReader(args)
 	}
 
 	if argRe != nil {
-		argReader = utils.NewFilteredStringReader(argReader, argRe)
+		r = utils.NewFilteredStringReader(r, argRe)
 	}
 
 	filteredArgs := make([]string, 0)
-	for s := argReader.ReadString(); s != ""; s = argReader.ReadString() {
+	for s, err := r.ReadString(); s != "" || err == nil; s, err = r.ReadString() {
 		filteredArgs = append(filteredArgs, s)
 	}
 
