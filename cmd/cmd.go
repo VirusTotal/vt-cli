@@ -43,6 +43,13 @@ func addAPIKeyFlag(flags *pflag.FlagSet) {
 		"api key")
 }
 
+func addHostFlag(flags *pflag.FlagSet) {
+	flags.String(
+		"host", "www.virustotal.com",
+		"API host name")
+	flags.MarkHidden("host")
+}
+
 func addIncludeExcludeFlags(flags *pflag.FlagSet) {
 	flags.StringSliceP(
 		"include", "i", []string{"**"},

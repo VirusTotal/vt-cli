@@ -5,7 +5,8 @@
   branch = "master"
   name = "github.com/VirusTotal/vt-go"
   packages = ["vt"]
-  revision = "f31b82edd399707338378dcf2381ee9fb67e275f"
+  revision = "4d73a88f4996a5095741743229625d4fd3617f10"
+
 [[projects]]
   name = "github.com/briandowns/spinner"
   packages = ["."]
@@ -232,6 +233,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6d10b26203b536c01a4096fada9c92745a505d12eb928ce4b37653738b75f59d"
+  inputs-digest = "791666f6bf45a20d0398aa0dd4fa60430debc4da9035b392d82fad17436b0d0b"
   solver-name = "gps-cdcl"
   solver-version = 1

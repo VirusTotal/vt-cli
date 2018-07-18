@@ -17,6 +17,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/VirusTotal/vt-go/vt"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -36,6 +37,10 @@ func NewVTCommand() *cobra.Command {
 			if err := viper.BindPFlags(cmd.Flags()); err != nil {
 				return err
 			}
+			host := viper.GetString("host")
+			if host != "" {
+				vt.SetHost(host)
+			}
 			if viper.GetBool("verbose") {
 				if configFile := viper.ConfigFileUsed(); configFile != "" {
 					fmt.Fprintf(os.Stderr, "* Config file: %s\n", configFile)
@@ -43,12 +48,14 @@ func NewVTCommand() *cobra.Command {
 				if apiKey := viper.GetString("apikey"); apiKey != "" {
 					fmt.Fprintf(os.Stderr, "* API key: %s\n", apiKey)
 				}
+				fmt.Fprintf(os.Stderr, "* API host: %s\n", host)
 			}
 			return nil
 		},
 	}
 
 	addAPIKeyFlag(cmd.PersistentFlags())
+	addHostFlag(cmd.PersistentFlags())
 	addVerboseFlag(cmd.PersistentFlags())
 
 	cmd.AddCommand(NewAnalysisCmd())
