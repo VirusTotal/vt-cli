@@ -19,6 +19,10 @@ import (
 type Coordinator struct {
 	Threads int
 	Spinner *spinner.Spinner
+
+	printingWg *sync.WaitGroup
+	doerStates []DoerState
+	resultsCh  chan string
 }
 
 // StringReader is the interface that wraps the ReadString method.
@@ -155,39 +159,39 @@ func (c *Coordinator) DoWithObjectsFromIterator(doer Doer, it *vt.Iterator) {
 // the channel is closed.
 func (c *Coordinator) DoWithItemsFromChannel(doer Doer, ch <-chan interface{}) {
 
-	resultsCh := make(chan string, c.Threads)
-	doerStates := make([]DoerState, c.Threads)
-	doersWg := &sync.WaitGroup{}
+	c.resultsCh = make(chan string, c.Threads)
+	c.doerStates = make([]DoerState, c.Threads)
+	wg := &sync.WaitGroup{}
 
 	for i := 0; i < c.Threads; i++ {
-		doersWg.Add(1)
+		wg.Add(1)
 		go func(i int) {
 			for arg := range ch {
-				resultsCh <- doer.Do(arg, &doerStates[i])
-				doerStates[i].Progress = ""
+				c.resultsCh <- doer.Do(arg, &c.doerStates[i])
+				c.doerStates[i].Progress = ""
 			}
-			doersWg.Done()
+			wg.Done()
 		}(i)
 	}
 
-	printingWg := &sync.WaitGroup{}
-	printingWg.Add(1)
+	c.printingWg = &sync.WaitGroup{}
+	c.printingWg.Add(1)
 
-	go c.printResults(resultsCh, doerStates, printingWg)
+	go c.printResults()
 
-	doersWg.Wait()
-	close(resultsCh)
-	printingWg.Wait()
+	wg.Wait()
+	close(c.resultsCh)
+	c.printingWg.Wait()
 }
 
-func (c *Coordinator) printResults(resCh chan string, doerStates []DoerState, wg *sync.WaitGroup) {
+func (c *Coordinator) printResults() {
 Loop:
 	for {
 		if c.Spinner != nil {
 			c.Spinner.Start()
 		}
 		select {
-		case res, ok := <-resCh:
+		case res, ok := <-c.resultsCh:
 			if !ok {
 				break Loop
 			}
@@ -200,7 +204,7 @@ Loop:
 		default:
 			// Print progress for pending workers
 			lines := 0
-			for _, ds := range doerStates {
+			for _, ds := range c.doerStates {
 				if ds.Progress != "" {
 					ansi.Printf("%s", ds.Progress)
 					ansi.EraseInLine(0) // Clear to the end of the line.
@@ -218,5 +222,5 @@ Loop:
 	if c.Spinner != nil {
 		c.Spinner.Stop()
 	}
-	wg.Done()
+	c.printingWg.Done()
 }

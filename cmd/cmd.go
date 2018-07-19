@@ -208,12 +208,12 @@ func (p *ObjectPrinter) Print(objType string, args []string, argRe *regexp.Regex
 }
 
 func (p *ObjectPrinter) PrintCollection(collection *url.URL) error {
-	options := vt.IteratorOptions{
-		Limit:  viper.GetInt("limit"),
-		Cursor: viper.GetString("cursor"),
-		Filter: viper.GetString("filter"),
-	}
-	it, err := p.client.Iterator(collection, options)
+	it, err := p.client.Iterator(collection,
+		vt.IteratorOptions{
+			Limit:  viper.GetInt("limit"),
+			Cursor: viper.GetString("cursor"),
+			Filter: viper.GetString("filter"),
+		})
 	if err != nil {
 		return err
 	}
