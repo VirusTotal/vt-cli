@@ -131,7 +131,7 @@ func NewDownloadCmd() *cobra.Command {
 			} else {
 				argReader = utils.NewStringArrayReader(args)
 			}
-			client, err := utils.NewAPIClient()
+			client, err := NewAPIClient()
 			if err != nil {
 				return err
 			}

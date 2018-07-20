@@ -24,7 +24,6 @@ import (
 
 	humanize "github.com/dustin/go-humanize"
 
-	"github.com/VirusTotal/vt-cli/utils"
 	"github.com/VirusTotal/vt-cli/yaml"
 	"github.com/VirusTotal/vt-go/vt"
 	"github.com/gosuri/uitable"
@@ -42,7 +41,7 @@ func retrohuntListTable(cmd *cobra.Command) error {
 		}
 	}
 
-	client, err := utils.NewAPIClient()
+	client, err := NewAPIClient()
 	if err != nil {
 		return err
 	}
@@ -162,7 +161,7 @@ func NewRetrohuntStartCmd() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			client, err := utils.NewAPIClient()
+			client, err := NewAPIClient()
 			if err != nil {
 				return err
 			}
@@ -200,7 +199,7 @@ func NewRetrohuntAbortCmd() *cobra.Command {
 		Short: "Abort a retrohunt job",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := utils.NewAPIClient()
+			client, err := NewAPIClient()
 			if err != nil {
 				return err
 			}
@@ -220,7 +219,7 @@ func NewRetrohuntDeleteCmd() *cobra.Command {
 		Args:    cobra.MinimumNArgs(1),
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := utils.NewAPIClient()
+			client, err := NewAPIClient()
 			if err != nil {
 				return err
 			}
@@ -250,7 +249,7 @@ func NewRetrohuntMatchesCmd() *cobra.Command {
 		Short: "Get matches for a retrohunt job",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := utils.NewAPIClient()
+			client, err := NewAPIClient()
 			if err != nil {
 				return err
 			}

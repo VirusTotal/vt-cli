@@ -19,7 +19,6 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/VirusTotal/vt-cli/utils"
 	"github.com/VirusTotal/vt-go/vt"
 	"github.com/spf13/cobra"
 )
@@ -38,7 +37,7 @@ func NewHuntingNotificationsPurgeCmd() *cobra.Command {
 		Long:  notificationsPurgeCmdHelp,
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := utils.NewAPIClient()
+			client, err := NewAPIClient()
 			if err != nil {
 				return err
 			}
@@ -128,7 +127,7 @@ func NewHuntingRulesetsListCmd() *cobra.Command {
 }
 
 func patchRuleset(id string, attrs map[string]interface{}) error {
-	client, err := utils.NewAPIClient()
+	client, err := NewAPIClient()
 	if err != nil {
 		return err
 	}
@@ -213,7 +212,7 @@ func NewHuntingRulesetsDeleteCmd() *cobra.Command {
 		Args:    cobra.MinimumNArgs(1),
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := utils.NewAPIClient()
+			client, err := NewAPIClient()
 			if err != nil {
 				return err
 			}
@@ -244,7 +243,7 @@ func NewHuntingRulesetsAddCmd() *cobra.Command {
 		Args:  cobra.ExactArgs(2),
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := utils.NewAPIClient()
+			client, err := NewAPIClient()
 			if err != nil {
 				return err
 			}

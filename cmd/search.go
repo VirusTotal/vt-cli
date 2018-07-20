@@ -56,7 +56,7 @@ func runSearchCmd(cmd *cobra.Command, args []string) error {
 	opts.BatchSize = batchSize
 	opts.DescriptorsOnly = viper.GetBool("identifiers-only") || viper.GetBool("download")
 
-	client, err := utils.NewAPIClient()
+	client, err := NewAPIClient()
 	if err != nil {
 		return err
 	}
@@ -174,7 +174,7 @@ func runContentSearchCmd(cmd *cobra.Command, args []string) error {
 	opts.BatchSize = batchSize
 	opts.DescriptorsOnly = viper.GetBool("identifiers-only") || viper.GetBool("download")
 
-	client, err := utils.NewAPIClient()
+	client, err := NewAPIClient()
 	if err != nil {
 		return err
 	}

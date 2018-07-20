@@ -14,6 +14,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/url"
@@ -145,6 +146,16 @@ func PrintCommandLineWithCursor(it *vt.Iterator) {
 	}
 }
 
+// NewAPIClient returns a new utils.APIClient with the API key specified via
+// command-line argument or config file.
+func NewAPIClient() (*utils.APIClient, error) {
+	apikey := viper.GetString("apikey")
+	if apikey == "" {
+		return nil, errors.New("An API key is needed. Either use the --apikey flag or run \"vt config\" to set up your API key")
+	}
+	return utils.NewAPIClient(apikey, fmt.Sprintf("vt-cli %s", Version))
+}
+
 // ObjectPrinter ...
 type ObjectPrinter struct {
 	client *utils.APIClient
@@ -152,7 +163,7 @@ type ObjectPrinter struct {
 
 // NewObjectPrinter ...
 func NewObjectPrinter() (*ObjectPrinter, error) {
-	client, err := utils.NewAPIClient()
+	client, err := NewAPIClient()
 	if err != nil {
 		return nil, err
 	}

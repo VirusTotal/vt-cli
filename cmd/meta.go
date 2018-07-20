@@ -16,7 +16,6 @@ package cmd
 import (
 	"os"
 
-	"github.com/VirusTotal/vt-cli/utils"
 	"github.com/VirusTotal/vt-cli/yaml"
 	"github.com/spf13/cobra"
 )
@@ -34,7 +33,7 @@ func NewMetaCmd() *cobra.Command {
 		Long:  metaCmdHelp,
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := utils.NewAPIClient()
+			client, err := NewAPIClient()
 			if err != nil {
 				return err
 			}
