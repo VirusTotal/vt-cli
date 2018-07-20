@@ -151,7 +151,7 @@ func PrintCommandLineWithCursor(it *vt.Iterator) {
 func NewAPIClient() (*utils.APIClient, error) {
 	apikey := viper.GetString("apikey")
 	if apikey == "" {
-		return nil, errors.New("An API key is needed. Either use the --apikey flag or run \"vt config\" to set up your API key")
+		return nil, errors.New("An API key is needed. Either use the --apikey flag or run \"vt init\" to set up your API key")
 	}
 	return utils.NewAPIClient(apikey, fmt.Sprintf("vt-cli %s", Version))
 }
