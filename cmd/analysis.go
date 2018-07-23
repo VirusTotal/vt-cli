@@ -44,7 +44,7 @@ func NewAnalysisCmd() *cobra.Command {
 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			re, _ := regexp.Compile(`(f|u)-[[:xdigit:]]{64}-\d+|[\d\w=]{20,}`)
-			p, err := NewObjectPrinter()
+			p, err := NewObjectPrinter(cmd)
 			if err != nil {
 				return err
 			}

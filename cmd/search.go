@@ -80,7 +80,7 @@ func runSearchCmd(cmd *cobra.Command, args []string) error {
 		return it.Error()
 	}
 
-	p, err := NewObjectPrinter()
+	p, err := NewObjectPrinter(cmd)
 	if err != nil {
 		return err
 	}
@@ -204,7 +204,7 @@ func runContentSearchCmd(cmd *cobra.Command, args []string) error {
 			strings.Join(ignored, ", "))
 	}
 
-	PrintCommandLineWithCursor(it)
+	PrintCommandLineWithCursor(cmd, it)
 	return it.Error()
 }
 

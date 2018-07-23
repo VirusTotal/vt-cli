@@ -45,7 +45,7 @@ func NewFileCmd() *cobra.Command {
 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			re, _ := regexp.Compile("[[:xdigit:]]{64}|[[:xdigit:]]{40}|[[:xdigit:]]{32}")
-			p, err := NewObjectPrinter()
+			p, err := NewObjectPrinter(cmd)
 			if err != nil {
 				return err
 			}

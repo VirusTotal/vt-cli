@@ -41,7 +41,7 @@ func NewURLCmd() *cobra.Command {
 		Args:    cobra.MinimumNArgs(1),
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			p, err := NewObjectPrinter()
+			p, err := NewObjectPrinter(cmd)
 			if err != nil {
 				return err
 			}

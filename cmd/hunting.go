@@ -63,7 +63,7 @@ func NewHuntingNotificationsListCmd() *cobra.Command {
 		Long:    notificationsListCmdHelp,
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			p, err := NewObjectPrinter()
+			p, err := NewObjectPrinter(cmd)
 			if err != nil {
 				return err
 			}
@@ -109,7 +109,7 @@ func NewHuntingRulesetsListCmd() *cobra.Command {
 		Long:    rulesetsListCmdHelp,
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			p, err := NewObjectPrinter()
+			p, err := NewObjectPrinter(cmd)
 			if err != nil {
 				return err
 			}
@@ -247,7 +247,7 @@ func NewHuntingRulesetsAddCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			p, err := NewObjectPrinter()
+			p, err := NewObjectPrinter(cmd)
 			if err != nil {
 				return err
 			}

@@ -129,7 +129,7 @@ func NewRetrohuntListCmd() *cobra.Command {
 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if viper.GetBool("yaml") {
-				p, err := NewObjectPrinter()
+				p, err := NewObjectPrinter(cmd)
 				if err != nil {
 					return err
 				}
@@ -273,7 +273,7 @@ func NewRetrohuntCmd() *cobra.Command {
 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			re, _ := regexp.Compile("\\w+-\\d+")
-			p, err := NewObjectPrinter()
+			p, err := NewObjectPrinter(cmd)
 			if err != nil {
 				return err
 			}

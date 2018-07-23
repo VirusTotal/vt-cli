@@ -22,6 +22,8 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/spf13/cobra"
+
 	"github.com/plusvic/go-ansi"
 
 	"github.com/fatih/color"
@@ -121,9 +123,9 @@ func ReadFile(filename string) ([]byte, error) {
 // PrintCommandLineWithCursor prints the same command-line that was used for
 // executing the program but adding or replacing the --cursor flag with
 // the current cursor for the given iterator.
-func PrintCommandLineWithCursor(it *vt.Iterator) {
+func PrintCommandLineWithCursor(cmd *cobra.Command, it *vt.Iterator) {
 	if cursor := it.Cursor(); cursor != "" {
-		args := os.Args
+		args := cmd.Flags().Args()
 		cursorFound := false
 		for i, arg := range args {
 			if arg == "-c" {
@@ -135,14 +137,14 @@ func PrintCommandLineWithCursor(it *vt.Iterator) {
 				cursorFound = true
 				break
 			}
-			if strings.Contains(arg, " ") {
-				args[i] = fmt.Sprintf("\"%s\"", arg)
-			}
+			args[i] = fmt.Sprintf("'%s'", arg)
 		}
 		if !cursorFound {
 			args = append(args, fmt.Sprintf("--cursor=%s", cursor))
 		}
-		color.New(color.Faint).Fprintf(ansi.NewAnsiStderr(), "\nMORE WITH:\n%s\n", strings.Join(args, " "))
+		color.New(color.Faint).Fprintf(
+			ansi.NewAnsiStderr(), "\nMORE WITH:\n%s %s\n",
+			cmd.CommandPath(), strings.Join(args, " "))
 	}
 }
 
@@ -159,10 +161,11 @@ func NewAPIClient() (*utils.APIClient, error) {
 // ObjectPrinter ...
 type ObjectPrinter struct {
 	client *utils.APIClient
+	cmd    *cobra.Command
 }
 
 // NewObjectPrinter ...
-func NewObjectPrinter() (*ObjectPrinter, error) {
+func NewObjectPrinter(cmd *cobra.Command) (*ObjectPrinter, error) {
 	client, err := NewAPIClient()
 	if err != nil {
 		return nil, err
@@ -253,7 +256,7 @@ func (p *ObjectPrinter) PrintIter(it *vt.Iterator) error {
 		}
 	}
 
-	PrintCommandLineWithCursor(it)
+	PrintCommandLineWithCursor(p.cmd, it)
 	return nil
 }
 
