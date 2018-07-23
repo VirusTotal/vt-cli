@@ -196,7 +196,7 @@ func runContentSearchCmd(cmd *cobra.Command, args []string) error {
 		c.EnableSpinner()
 	}
 
-	c.DoWithObjectsFromIterator(doer, it)
+	c.DoWithObjectsFromIterator(doer, it, batchSize)
 
 	if ignored := getIgnoredSubstrings(it.Meta()); ignored != nil {
 		colorScheme.CommentColor.Printf(

@@ -155,9 +155,10 @@ func (c *Coordinator) DoWithStringsFromReader(doer Doer, reader StringReader) {
 }
 
 // DoWithObjectsFromIterator calls the Do of a type implementing the Doer
-// interface with the objects returned by a vt.Iterator.
-func (c *Coordinator) DoWithObjectsFromIterator(doer Doer, it *vt.Iterator) {
-	ch := make(chan interface{})
+// interface with the objects returned by a vt.Iterator. Objects returned by the
+// iterator are put in a channel with a buffer size of bufferSize.
+func (c *Coordinator) DoWithObjectsFromIterator(doer Doer, it *vt.Iterator, bufferSize int) {
+	ch := make(chan interface{}, bufferSize)
 	go func() {
 		for it.Next() {
 			ch <- it.Get()
