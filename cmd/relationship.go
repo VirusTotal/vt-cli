@@ -14,7 +14,9 @@
 package cmd
 
 import (
+	"encoding/base64"
 	"encoding/gob"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path"
@@ -42,11 +44,41 @@ func NewRelationshipCmd(collection, relationship, use, description string) *cobr
 		Use:   fmt.Sprintf("%s %s", relationship, use),
 		Short: description,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			p, err := NewObjectPrinter()
+			client, err := NewAPIClient()
 			if err != nil {
 				return err
 			}
-			return p.PrintCollection(vt.URL("%s/%s/%s", collection, args[0], relationship))
+			objectID := args[0]
+			if collection == "urls" {
+				// If collections is "urls" let's encode the objectID is the
+				// URL itself and it needs to be encoded in base64.
+				objectID = base64.RawURLEncoding.EncodeToString([]byte(objectID))
+			}
+			url := vt.URL("%s/%s/%s", collection, objectID, relationship)
+			// A relationship can return a single object or a collection, so
+			// we retrieve the data but do not unmarshall it as we don't know
+			// the kind of data that we are receiving.
+			var data json.RawMessage
+			if _, err = client.GetData(url, &data); err != nil {
+				return err
+			}
+			p, err := NewObjectPrinter(cmd)
+			if err != nil {
+				return err
+			}
+			obj := &vt.Object{}
+			// Try to unmarshall the data into an object, if it succeeds we
+			// can proceed to print the object, if not the relationship returns
+			// a collection.
+			if err := json.Unmarshal(data, obj); err == nil {
+				return p.PrintObject(obj)
+			}
+			// If the returned data was not an object let's use PrintCollection.
+			// This is not the most efficient solution as it sends another
+			// request to the server.
+			// TODO(vmalvarez): Avoid the extra API request by reusing the data
+			// that we already have.
+			return p.PrintCollection(url)
 		},
 	}
 
