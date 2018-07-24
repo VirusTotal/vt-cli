@@ -157,7 +157,7 @@ func getIgnoredSubstrings(meta map[string]interface{}) []string {
 		for i := range ss {
 			s := ii[i].(string)
 			h, _ := hex.DecodeString(s)
-			ss[i] = fmt.Sprintf("{% x} %q", h, h)
+			ss[i] = fmt.Sprintf("{% X} %q", h, h)
 		}
 		return ss
 	}
