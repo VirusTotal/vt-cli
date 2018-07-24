@@ -170,7 +170,7 @@ func NewObjectPrinter(cmd *cobra.Command) (*ObjectPrinter, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &ObjectPrinter{client: client}, nil
+	return &ObjectPrinter{client: client, cmd: cmd}, nil
 }
 
 // Print ...
