@@ -14,6 +14,7 @@
 package cmd
 
 import (
+	"encoding/hex"
 	"fmt"
 	"strings"
 
@@ -154,7 +155,9 @@ func getIgnoredSubstrings(meta map[string]interface{}) []string {
 		ii := i.([]interface{})
 		ss := make([]string, len(ii))
 		for i := range ss {
-			ss[i] = ii[i].(string)
+			s := ii[i].(string)
+			h, _ := hex.DecodeString(s)
+			ss[i] = fmt.Sprintf("{% x} %q", h, h)
 		}
 		return ss
 	}
@@ -201,7 +204,7 @@ func runContentSearchCmd(cmd *cobra.Command, args []string) error {
 	if ignored := getIgnoredSubstrings(it.Meta()); ignored != nil {
 		colorScheme.CommentColor.Printf(
 			"IGNORED SUBSTRINGS:\n%s\n",
-			strings.Join(ignored, ", "))
+			strings.Join(ignored, "\n"))
 	}
 
 	PrintCommandLineWithCursor(cmd, it)
