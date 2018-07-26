@@ -14,6 +14,8 @@
 package cmd
 
 import (
+	"encoding/base64"
+
 	"github.com/spf13/cobra"
 )
 
@@ -45,7 +47,11 @@ func NewURLCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return p.Print("urls", args, nil)
+			ids := make([]string, len(args))
+			for i, arg := range args {
+				ids[i] = base64.RawURLEncoding.EncodeToString([]byte(arg))
+			}
+			return p.Print("urls", ids, nil)
 		},
 	}
 
