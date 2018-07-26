@@ -1,6 +1,6 @@
 # VirusTotal CLI
 
-Welcome to the VirusTotal CLI, a tool designed for those of you who love both VirusTotal and command-line interfaces. With this tool you can do everything you'd normally do using the VirusTotal's web page, including:
+Welcome to the VirusTotal CLI, a tool designed for those who love both VirusTotal and command-line interfaces. With this tool you can do everything you'd normally do using the VirusTotal's web page, including:
 
 * Retrieve information about a file, URL, domain name, IP address, etc.
 * Search for files using VirusTotal Intelligence query syntax.
@@ -18,7 +18,7 @@ As this tool use the [VirusTotal API](https://developers.virustotal.com/v3.0/ref
 
 ### Installing the tool
 
-For installing the tool you can download one the [pre-compiled binaries](https://github.com/VirusTotal/vt-cli/releases) we offer for the most popular operating systems, or alternatively you can compile it yourself from source code. For compiling the program you'll need Go 1.9.x or higher installed in your system and type the following commands:
+For installing the tool you can download one the [pre-compiled binaries](https://github.com/VirusTotal/vt-cli/releases) we offer for Windows, Linux and Mac OS X, or alternatively you can compile it yourself from source code. For compiling the program you'll need Go 1.9.x or higher installed in your system and type the following commands:
 
 ```
 $ go get -u github.com/golang/dep/cmd/dep
@@ -40,7 +40,7 @@ This command will ask for your API key, and save it to a config file in your hom
 
 ### Setup Bash completion
 
-If you are going to use this tool frequently you may want to have command auto-completion, as it saves both precious time and keystrokes. Follow these instructions to enable Bash completion:
+If you are going to use this tool frequently you may want to have command auto-completion. It saves both precious time and keystrokes. Notice however that you must configure your API as described in the previous section *before* following the steps listed below. The API is necessary for determining the commands that you will have access to.
 
 * Linux:
 	```
@@ -146,7 +146,7 @@ The data shown above can be retrieved with:
 $ vt url http://www.virustotal.com
 ```
 
-Notice that the returned data usually follows a hierarchical structure, with some top-level fields that may contain subfields which in turn can contain some more subfields. In the example above the `last_http_response_headers` field has subfields `age`, `cache-control`, `content-lengt` and so on, while `total_votes` has `harmless` and `malicious`. For refering to a particular field within the hierarchy we can use a path, similarly to how we identify a file in our computers, but in this case we are going to use a dot character (.) as the separator for path components, instead of the slashes (or backslashes) used by most file systems. The following ones are valid paths for our example structure:
+Notice that the returned data usually follows a hierarchical structure, with some top-level fields that may contain subfields which in turn can contain their own subfields. In the example above `last_http_response_headers` has subfields `age`, `cache-control`, `content-lengt` and so on, while `total_votes` has `harmless` and `malicious`. For refering to a particular field within the hierarchy we can use a path, similarly to how we identify a file in our computers, but in this case we are going to use a dot character (.) as the separator for path components, instead of the slashes (or backslashes) used by most file systems. The following ones are valid paths for our example structure:
 
 * `last_http_response_headers.age`
 * `total_votes.harmless`
@@ -156,7 +156,7 @@ Notice that the returned data usually follows a hierarchical structure, with som
 The filters accepted by both `--include` and `--exclude` are paths in which we can use `*` and `**` has placeholders for one and many path elements respectively. For example `foo.*` matches `foo.bar` but not `foo.bar.baz`, while `foo.**` matches `foo.bar`, `foo.bar.baz` and `foo.bar.baz.qux`. In the other hand, `foo.*.qux` matches `foo.bar.qux` and `foo.baz.qux` but not `foo.bar.baz.qux`, while `foo.**.qux` matches
 `foo.bar.baz.qux` and any other path starting with `foo` and ending with `qux`.
 
-For cherry-picking only some of the fields you should use `--include` followed by a path pattern as explained above. You can also include more than one pattern either by using the `--include` argument multiple times, or by using it with a comma-separated list of patterns. For example, the following two options are equivalent:
+For cherry-picking only some of the fields you should use `--include` followed by a path pattern as explained above. You can also include more than one pattern either by using the `--include` argument multiple times, or by using it with a comma-separated list of patterns. The following two options are equivalent:
 
 ```
 $ vt url http://www.virustotal.com --include=reputation --include=total_votes.*
@@ -233,4 +233,4 @@ $ vt url http://www.virustotal.com --include=**.result
         result: "clean"
 ```
 
-The `--exclude` options works very similarly to `--include` but instead of including the matching fields in the output, it includes everything except the matching fields. You can use this option when you want most of the information, but you want to leave out a few fields that are not interesting for you. If you use `--include` and `--exclude` simultaneuosly `--include` enters in action first, allowing to pass only the fields  that match the include patterns, while `--exclude` comes after that, removing any remaining field that matches the exclude patterns.
+The `--exclude` option works similarly to `--include` but instead of including the matching fields in the output, it includes everything except the matching fields. You can use this option when you want keep most of the fields, but leave out a few of them that are not interesting. If you use `--include` and `--exclude` simultaneuosly `--include` enters in action first, allowing to pass only the fields that match the include patterns, while `--exclude` comes in after that, removing any remaining field that matches the exclude patterns.
