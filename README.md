@@ -46,7 +46,7 @@ If you are going to use this tool frequently you may want to have command auto-c
 	```
 	$ vt completion bash > /etc/bash_completion.d/vt
 	```
-	
+
 * Mac OS X:
 	```
 	$ brew install bash-completion
@@ -66,12 +66,171 @@ If you are going to use this tool frequently you may want to have command auto-c
 	$ vt file 8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85
 	```
 
+* Get the analyses performed on a file:
+	```
+	$ vt file analyses 8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85
+	```
+
 * Download files given a list of hashes in a text file, one hash per line:
 	```
-	$ cat /path/list_of_hashes.txt | vt download -  
+	$ cat /path/list_of_hashes.txt | vt download -
 	```
-	
+
+* Get information about a URL:
+	```
+	$ vt url http://www.virustotal.com
+	```
+
+* Get the IP address that served a URL:
+	```
+	$ vt url last_serving_ip_address http://www.virustotal.com
+	```
+
 * Search for files:
 	```
-	$ vt search "positives:5+ type:pdf"  
+	$ vt search "positives:5+ type:pdf"
 	```
+
+## Getting only what you want
+
+When you ask for information about a file, URL, domain, IP address or any other object in VirusTotal, you get a lot of data (by default in YAML format) that is usually more than what you need. You can narrow down the information shown by the vt-cli tool by using the `--include` and `--exclude` command-line options (`-i` and `-x` in short form).
+
+These options accept patterns that are matched against the fields composing the data, and allow you to include only a subset of them, or exclude any field that is not interesting for you. Let's see how it works using the data we have about `http://www.virustotal.com` as an example:
+
+```
+- url <1db0ad7dbcec0676710ea0eaacd35d5e471d3e11944d53bcbd31f0cbd11bce31>:
+    first_submission_date: 1275391445  # 2010-06-01 13:24:05 +0200 CEST
+    last_analysis_date: 1532442650  # 2018-07-24 16:30:50 +0200 CEST
+    last_analysis_results:
+      ADMINUSLabs:
+        category: "harmless"
+        engine_name: "ADMINUSLabs"
+        method: "blacklist"
+        result: "clean"
+      AegisLab WebGuard:
+        category: "harmless"
+        engine_name: "AegisLab WebGuard"
+        method: "blacklist"
+        result: "clean"
+      AlienVault:
+        category: "harmless"
+        engine_name: "AlienVault"
+        method: "blacklist"
+        result: "clean"
+    last_http_response_code: 200
+    last_http_response_content_length: 7216
+    last_http_response_content_sha256: "7ed66734d9fb8c5a922fffd039c1cd5d85f8c2bb39d14803983528437852ba94"
+    last_http_response_headers:
+      age: "26"
+      cache-control: "public, max-age=60"
+      content-length: "7216"
+      content-type: "text/html"
+      date: "Tue, 24 Jul 2018 14:30:24 GMT"
+      etag: "\"bGPKJQ\""
+      expires: "Tue, 24 Jul 2018 14:31:24 GMT"
+      server: "Google Frontend"
+      x-cloud-trace-context: "131ac6cb5e2cdb7970d54ee42fd5ce4a"
+      x-frame-options: "DENY"
+    last_submission_date: 1532442650  # 2018-07-24 16:30:50 +0200 CEST
+    private: false
+    reputation: 1484
+    times_submitted: 213227
+    total_votes:
+      harmless: 660
+      malicious: 197
+```
+
+The data shown above can be retrieved with:
+
+```
+$ vt url http://www.virustotal.com
+```
+
+Notice that the returned data usually follows a hierarchical structure, with some top-level fields that may contain subfields which in turn can contain some more subfields. In the example above the `last_http_response_headers` field has subfields `age`, `cache-control`, `content-lengt` and so on, while `total_votes` has `harmless` and `malicious`. For refering to a particular field within the hierarchy we can use a path, similarly to how we identify a file in our computers, but in this case we are going to use a dot character (.) as the separator for path components, instead of the slashes (or backslashes) used by most file systems. The following ones are valid paths for our example structure:
+
+* `last_http_response_headers.age`
+* `total_votes.harmless`
+* `last_analysis_results.ADMINUSLabs.category`
+* `last_analysis_results.ADMINUSLabs.engine_name`
+
+The filters accepted by both `--include` and `--exclude` are paths in which we can use `*` and `**` has placeholders for one and many path elements respectively. For example `foo.*` matches `foo.bar` but not `foo.bar.baz`, while `foo.**` matches `foo.bar`, `foo.bar.baz` and `foo.bar.baz.qux`. In the other hand, `foo.*.qux` matches `foo.bar.qux` and `foo.baz.qux` but not `foo.bar.baz.qux`, while `foo.**.qux` matches
+`foo.bar.baz.qux` and any other path starting with `foo` and ending with `qux`.
+
+For cherry-picking only some of the fields you should use `--include` followed by a path pattern as explained above. You can also include more than one pattern either by using the `--include` argument multiple times, or by using it with a comma-separated list of patterns. For example, the following two options are equivalent:
+
+```
+$ vt url http://www.virustotal.com --include=reputation --include=total_votes.*
+$ vt url http://www.virustotal.com --include=reputation,total_votes.*
+```
+
+Here you have different examples with their outputs (assuming that `vt url http://www.virustotal.com` returns the structure shown above):
+
+```
+$ vt url http://www.virustotal.com --include=last_http_response_headers.age
+- url <1db0ad7dbcec0676710ea0eaacd35d5e471d3e11944d53bcbd31f0cbd11bce31>:
+    last_http_response_headers:
+      age: "26"
+```
+
+```
+$ vt url http://www.virustotal.com --include=last_http_response_headers.*
+- url <1db0ad7dbcec0676710ea0eaacd35d5e471d3e11944d53bcbd31f0cbd11bce31>:
+    last_http_response_headers:
+      age: "26"
+      cache-control: "public, max-age=60"
+      content-length: "7216"
+      content-type: "text/html"
+      date: "Tue, 24 Jul 2018 14:30:24 GMT"
+      etag: "\"bGPKJQ\""
+      expires: "Tue, 24 Jul 2018 14:31:24 GMT"
+      server: "Google Frontend"
+      x-cloud-trace-context: "131ac6cb5e2cdb7970d54ee42fd5ce4a"
+      x-frame-options: "DENY"
+```
+
+```
+$ vt url http://www.virustotal.com --include=last_analysis_results.**
+- url <1db0ad7dbcec0676710ea0eaacd35d5e471d3e11944d53bcbd31f0cbd11bce31>:
+    last_analysis_results:
+      ADMINUSLabs:
+        category: "harmless"
+        engine_name: "ADMINUSLabs"
+        method: "blacklist"
+        result: "clean"
+      AegisLab WebGuard:
+        category: "harmless"
+        engine_name: "AegisLab WebGuard"
+        method: "blacklist"
+        result: "clean"
+      AlienVault:
+        category: "harmless"
+        engine_name: "AlienVault"
+        method: "blacklist"
+        result: "clean"
+```
+
+```
+$ vt url http://www.virustotal.com --include=last_analysis_results.*.result
+- url <1db0ad7dbcec0676710ea0eaacd35d5e471d3e11944d53bcbd31f0cbd11bce31>:
+    last_analysis_results:
+      ADMINUSLabs:
+        result: "clean"
+      AegisLab WebGuard:
+        result: "clean"
+      AlienVault:
+        result: "clean"
+```
+
+```
+$ vt url http://www.virustotal.com --include=**.result
+- url <1db0ad7dbcec0676710ea0eaacd35d5e471d3e11944d53bcbd31f0cbd11bce31>:
+    last_analysis_results:
+      ADMINUSLabs:
+        result: "clean"
+      AegisLab WebGuard:
+        result: "clean"
+      AlienVault:
+        result: "clean"
+```
+
+The `--exclude` options works very similarly to `--include` but instead of including the matching fields in the output, it includes everything except the matching fields. You can use this option when you want most of the information, but you want to leave out a few fields that are not interesting for you. If you use `--include` and `--exclude` simultaneuosly `--include` enters in action first, allowing to pass only the fields  that match the include patterns, while `--exclude` comes after that, removing any remaining field that matches the exclude patterns.
