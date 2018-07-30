@@ -126,25 +126,19 @@ func ReadFile(filename string) ([]byte, error) {
 func PrintCommandLineWithCursor(cmd *cobra.Command, it *vt.Iterator) {
 	if cursor := it.Cursor(); cursor != "" {
 		args := cmd.Flags().Args()
-		cursorFound := false
 		for i, arg := range args {
-			if arg == "-c" {
-				args[i+1] = cursor
-				cursorFound = true
-				break
-			} else if strings.HasPrefix(arg, "--cursor=") {
-				args[i] = fmt.Sprintf("--cursor=%s", cursor)
-				cursorFound = true
-				break
-			}
 			args[i] = fmt.Sprintf("'%s'", arg)
 		}
-		if !cursorFound {
-			args = append(args, fmt.Sprintf("--cursor=%s", cursor))
-		}
+		flags := make([]string, 0)
+		cmd.Flags().Visit(func(flag *pflag.Flag) {
+			if flag.Name != "cursor" {
+				flags = append(flags, fmt.Sprintf("--%s=%v", flag.Name, flag.Value.String()))
+			}
+		})
+		flags = append(flags, fmt.Sprintf("--cursor=%s", cursor))
 		color.New(color.Faint).Fprintf(
-			ansi.NewAnsiStderr(), "\nMORE WITH:\n%s %s\n",
-			cmd.CommandPath(), strings.Join(args, " "))
+			ansi.NewAnsiStderr(), "\nMORE WITH:\n%s %s %s\n",
+			cmd.CommandPath(), strings.Join(args, " "), strings.Join(flags, " "))
 	}
 }
 
