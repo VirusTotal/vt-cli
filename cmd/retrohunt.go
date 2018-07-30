@@ -24,7 +24,6 @@ import (
 
 	humanize "github.com/dustin/go-humanize"
 
-	"github.com/VirusTotal/vt-cli/yaml"
 	"github.com/VirusTotal/vt-go/vt"
 	"github.com/gosuri/uitable"
 	"github.com/spf13/cobra"
@@ -244,21 +243,25 @@ func NewRetrohuntDeleteCmd() *cobra.Command {
 
 // NewRetrohuntMatchesCmd returns a new instance of the 'matches' command.
 func NewRetrohuntMatchesCmd() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "matches [job id]",
 		Short: "Get matches for a retrohunt job",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := NewAPIClient()
+			p, err := NewObjectPrinter(cmd)
 			if err != nil {
 				return err
 			}
-			matches := make([]map[string]interface{}, 0)
-			url := vt.URL("intelligence/retrohunt_jobs/%s/matches", args[0])
-			client.GetData(url, &matches)
-			return yaml.NewColorEncoder(os.Stdout, colorScheme).Encode(matches)
+			return p.PrintCollection(vt.URL("intelligence/retrohunt_jobs/%s/matching_files", args[0]))
 		},
 	}
+
+	addIncludeExcludeFlags(cmd.Flags())
+	addIDOnlyFlag(cmd.Flags())
+	addLimitFlag(cmd.Flags())
+	addCursorFlag(cmd.Flags())
+
+	return cmd
 }
 
 // NewRetrohuntCmd returns a new instance of the 'retrohunt' command.
