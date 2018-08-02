@@ -28,6 +28,11 @@ $ dep ensure
 $ make install
 ```
 
+### A note on Window's console
+
+If you plan to use vt-cli in Windows on a regular basis we highly recommend you to avoid the standard Windows's console and use Cygwin(https://www.cygwin.com/) instead. The Windows's console is *very* slow when printing large amounts of text (as vt-cli usually does) while Cygwin performs much better. Additionally you can benefit of Cygwin's support for command auto-completion, a handy feature that Window's console doesn't offer. In order to take advantage of auto-completion make sure to include the `bash-completion` package while installing Cygwin.
+
+
 ### Configuring your API key
 
 Once you have installed the vt-cli tool you may want to configure it with your API key. This is not strictly necessary, as you can provide your API key every time you invoke the tool by using the `--apikey` option (`-k` in short form), but that's a bit of a hassle if you are going to use the tool frequently (and we bet you'll do!). For configuring your API key just type:
@@ -58,6 +63,15 @@ If you are going to use this tool frequently you may want to have command auto-c
 	. $(brew --prefix)/etc/bash_completion
 	fi
 	```
+
+* Cygwin:
+
+  Make sure the `bash-completion` package is installed (Cygwin doesn't installed it by default) and type:
+  ```
+	$ vt completion bash > /usr/share/bash-completion/completions/vt
+	```
+
+:heavy_exclamation_mark: You may need to restart your shell in order for autocompletion to start working.
 
 ## Usage examples
 
