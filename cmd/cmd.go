@@ -132,7 +132,15 @@ func PrintCommandLineWithCursor(cmd *cobra.Command, it *vt.Iterator) {
 		flags := make([]string, 0)
 		cmd.Flags().Visit(func(flag *pflag.Flag) {
 			if flag.Name != "cursor" {
-				flags = append(flags, fmt.Sprintf("--%s=%v", flag.Name, flag.Value.String()))
+				var f string
+				switch flag.Value.Type() {
+				case "stringSlice":
+					ss, _ := cmd.Flags().GetStringSlice(flag.Name)
+					f = fmt.Sprintf("--%s='%s'", flag.Name, strings.Join(ss, ","))
+				default:
+					f = fmt.Sprintf("--%s=%v", flag.Name, flag.Value.String())
+				}
+				flags = append(flags, f)
 			}
 		})
 		flags = append(flags, fmt.Sprintf("--cursor=%s", cursor))
