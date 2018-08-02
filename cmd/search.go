@@ -134,6 +134,7 @@ func (m *matchPrinter) Do(fileObj interface{}, ds *utils.DoerState) string {
 		var s string
 		confidence := f.ContextAttributes["confidence"].(float64)
 		snippetID := f.ContextAttributes["snippet"].(string)
+		inSubFile := f.ContextAttributes["match_in_subfile"].(bool)
 		snippets := make([]string, 0)
 		_, err := m.client.GetData(vt.URL("intelligence/search/snippets/%s", snippetID), &snippets)
 		if err == nil {
@@ -144,8 +145,8 @@ func (m *matchPrinter) Do(fileObj interface{}, ds *utils.DoerState) string {
 			s = "<no snippet available>"
 		}
 		line = fmt.Sprintf(
-			"%s\n\nsha256  : %s\nscore   : %03.1f \n\n%s\n",
-			strings.Repeat("_", 76), f.ID, confidence, s)
+			"%s\n\nsha256  : %s\nscore   : %03.1f \nsubfile : %v\n\n%s\n",
+			strings.Repeat("_", 76), f.ID, confidence, inSubFile, s)
 	}
 	return line
 }
