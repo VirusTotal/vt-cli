@@ -105,10 +105,10 @@ func addVerboseFlag(flags *pflag.FlagSet) {
 		"verbose output")
 }
 
-func addYAMLFlag(flags *pflag.FlagSet) {
+func addTableFlag(flags *pflag.FlagSet) {
 	flags.BoolP(
-		"yaml", "y", false,
-		"output in YAML format")
+		"table", "T", false,
+		"output in table format")
 }
 
 // ReadFile reads the specified file and returns its content. If filename is "-"

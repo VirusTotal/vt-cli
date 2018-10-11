@@ -127,14 +127,14 @@ func NewRetrohuntListCmd() *cobra.Command {
 		Long:    `List retrohunt jobs.`,
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if viper.GetBool("yaml") {
-				p, err := NewObjectPrinter(cmd)
-				if err != nil {
-					return err
-				}
-				return p.PrintCollection(vt.URL("intelligence/retrohunt_jobs"))
+			if viper.GetBool("table") {
+				return retrohuntListTable(cmd)
 			}
-			return retrohuntListTable(cmd)
+			p, err := NewObjectPrinter(cmd)
+			if err != nil {
+				return err
+			}
+			return p.PrintCollection(vt.URL("intelligence/retrohunt_jobs"))
 		},
 	}
 
@@ -142,7 +142,7 @@ func NewRetrohuntListCmd() *cobra.Command {
 	addFilterFlag(cmd.Flags())
 	addLimitFlag(cmd.Flags())
 	addCursorFlag(cmd.Flags())
-	addYAMLFlag(cmd.Flags())
+	addTableFlag(cmd.Flags())
 
 	return cmd
 }
