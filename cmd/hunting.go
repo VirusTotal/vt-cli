@@ -14,6 +14,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -21,30 +22,55 @@ import (
 
 	"github.com/VirusTotal/vt-go/vt"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
-var notificationsPurgeCmdHelp = `Delete all hunting notifications.
+var notificationsDeleteCmdHelp = `Delete hunting notifications.
 
-This command deletes all the malware hunting notifications associated to the
+This command deletes the malware hunting notifications associated to the
 currently configured API key.`
 
-// NewHuntingNotificationsPurgeCmd returns a command for deleting all hunting
+// NewHuntingNotificationsDeleteCmd returns a command for deleting all hunting
 // notifications for the current user.
-func NewHuntingNotificationsPurgeCmd() *cobra.Command {
+func NewHuntingNotificationsDeleteCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "purge",
-		Short: "Delete all hunting notifications",
-		Long:  notificationsPurgeCmdHelp,
-
+		Use:   "delete [notification id]...",
+		Short: "Delete hunting notifications",
+		Long:  notificationsDeleteCmdHelp,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			deleteAll := viper.GetBool("all")
+			deleteTag := viper.GetString("with-tag")
+			if len(args) == 0 && !deleteAll && deleteTag == "" {
+				return errors.New("Specify notification id or use --all or --with-tag")
+			}
 			client, err := NewAPIClient()
 			if err != nil {
 				return err
 			}
-			_, err = client.Delete(vt.URL("intelligence/hunting_notifications"))
-			return err
+			if deleteAll {
+				_, err = client.Delete(vt.URL("intelligence/hunting_notifications"))
+			} else if deleteTag != "" {
+				_, err = client.Delete(vt.URL("intelligence/hunting_notifications?tag=%s", deleteTag))
+			} else {
+				var wg sync.WaitGroup
+				for _, arg := range args {
+					wg.Add(1)
+					go func(notificationID string) {
+						url := vt.URL("intelligence/hunting_notifications/%s", notificationID)
+						if _, err := client.Delete(url); err != nil {
+							fmt.Fprintf(os.Stderr, "%v\n", err)
+						}
+						wg.Done()
+					}(arg)
+				}
+				wg.Wait()
+			}
+			return nil
 		},
 	}
+
+	cmd.Flags().BoolP("all", "a", false, "delete all notifications")
+	cmd.Flags().StringP("with-tag", "t", "", "delete notifications with a given tag")
 
 	return cmd
 }
@@ -76,7 +102,7 @@ func NewHuntingNotificationsListCmd() *cobra.Command {
 	addLimitFlag(cmd.Flags())
 	addCursorFlag(cmd.Flags())
 
-	cmd.AddCommand(NewHuntingNotificationsPurgeCmd())
+	cmd.AddCommand(NewHuntingNotificationsDeleteCmd())
 
 	return cmd
 }
@@ -90,7 +116,7 @@ func NewHuntingNotificationsCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(NewHuntingNotificationsListCmd())
-	cmd.AddCommand(NewHuntingNotificationsPurgeCmd())
+	cmd.AddCommand(NewHuntingNotificationsDeleteCmd())
 
 	return cmd
 }
@@ -216,7 +242,6 @@ func NewHuntingRulesetsDeleteCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-
 			var wg sync.WaitGroup
 			for _, arg := range args {
 				wg.Add(1)
@@ -228,7 +253,6 @@ func NewHuntingRulesetsDeleteCmd() *cobra.Command {
 					wg.Done()
 				}(arg)
 			}
-
 			wg.Wait()
 			return nil
 		},
