@@ -30,7 +30,7 @@ the standard input, one per line.`
 
 var analysisCmdExample = `  vt analysis f-e04b82f7f8afc6e599d4913bee5eb571921ec8958d1ea5e3bbffe9c7ea9a0960-1542306475
   vt analysis u-1db0ad7dbcec0676710ea0eaacd35d5e471d3e11944d53bcbd31f0cbd11bce31-1542292491
-  cat list_of_analysis_ids | vt analysis`
+  cat list_of_analysis_ids | vt analysis -`
 
 // NewAnalysisCmd returns a new instance of the 'analysis' command.
 func NewAnalysisCmd() *cobra.Command {
@@ -40,6 +40,7 @@ func NewAnalysisCmd() *cobra.Command {
 		Short:   "Get a file or URL analysis",
 		Long:    analysisCmdHelp,
 		Example: analysisCmdExample,
+		Args:    cobra.MinimumNArgs(1),
 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			re, _ := regexp.Compile(`(f|u)-[[:xdigit:]]{64}-\d+|[\d\w=]{20,}`)
