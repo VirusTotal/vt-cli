@@ -28,9 +28,8 @@ appear in the command line.
 If the identifiers are not provided in the command line they will be read from
 the standard input, one per line.`
 
-var analysisCmdExample = `  vt analysis 8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d8
-  vt analysis 76cdb2bad9582d23c1f6f4d868218d6c
-  vt analysis 76cdb2bad9582d23c1f6f4d868218d6c 44d88612fea8a8f36de82e1278abb02f
+var analysisCmdExample = `  vt analysis f-e04b82f7f8afc6e599d4913bee5eb571921ec8958d1ea5e3bbffe9c7ea9a0960-1542306475
+  vt analysis u-1db0ad7dbcec0676710ea0eaacd35d5e471d3e11944d53bcbd31f0cbd11bce31-1542292491
   cat list_of_analysis_ids | vt analysis`
 
 // NewAnalysisCmd returns a new instance of the 'analysis' command.
