@@ -15,6 +15,7 @@ package cmd
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"path"
 	"regexp"
@@ -57,6 +58,9 @@ Loop:
 		case <-t.C:
 			callback(resp)
 		case <-resp.Done:
+			if resp.HTTPResponse.StatusCode != http.StatusOK {
+				return fmt.Errorf("error downloading file: %d", resp.HTTPResponse.StatusCode)
+			}
 			callback(resp)
 			break Loop
 		}
