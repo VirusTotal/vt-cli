@@ -108,7 +108,7 @@ func retrohuntListTable(cmd *cobra.Command) error {
 			status,
 			eta,
 			humanize.Bytes(uint64(job.Attributes["scanned_bytes"].(int64))),
-			humanize.Comma(job.Attributes["total_matches"].(int64)),
+			humanize.Comma(job.Attributes["num_matches"].(int64)),
 			rules)
 	}
 
