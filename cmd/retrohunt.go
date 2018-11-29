@@ -84,8 +84,8 @@ func retrohuntListTable(cmd *cobra.Command) error {
 		}
 
 		eta := "-"
-		if e, ok := job.Attributes["eta"].(int64); ok {
-			eta = fmt.Sprintf("%ds", e)
+		if e, ok := job.Attributes["eta_seconds"].(int64); ok {
+			eta = time.Duration(e * 1000000000).String()
 		}
 
 		matches := rulesPattern.FindAllStringSubmatch(job.Attributes["rules"].(string), 5)
