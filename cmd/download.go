@@ -59,7 +59,7 @@ Loop:
 			callback(resp)
 		case <-resp.Done:
 			if resp.HTTPResponse.StatusCode != http.StatusOK {
-				return fmt.Errorf("error downloading file: %d", resp.HTTPResponse.StatusCode)
+				return fmt.Errorf("http error: %d", resp.HTTPResponse.StatusCode)
 			}
 			callback(resp)
 			break Loop
@@ -95,8 +95,7 @@ func (d *downloader) Do(file interface{}, ds *utils.DoerState) string {
 		if apiErr, ok := err.(vt.Error); ok && apiErr.Code == "NotFoundError" {
 			msg = color.RedString("not found")
 		} else {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
+			msg = color.RedString(err.Error())
 		}
 	}
 
