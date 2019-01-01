@@ -66,8 +66,8 @@ If you are going to use this tool frequently you may want to have command auto-c
 
 * Cygwin:
 
-  Make sure the `bash-completion` package is installed (Cygwin doesn't installed it by default) and type:
-  ```
+	Make sure the `bash-completion` package is installed (Cygwin doesn't installed it by default) and type:
+	```
 	$ vt completion bash > /usr/share/bash-completion/completions/vt
 	```
 
@@ -75,14 +75,30 @@ If you are going to use this tool frequently you may want to have command auto-c
 
 ## Usage examples
 
-* Get information about a file:
+* Get information about a file from the result of its most recent analysis:
 	```
 	$ vt file 8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85
 	```
 
-* Get the analyses performed on a file:
+* Get a specific analyses report for a file:
 	```
-	$ vt file analyses 8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85
+	$ # File analysis IDs can be given as `f-<file_SHA256_hash>-<UNIX timestamp>`...
+	$ vt analysis f-8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85-1546309359
+	$ # ...or as a Base64 encoded string, retrieved from the `vt scan file` command:
+	$ vt scan file test.txt
+	test.txt MDJiY2FiZmZmZmQxNmZlMGZjMjUwZjA4Y2FkOTVlMGM6MTU0NjQ1NDUyMA==
+	$ vt analysis MDJiY2FiZmZmZmQxNmZlMGZjMjUwZjA4Y2FkOTVlMGM6MTU0NjQ1NDUyMA==
+	- analysis <MDJiY2FiZmZmZmQxNmZlMGZjMjUwZjA4Y2FkOTVlMGM6MTU0NjQ1NDUyMA==>:
+	    date: 1546454520  # 2019-01-02 13:42:00 -0500 EST
+	    stats:
+	      failure: 0
+	      harmless: 0
+	      malicious: 0
+	      suspicious: 0
+	      timeout: 0
+	      type-unsupported: 0
+	      undetected: 0
+	    status: "queued"
 	```
 
 * Download files given a list of hashes in a text file, one hash per line:
