@@ -153,7 +153,7 @@ This command receives a file containing YARA rules and starts a retrohunt job wi
 
 // NewRetrohuntStartCmd returns a new instance of the 'start' command.
 func NewRetrohuntStartCmd() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "start [file]",
 		Short: "Start a retrohunt job",
 		Long:  retrohuntStartCmdHelp,
@@ -180,6 +180,32 @@ func NewRetrohuntStartCmd() *cobra.Command {
 
 			obj.Attributes["rules"] = string(rules)
 
+			before := viper.GetString("before")
+			after := viper.GetString("after")
+
+			var timeRange map[string]int64
+
+			if before != "" || after != "" {
+				timeRange = make(map[string]int64)
+				obj.Attributes["time_range"] = timeRange
+			}
+
+			if after != "" {
+				if t, err := time.Parse("2006-01-02", after); err == nil {
+					timeRange["start"] = t.Unix()
+				} else {
+					return err
+				}
+			}
+
+			if before != "" {
+				if t, err := time.Parse("2006-01-02", before); err == nil {
+					timeRange["end"] = t.Unix()
+				} else {
+					return err
+				}
+			}
+
 			err = client.CreateObject(vt.URL("intelligence/retrohunt_jobs"), obj)
 			if err != nil {
 				return err
@@ -189,6 +215,16 @@ func NewRetrohuntStartCmd() *cobra.Command {
 			return nil
 		},
 	}
+
+	cmd.Flags().String(
+		"before", "",
+		"scan files sent to VirusTotal before the given date (format: YYYY-MM-DD)")
+
+	cmd.Flags().String(
+		"after", "",
+		"scan files sent to VirusTotal after the given date (format: YYYY-MM-DD)")
+
+	return cmd
 }
 
 // NewRetrohuntAbortCmd returns a new instance of the 'abort' command.
