@@ -14,6 +14,7 @@
 package cmd
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"os"
@@ -65,7 +66,7 @@ func NewHuntingNotificationsDeleteCmd() *cobra.Command {
 				}
 				wg.Wait()
 			}
-			return nil
+			return err
 		},
 	}
 
@@ -231,32 +232,49 @@ func NewHuntingRulesetsSetLimitCmd() *cobra.Command {
 
 // NewHuntingRulesetsDeleteCmd returns a command for deleting a given ruleset.
 func NewHuntingRulesetsDeleteCmd() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Aliases: []string{"del", "rm"},
 		Use:     "delete [ruleset id]...",
 		Short:   "Delete rulesets",
-		Args:    cobra.MinimumNArgs(1),
 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := NewAPIClient()
 			if err != nil {
 				return err
 			}
-			var wg sync.WaitGroup
-			for _, arg := range args {
-				wg.Add(1)
-				go func(rulesetID string) {
-					url := vt.URL("intelligence/hunting_rulesets/%s", rulesetID)
-					if _, err := client.Delete(url); err != nil {
-						fmt.Fprintf(os.Stderr, "%v\n", err)
-					}
-					wg.Done()
-				}(arg)
+			deleteAll := viper.GetBool("all")
+			if len(args) == 0 && !deleteAll {
+				return errors.New("Specify ruleset id or use --all")
 			}
-			wg.Wait()
-			return nil
+			if deleteAll {
+				fmt.Print("Enter your VirusTotal username to confirm: ")
+				scanner := bufio.NewScanner(os.Stdin)
+				scanner.Scan()
+				username := scanner.Text()
+				_, err = client.Delete(
+					vt.URL("intelligence/hunting_rulesets"),
+					vt.WithHeader("x-confirm-delete", username))
+			} else {
+				var wg sync.WaitGroup
+				for _, arg := range args {
+					wg.Add(1)
+					go func(rulesetID string) {
+						url := vt.URL("intelligence/hunting_rulesets/%s", rulesetID)
+						if _, err := client.Delete(url); err != nil {
+							fmt.Fprintf(os.Stderr, "%v\n", err)
+						}
+						wg.Done()
+					}(arg)
+				}
+				wg.Wait()
+			}
+			return err
 		},
 	}
+
+	cmd.Flags().BoolP("all", "a", false, "delete all rulesets")
+
+	return cmd
 }
 
 // NewHuntingRulesetsAddCmd returns a command for adding a new ruleset.
