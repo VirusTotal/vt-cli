@@ -183,9 +183,12 @@ func runContentSearchCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	query := fmt.Sprintf("content:%s", args[0])
+	terms := make([]string, len(args))
+	for i, arg := range args {
+		terms[i] = fmt.Sprintf("content:%s", arg)
+	}
 
-	it, err := client.Search(query, opts)
+	it, err := client.Search(strings.Join(terms, " "), opts)
 	if err != nil {
 		return err
 	}
@@ -222,7 +225,7 @@ var cmdContentSearchExample = `  vt search content '{cafebabe}'
 func NewContentSearchCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
-		Args:    cobra.ExactArgs(1),
+		Args:    cobra.MinimumNArgs(1),
 		Use:     "content [query]",
 		Short:   "Search for patterns within files in VirusTotal Intelligence",
 		Long:    cmdContentSearchHelp,
