@@ -18,6 +18,7 @@ import (
 	"io"
 	"reflect"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -112,10 +113,19 @@ func (enc *Encoder) encodeMap(m reflect.Value, indent int, prefix string) (err e
 			return err
 		}
 		ks := k.String()
+		vt := vk.Elem().Type()
+		// If key is "date" or ends with "_date" and value is json.Number, this
+		// field is a date.
 		isDate := (ks == "date" || strings.HasSuffix(ks, "_date")) &&
-			vk.Elem().Kind() == reflect.Int64
+			vt.Name() == "Number" && vt.PkgPath() == "encoding/json"
+		// If this field is a date let's add a comment with the date in a
+		// human-readable format.
 		if isDate {
-			commentPrinter(enc.w, "  # %v ", time.Unix(vk.Elem().Int(), 0))
+			ts, err := strconv.ParseInt(vk.Elem().String(), 10, 64)
+			if err != nil {
+				panic(err)
+			}
+			commentPrinter(enc.w, "  # %v ", time.Unix(ts, 0))
 		}
 		if i < n-1 {
 			err = enc.lineBreak(indent)
@@ -171,7 +181,12 @@ func (enc *Encoder) encodeValue(v reflect.Value, indent int, prefix string) (err
 		}
 	case reflect.String:
 		s := v.String()
-		if strings.Contains(s, "\n") {
+		t := v.Type()
+		switch {
+		case t.PkgPath() == "encoding/json" && t.Name() == "Number":
+			// This string is a actually a json.Number.
+			_, err = enc.Colors.ValueColor.Fprintf(enc.w, "%s", s)
+		case strings.Contains(s, "\n"):
 			// If string contains new line characters lets encode it as a
 			// literal block. Example:
 			// literal_block : |
@@ -183,7 +198,7 @@ func (enc *Encoder) encodeValue(v reflect.Value, indent int, prefix string) (err
 				enc.lineBreak(2 + indent)
 				enc.Colors.ValueColor.Fprintf(enc.w, "%s", line)
 			}
-		} else {
+		default:
 			_, err = enc.Colors.ValueColor.Fprintf(enc.w, "%#v", v)
 		}
 	default:

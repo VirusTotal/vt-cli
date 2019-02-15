@@ -14,6 +14,7 @@ package yaml
 
 import (
 	"bytes"
+	"encoding/json"
 	"strings"
 	"testing"
 
@@ -49,16 +50,28 @@ var tests = []T{
 		`),
 	},
 	{
+		data: json.Number("1"),
+		yaml: Y(`
+			1
+		`),
+	},
+	{
+		data: json.Number("1.0"),
+		yaml: Y(`
+			1.0
+		`),
+	},
+	{
 		data: false,
 		yaml: Y(`
 			false
-			`),
+		`),
 	},
 	{
 		data: true,
 		yaml: Y(`
 			true
-			`),
+		`),
 	},
 	{
 		data: map[string]string{},
@@ -165,5 +178,4 @@ func TestYAML(t *testing.T) {
 	enc.IndentSize = 1
 	assert.NoError(t, enc.Encode(tests[5].data))
 	assert.Equal(t, tests[5].yaml, b.String())
-
 }
