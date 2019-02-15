@@ -14,6 +14,8 @@
 package cmd
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -23,6 +25,7 @@ import (
 
 	"github.com/VirusTotal/vt-cli/utils"
 	"github.com/VirusTotal/vt-go/vt"
+	"github.com/briandowns/spinner"
 	"github.com/cavaliercoder/grab"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -32,21 +35,15 @@ import (
 type downloadCallback func(grabResp *grab.Response)
 
 // downloadFile downloads a file given a hash (SHA-256, SHA-1 or MD5)
-func downloadFile(client *utils.APIClient, hash string, callback downloadCallback) error {
-	var downloadURL string
+func downloadFile(client *utils.APIClient, downloadURL, dstPath string, callback downloadCallback) error {
 
-	// Get download URL
-	u := vt.URL("files/%s/download_url", hash)
-	if _, err := client.GetData(u, &downloadURL); err != nil {
-		return err
-	}
-
-	// We have the download URL, let's grab the file
 	c := grab.NewClient()
-	req, err := grab.NewRequest(path.Join(viper.GetString("output"), hash), downloadURL)
+	req, err := grab.NewRequest(dstPath, downloadURL)
 	if err != nil {
 		return err
 	}
+
+	req.HTTPRequest.Header.Add("x-apikey", client.APIKey)
 
 	resp := c.Do(req)
 	t := time.NewTicker(500 * time.Millisecond)
@@ -68,6 +65,8 @@ Loop:
 	return nil
 }
 
+// Standard downloader, it implements the Doer interface and downloads
+// individual files.
 type downloader struct {
 	client *utils.APIClient
 }
@@ -82,13 +81,21 @@ func (d *downloader) Do(file interface{}, ds *utils.DoerState) string {
 	}
 
 	ds.Progress = fmt.Sprintf("%s %4.1f%%", hash, 0.0)
-	err := downloadFile(d.client, hash, func(resp *grab.Response) {
-		progress := 100 * resp.Progress()
-		if progress < 100 {
-			ds.Progress = fmt.Sprintf("%s %4.1f%% %6.1f KBi/s",
-				hash, progress, resp.BytesPerSecond()/1024)
-		}
-	})
+
+	// Get download URL
+	var downloadURL string
+	_, err := d.client.GetData(vt.URL("files/%s/download_url", hash), &downloadURL)
+
+	if err == nil {
+		dstPath := path.Join(viper.GetString("output"), hash)
+		err = downloadFile(d.client, downloadURL, dstPath, func(resp *grab.Response) {
+			progress := 100 * resp.Progress()
+			if progress < 100 {
+				ds.Progress = fmt.Sprintf("%s %4.1f%% %6.1f KBi/s",
+					hash, progress, resp.BytesPerSecond()/1024)
+			}
+		})
+	}
 
 	msg := color.GreenString("ok")
 	if err != nil {
@@ -100,6 +107,72 @@ func (d *downloader) Do(file interface{}, ds *utils.DoerState) string {
 	}
 
 	return fmt.Sprintf("%s [%s]", hash, msg)
+}
+
+// ZIP downloader, uses the API for creating ZIP files in the backend.
+type zipDownloader struct {
+	client *utils.APIClient
+}
+
+func (z *zipDownloader) Download(hashes utils.StringReader, password string) error {
+
+	spin := spinner.New(spinner.CharSets[6], 250*time.Millisecond)
+	spin.Color("green")
+	spin.Suffix = " creating ZIP..."
+	spin.Start()
+	defer spin.Stop()
+
+	hashList := make([]string, 0)
+	for hash, err := hashes.ReadString(); err == nil; hash, err = hashes.ReadString() {
+		hashList = append(hashList, hash)
+	}
+
+	req := struct {
+		Hashes   []string `json:"hashes,omitempty"`
+		Password string   `json:"password,omitempty"`
+	}{
+		Hashes:   hashList,
+		Password: password,
+	}
+
+	resp, err := z.client.PostData(vt.URL("intelligence/zip_files"), &req)
+	if err != nil {
+		return err
+	}
+
+	var obj *vt.Object
+	if err := json.Unmarshal(resp.Data, &obj); err != nil {
+		return err
+	}
+
+	for obj.Attributes["status"] != "finished" {
+		obj, err = z.client.GetObject(vt.URL("intelligence/zip_files/%s", obj.ID))
+		if err != nil {
+			return err
+		}
+		switch status, _ := obj.GetAttributeString("status"); status {
+		case "error-starting":
+			return errors.New("Error starting ZIP file creation")
+		case "error-creating":
+			return errors.New("Error creating ZIP file")
+		case "timeout":
+			return errors.New("ZIP file creation is taking too long")
+		}
+		progress, _ := obj.GetAttributeFloat64("progress")
+		spin.Suffix = fmt.Sprintf(" creating ZIP... %2.0f%%", progress*100)
+		time.Sleep(2 * time.Second)
+	}
+
+	url := vt.URL("intelligence/zip_files/%s/download", obj.ID)
+	dstPath := viper.GetString("output")
+
+	err = downloadFile(z.client, url.String(), dstPath, func(resp *grab.Response) {
+		spin.Suffix = fmt.Sprintf(
+			" downloading ZIP %4.1f%% %6.1f KBi/s",
+			resp.Progress()*100, resp.BytesPerSecond()/1024)
+	})
+
+	return err
 }
 
 var downloadCmdHelp = `Download one or more files.
@@ -127,7 +200,6 @@ func NewDownloadCmd() *cobra.Command {
 		Args:    cobra.MinimumNArgs(1),
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			c := utils.NewCoordinator(viper.GetInt("threads"))
 			var argReader utils.StringReader
 			if len(args) == 1 && args[0] == "-" {
 				argReader = utils.NewStringIOReader(os.Stdin)
@@ -138,12 +210,21 @@ func NewDownloadCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			d := &downloader{client: client}
 			re, _ := regexp.Compile(`^([[:xdigit:]]{64}|[[:xdigit:]]{40}|[[:xdigit:]]{32})$`)
-			c.DoWithStringsFromReader(d, utils.NewFilteredStringReader(argReader, re))
-			return nil
+			hashes := utils.NewFilteredStringReader(argReader, re)
+			if viper.GetBool("zip") {
+				z := zipDownloader{client}
+				err = z.Download(hashes, viper.GetString("zip-password"))
+			} else {
+				c := utils.NewCoordinator(viper.GetInt("threads"))
+				c.DoWithStringsFromReader(&downloader{client}, hashes)
+			}
+			return err
 		},
 	}
+
+	cmd.Flags().BoolP("zip", "z", false, "download in a ZIP file")
+	cmd.Flags().String("zip-password", "", "password for the ZIP file, used with --zip")
 
 	addThreadsFlag(cmd.Flags())
 	addOutputFlag(cmd.Flags())
