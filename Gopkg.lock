@@ -5,7 +5,7 @@
   branch = "master"
   name = "github.com/VirusTotal/vt-go"
   packages = ["vt"]
-  revision = "4fe9197a5f85c8a088e5da6fd28ff386257043a2"
+  revision = "93b698c477f5de2198888d1cc693520d7727d27e"
 
 [[projects]]
   name = "github.com/briandowns/spinner"
@@ -209,7 +209,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "e77772198cdc3dbfcf7f2de96630204df9fd3a0b"
+  revision = "d0b11bdaac8adb652bff00e49bcacf992835621a"
 
 [[projects]]
   name = "golang.org/x/text"
