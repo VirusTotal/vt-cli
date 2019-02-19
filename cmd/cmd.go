@@ -32,7 +32,7 @@ import (
 
 	"github.com/VirusTotal/vt-cli/utils"
 	"github.com/VirusTotal/vt-cli/yaml"
-	"github.com/VirusTotal/vt-go/vt"
+	vt "github.com/VirusTotal/vt-go"
 )
 
 var colorScheme = yaml.Colors{

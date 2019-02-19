@@ -4,8 +4,8 @@
 [[projects]]
   branch = "master"
   name = "github.com/VirusTotal/vt-go"
-  packages = ["vt"]
-  revision = "93b698c477f5de2198888d1cc693520d7727d27e"
+  packages = ["."]
+  revision = "e074d0fcc32925058736d82dd1eb2dbff5172ca8"
 
 [[projects]]
   name = "github.com/briandowns/spinner"
@@ -209,7 +209,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "d0b11bdaac8adb652bff00e49bcacf992835621a"
+  revision = "153ac476189d567564fda94622d7a8c0fb338f6b"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -233,6 +233,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "791666f6bf45a20d0398aa0dd4fa60430debc4da9035b392d82fad17436b0d0b"
+  inputs-digest = "e8cabc55feb43e566d388cc7ace87dadd588df77c08444b03aec73e06a0e0273"
   solver-name = "gps-cdcl"
   solver-version = 1

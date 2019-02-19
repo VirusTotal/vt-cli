@@ -22,7 +22,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/VirusTotal/vt-go/vt"
+	vt "github.com/VirusTotal/vt-go"
 	"github.com/briandowns/spinner"
 	"github.com/plusvic/go-ansi"
 )

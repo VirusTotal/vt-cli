@@ -21,7 +21,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/VirusTotal/vt-go/vt"
+	vt "github.com/VirusTotal/vt-go"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 )

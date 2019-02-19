@@ -24,7 +24,7 @@ import (
 
 	humanize "github.com/dustin/go-humanize"
 
-	"github.com/VirusTotal/vt-go/vt"
+	vt "github.com/VirusTotal/vt-go"
 	"github.com/gosuri/uitable"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

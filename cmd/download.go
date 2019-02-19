@@ -24,7 +24,7 @@ import (
 	"time"
 
 	"github.com/VirusTotal/vt-cli/utils"
-	"github.com/VirusTotal/vt-go/vt"
+	vt "github.com/VirusTotal/vt-go"
 	"github.com/briandowns/spinner"
 	"github.com/cavaliercoder/grab"
 	"github.com/fatih/color"

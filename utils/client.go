@@ -19,7 +19,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/VirusTotal/vt-go/vt"
+	vt "github.com/VirusTotal/vt-go"
 	"github.com/spf13/viper"
 )
 

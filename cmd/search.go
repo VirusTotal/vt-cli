@@ -21,7 +21,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/VirusTotal/vt-cli/utils"
-	"github.com/VirusTotal/vt-go/vt"
+	vt "github.com/VirusTotal/vt-go"
 	"github.com/spf13/cobra"
 )
 
