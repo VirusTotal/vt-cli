@@ -51,18 +51,18 @@ func runSearchCmd(cmd *cobra.Command, args []string) error {
 		batchSize = viper.GetInt("limit")
 	}
 
-	opts := vt.SearchOptions{}
-	opts.Limit = viper.GetInt("limit")
-	opts.Cursor = viper.GetString("cursor")
-	opts.BatchSize = batchSize
-	opts.DescriptorsOnly = viper.GetBool("identifiers-only") || viper.GetBool("download")
-
 	client, err := NewAPIClient()
 	if err != nil {
 		return err
 	}
 
-	it, err := client.Search(args[0], opts)
+	it, err := client.Search(args[0],
+		vt.WithLimit(viper.GetInt("limit")),
+		vt.WithCursor(viper.GetString("cursor")),
+		vt.WithBatchSize(batchSize),
+		vt.WithDescriptorsOnly(
+			viper.GetBool("identifiers-only") || viper.GetBool("download")))
+
 	if err != nil {
 		return err
 	}
@@ -172,12 +172,6 @@ func runContentSearchCmd(cmd *cobra.Command, args []string) error {
 		batchSize = viper.GetInt("limit")
 	}
 
-	opts := vt.SearchOptions{}
-	opts.Limit = viper.GetInt("limit")
-	opts.Cursor = viper.GetString("cursor")
-	opts.BatchSize = batchSize
-	opts.DescriptorsOnly = viper.GetBool("identifiers-only") || viper.GetBool("download")
-
 	client, err := NewAPIClient()
 	if err != nil {
 		return err
@@ -188,7 +182,13 @@ func runContentSearchCmd(cmd *cobra.Command, args []string) error {
 		terms[i] = fmt.Sprintf("content:%s", arg)
 	}
 
-	it, err := client.Search(strings.Join(terms, " "), opts)
+	it, err := client.Search(strings.Join(terms, " "),
+		vt.WithLimit(viper.GetInt("limit")),
+		vt.WithCursor(viper.GetString("cursor")),
+		vt.WithBatchSize(batchSize),
+		vt.WithDescriptorsOnly(
+			viper.GetBool("identifiers-only") || viper.GetBool("download")))
+
 	if err != nil {
 		return err
 	}

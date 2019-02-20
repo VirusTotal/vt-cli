@@ -160,13 +160,13 @@ func NewAPIClient() (*utils.APIClient, error) {
 	return utils.NewAPIClient(apikey, fmt.Sprintf("vt-cli %s", Version))
 }
 
-// ObjectPrinter ...
+// ObjectPrinter prints objects to stdout.
 type ObjectPrinter struct {
 	client *utils.APIClient
 	cmd    *cobra.Command
 }
 
-// NewObjectPrinter ...
+// NewObjectPrinter creates a new object printer.
 func NewObjectPrinter(cmd *cobra.Command) (*ObjectPrinter, error) {
 	client, err := NewAPIClient()
 	if err != nil {
@@ -175,7 +175,9 @@ func NewObjectPrinter(cmd *cobra.Command) (*ObjectPrinter, error) {
 	return &ObjectPrinter{client: client, cmd: cmd}, nil
 }
 
-// Print ...
+// Print retrieves a set of objects of the specified object type with objects
+// IDs specified in the args array. If args contains a single "-" string, the
+// object IDs are read from stdin one per line.
 func (p *ObjectPrinter) Print(objType string, args []string, argRe *regexp.Regexp) error {
 
 	var r utils.StringReader
@@ -223,19 +225,20 @@ func (p *ObjectPrinter) Print(objType string, args []string, argRe *regexp.Regex
 	return nil
 }
 
+// PrintCollection prints a collection of objects retrieved from the collection
+// specified by the collection URL.
 func (p *ObjectPrinter) PrintCollection(collection *url.URL) error {
 	it, err := p.client.Iterator(collection,
-		vt.IteratorOptions{
-			Limit:  viper.GetInt("limit"),
-			Cursor: viper.GetString("cursor"),
-			Filter: viper.GetString("filter"),
-		})
+		vt.WithLimit(viper.GetInt("limit")),
+		vt.WithCursor(viper.GetString("cursor")),
+		vt.WithFilter(viper.GetString("filter")))
 	if err != nil {
 		return err
 	}
 	return p.PrintIter(it)
 }
 
+// PrintIter prints the objects returned by an object iterator.
 func (p *ObjectPrinter) PrintIter(it *vt.Iterator) error {
 
 	objs := make([]*vt.Object, 0)
@@ -262,12 +265,14 @@ func (p *ObjectPrinter) PrintIter(it *vt.Iterator) error {
 	return nil
 }
 
+// PrintObject prints the specified object to stdout.
 func (p *ObjectPrinter) PrintObject(obj *vt.Object) error {
 	objs := make([]*vt.Object, 1)
 	objs[0] = obj
 	return p.PrintObjects(objs)
 }
 
+// PrintObjects prints all the specified objects to stdout.
 func (p *ObjectPrinter) PrintObjects(objs []*vt.Object) error {
 
 	list := make([]map[string]interface{}, 0)

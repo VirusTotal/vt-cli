@@ -50,12 +50,11 @@ func retrohuntListTable(cmd *cobra.Command) error {
 		limit = viper.GetInt("limit")
 	}
 
-	options := vt.IteratorOptions{
-		Limit:  limit,
-		Filter: viper.GetString("filter"),
-	}
+	it, err := client.Iterator(
+		vt.URL("intelligence/retrohunt_jobs"),
+		vt.WithLimit(limit),
+		vt.WithFilter(viper.GetString("filter")))
 
-	it, err := client.Iterator(vt.URL("intelligence/retrohunt_jobs"), options)
 	if err != nil {
 		return err
 	}
