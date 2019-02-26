@@ -105,15 +105,21 @@ func (enc *Encoder) encodeMap(m reflect.Value, indent int, prefix string) (err e
 
 	for i, k := range keys {
 		keyPrinter(enc.w, "%s: ", k)
-		vk := m.MapIndex(k)
-		if indentIncr, err = enc.lineBreakV(vk, indent); err != nil {
+		v := m.MapIndex(k)
+		if indentIncr, err = enc.lineBreakV(v, indent); err != nil {
 			return err
 		}
-		if err = enc.encodeValue(vk, indent+indentIncr, prefix+k.String()); err != nil {
+		if err = enc.encodeValue(v, indent+indentIncr, prefix+k.String()); err != nil {
 			return err
 		}
+		switch v.Kind() {
+		case reflect.Interface:
+			v = v.Elem()
+		case reflect.Ptr:
+			v = v.Elem()
+		}
+		vt := v.Type()
 		ks := k.String()
-		vt := vk.Elem().Type()
 		// If key is "date" or ends with "_date" and value is json.Number, this
 		// field is a date.
 		isDate := (ks == "date" || strings.HasSuffix(ks, "_date")) &&
@@ -121,11 +127,11 @@ func (enc *Encoder) encodeMap(m reflect.Value, indent int, prefix string) (err e
 		// If this field is a date let's add a comment with the date in a
 		// human-readable format.
 		if isDate {
-			ts, err := strconv.ParseInt(vk.Elem().String(), 10, 64)
+			ts, err := strconv.ParseInt(v.String(), 10, 64)
 			if err != nil {
 				panic(err)
 			}
-			commentPrinter(enc.w, "  # %v ", time.Unix(ts, 0))
+			commentPrinter(enc.w, "  # %v", time.Unix(ts, 0))
 		}
 		if i < n-1 {
 			err = enc.lineBreak(indent)

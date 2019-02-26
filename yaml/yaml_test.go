@@ -160,6 +160,16 @@ var tests = []T{
 			  numeral: "second"
 			`),
 	},
+	{
+		data: struct {
+			Foo_date json.Number
+		}{
+			Foo_date: "10000",
+		},
+		yaml: Y(`
+			Foo_date: 10000  # 1970-01-01 03:46:40 +0100 CET
+			`),
+	},
 }
 
 func TestYAML(t *testing.T) {
