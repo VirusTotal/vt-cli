@@ -14,7 +14,6 @@
 package cmd
 
 import (
-	"encoding/hex"
 	"fmt"
 	"strings"
 
@@ -156,9 +155,7 @@ func getIgnoredSubstrings(meta map[string]interface{}) []string {
 		ii := i.([]interface{})
 		ss := make([]string, len(ii))
 		for i := range ss {
-			s := ii[i].(string)
-			h, _ := hex.DecodeString(s)
-			ss[i] = fmt.Sprintf("{% X} %q", h, h)
+			ss[i] = ii[i].(string)
 		}
 		return ss
 	}
