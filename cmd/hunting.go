@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"regexp"
 	"strconv"
 	"sync"
 
@@ -31,9 +32,9 @@ var notificationsDeleteCmdHelp = `Delete hunting notifications.
 This command deletes the malware hunting notifications associated to the
 currently configured API key.`
 
-// NewHuntingNotificationsDeleteCmd returns a command for deleting all hunting
+// NewHuntingNotificationDeleteCmd returns a command for deleting all hunting
 // notifications for the current user.
-func NewHuntingNotificationsDeleteCmd() *cobra.Command {
+func NewHuntingNotificationDeleteCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete [notification id]...",
 		Short: "Delete hunting notifications",
@@ -81,8 +82,8 @@ var notificationsListCmdHelp = `List malware hunting notifications.
 This command list the malware hunting notifications associated to the currently
 configured API key.`
 
-// NewHuntingNotificationsListCmd returns a new instance of the 'notifications list' command.
-func NewHuntingNotificationsListCmd() *cobra.Command {
+// NewHuntingNotificationListCmd returns a new instance of the 'notifications list' command.
+func NewHuntingNotificationListCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Aliases: []string{"ls"},
 		Use:     "list",
@@ -103,21 +104,33 @@ func NewHuntingNotificationsListCmd() *cobra.Command {
 	addLimitFlag(cmd.Flags())
 	addCursorFlag(cmd.Flags())
 
-	cmd.AddCommand(NewHuntingNotificationsDeleteCmd())
+	cmd.AddCommand(NewHuntingNotificationDeleteCmd())
 
 	return cmd
 }
 
-// NewHuntingNotificationsCmd returns a new instance of the 'notifications' command.
-func NewHuntingNotificationsCmd() *cobra.Command {
+// NewHuntingNotificationCmd returns a new instance of the 'notifications' command.
+func NewHuntingNotificationCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Aliases: []string{"nt"},
-		Use:     "notifications",
+		Use:     "notification [id]...",
 		Short:   "Manage malware hunting notifications",
+		Args:    cobra.MinimumNArgs(1),
+
+		RunE: func(cmd *cobra.Command, args []string) error {
+			re, _ := regexp.Compile("\\d+")
+			p, err := NewObjectPrinter(cmd)
+			if err != nil {
+				return err
+			}
+			return p.Print("intelligence/hunting_notifications", args, re)
+		},
 	}
 
-	cmd.AddCommand(NewHuntingNotificationsListCmd())
-	cmd.AddCommand(NewHuntingNotificationsDeleteCmd())
+	addThreadsFlag(cmd.Flags())
+
+	cmd.AddCommand(NewHuntingNotificationListCmd())
+	cmd.AddCommand(NewHuntingNotificationDeleteCmd())
 
 	return cmd
 }
@@ -127,8 +140,8 @@ var rulesetsListCmdHelp = `List malware hunting rulesets.
 This command list the malware hunting rulesets associated to the currently
 configured API key.`
 
-// NewHuntingRulesetsListCmd returns a new instance of the 'rulesets list' command.
-func NewHuntingRulesetsListCmd() *cobra.Command {
+// NewHuntingRulesetListCmd returns a new instance of the 'rulesets list' command.
+func NewHuntingRulesetListCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Aliases: []string{"ls"},
 		Use:     "list",
@@ -166,8 +179,8 @@ func patchRuleset(id string, attrs map[string]interface{}) error {
 	return client.PatchObject(vt.URL("intelligence/hunting_rulesets/%s", id), obj)
 }
 
-// NewHuntingRulesetsDisableCmd returns a command for disabling a given ruleset.
-func NewHuntingRulesetsDisableCmd() *cobra.Command {
+// NewHuntingRulesetDisableCmd returns a command for disabling a given ruleset.
+func NewHuntingRulesetDisableCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "disable [ruleset id]",
 		Short: "Disable ruleset",
@@ -181,8 +194,8 @@ func NewHuntingRulesetsDisableCmd() *cobra.Command {
 	}
 }
 
-// NewHuntingRulesetsEnableCmd returns a command for enabling a given ruleset.
-func NewHuntingRulesetsEnableCmd() *cobra.Command {
+// NewHuntingRulesetEnableCmd returns a command for enabling a given ruleset.
+func NewHuntingRulesetEnableCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "enable [ruleset id]",
 		Short: "Enable ruleset",
@@ -196,8 +209,8 @@ func NewHuntingRulesetsEnableCmd() *cobra.Command {
 	}
 }
 
-// NewHuntingRulesetsRenameCmd returns a command for renaming a given ruleset.
-func NewHuntingRulesetsRenameCmd() *cobra.Command {
+// NewHuntingRulesetRenameCmd returns a command for renaming a given ruleset.
+func NewHuntingRulesetRenameCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "rename [ruleset id] [name]",
 		Short: "Rename ruleset",
@@ -211,8 +224,8 @@ func NewHuntingRulesetsRenameCmd() *cobra.Command {
 	}
 }
 
-// NewHuntingRulesetsSetLimitCmd returns a command for changing a ruleset's limit.
-func NewHuntingRulesetsSetLimitCmd() *cobra.Command {
+// NewHuntingRulesetSetLimitCmd returns a command for changing a ruleset's limit.
+func NewHuntingRulesetSetLimitCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "setlimit [ruleset id] [limit]",
 		Short: "Set ruleset limit",
@@ -230,8 +243,8 @@ func NewHuntingRulesetsSetLimitCmd() *cobra.Command {
 	}
 }
 
-// NewHuntingRulesetsDeleteCmd returns a command for deleting a given ruleset.
-func NewHuntingRulesetsDeleteCmd() *cobra.Command {
+// NewHuntingRulesetDeleteCmd returns a command for deleting a given ruleset.
+func NewHuntingRulesetDeleteCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Aliases: []string{"del", "rm"},
 		Use:     "delete [ruleset id]...",
@@ -277,8 +290,8 @@ func NewHuntingRulesetsDeleteCmd() *cobra.Command {
 	return cmd
 }
 
-// NewHuntingRulesetsAddCmd returns a command for adding a new ruleset.
-func NewHuntingRulesetsAddCmd() *cobra.Command {
+// NewHuntingRulesetAddCmd returns a command for adding a new ruleset.
+func NewHuntingRulesetAddCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "add [ruleset name] [rules file]",
 		Short: "Add a new ruleset",
@@ -310,22 +323,34 @@ func NewHuntingRulesetsAddCmd() *cobra.Command {
 	}
 }
 
-// NewHuntingRulesetsCmd returns a new instance of the 'rulesets' command.
-func NewHuntingRulesetsCmd() *cobra.Command {
+// NewHuntingRulesetCmd returns a new instance of the 'rulesets' command.
+func NewHuntingRulesetCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Aliases: []string{"rs"},
-		Use:     "rulesets",
-		Short:   "Get malware hunting rulesets",
+		Use:     "ruleset [id]...",
+		Short:   "Manage hunting rulesets",
+		Args:    cobra.MinimumNArgs(1),
+
+		RunE: func(cmd *cobra.Command, args []string) error {
+			re, _ := regexp.Compile("\\d+")
+			p, err := NewObjectPrinter(cmd)
+			if err != nil {
+				return err
+			}
+			return p.Print("intelligence/hunting_rulesets", args, re)
+		},
 	}
 
-	cmd.AddCommand(NewHuntingRulesetsAddCmd())
-	cmd.AddCommand(NewHuntingRulesetsDeleteCmd())
-	cmd.AddCommand(NewHuntingRulesetsDisableCmd())
-	cmd.AddCommand(NewHuntingRulesetsEnableCmd())
-	cmd.AddCommand(NewHuntingRulesetsListCmd())
-	cmd.AddCommand(NewHuntingRulesetsRenameCmd())
-	cmd.AddCommand(NewHuntingRulesetsSetLimitCmd())
+	addThreadsFlag(cmd.Flags())
+
+	cmd.AddCommand(NewHuntingRulesetAddCmd())
+	cmd.AddCommand(NewHuntingRulesetDeleteCmd())
+	cmd.AddCommand(NewHuntingRulesetDisableCmd())
+	cmd.AddCommand(NewHuntingRulesetEnableCmd())
+	cmd.AddCommand(NewHuntingRulesetListCmd())
+	cmd.AddCommand(NewHuntingRulesetRenameCmd())
+	cmd.AddCommand(NewHuntingRulesetSetLimitCmd())
 
 	return cmd
 }
@@ -339,8 +364,8 @@ func NewHuntingCmd() *cobra.Command {
 		Short:   "Manage malware hunting rules and notifications",
 	}
 
-	cmd.AddCommand(NewHuntingNotificationsCmd())
-	cmd.AddCommand(NewHuntingRulesetsCmd())
+	cmd.AddCommand(NewHuntingNotificationCmd())
+	cmd.AddCommand(NewHuntingRulesetCmd())
 
 	return cmd
 }
