@@ -243,6 +243,25 @@ func NewHuntingRulesetSetLimitCmd() *cobra.Command {
 	}
 }
 
+// NewHuntingRulesetUpdateCmd returns a command for updating ruleset's rules.
+func NewHuntingRulesetUpdateCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "update [ruleset id] [rules file]",
+		Short: "Change the rules for a ruleset.",
+		Args:  cobra.MinimumNArgs(2),
+
+		RunE: func(cmd *cobra.Command, args []string) error {
+			rules, err := ReadFile(args[1])
+			if err != nil {
+				return err
+			}
+			return patchRuleset(args[0], map[string]interface{}{
+				"rules": string(rules),
+			})
+		},
+	}
+}
+
 // NewHuntingRulesetDeleteCmd returns a command for deleting a given ruleset.
 func NewHuntingRulesetDeleteCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -351,6 +370,7 @@ func NewHuntingRulesetCmd() *cobra.Command {
 	cmd.AddCommand(NewHuntingRulesetListCmd())
 	cmd.AddCommand(NewHuntingRulesetRenameCmd())
 	cmd.AddCommand(NewHuntingRulesetSetLimitCmd())
+	cmd.AddCommand(NewHuntingRulesetUpdateCmd())
 
 	return cmd
 }
