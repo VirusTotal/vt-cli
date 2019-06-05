@@ -178,6 +178,7 @@ func NewRetrohuntStartCmd() *cobra.Command {
 			}
 
 			obj.Attributes["rules"] = string(rules)
+			obj.Attributes["corpus"] = viper.GetString("corpus")
 
 			before := viper.GetString("before")
 			after := viper.GetString("after")
@@ -222,6 +223,10 @@ func NewRetrohuntStartCmd() *cobra.Command {
 	cmd.Flags().String(
 		"after", "",
 		"scan files sent to VirusTotal after the given date (format: YYYY-MM-DD)")
+
+	cmd.Flags().String(
+		"corpus", "main",
+		"specify the corpus that will be scanned, possible values are \"main\" and \"goodware\"")
 
 	return cmd
 }
