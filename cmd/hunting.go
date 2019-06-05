@@ -333,7 +333,7 @@ func NewHuntingRulesetAddCmd() *cobra.Command {
 			}
 			obj.Attributes["name"] = args[0]
 			obj.Attributes["rules"] = string(rules)
-			err = client.CreateObject(vt.URL("intelligence/hunting_rulesets"), obj)
+			err = client.PostObject(vt.URL("intelligence/hunting_rulesets"), obj)
 			if err != nil {
 				return err
 			}

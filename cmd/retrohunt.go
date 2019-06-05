@@ -205,7 +205,7 @@ func NewRetrohuntStartCmd() *cobra.Command {
 				}
 			}
 
-			err = client.CreateObject(vt.URL("intelligence/retrohunt_jobs"), obj)
+			err = client.PostObject(vt.URL("intelligence/retrohunt_jobs"), obj)
 			if err != nil {
 				return err
 			}
