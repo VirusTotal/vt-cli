@@ -229,9 +229,9 @@ func (p *ObjectPrinter) Print(objType string, args []string, argRe *regexp.Regex
 // specified by the collection URL.
 func (p *ObjectPrinter) PrintCollection(collection *url.URL) error {
 	it, err := p.client.Iterator(collection,
-		vt.WithLimit(viper.GetInt("limit")),
-		vt.WithCursor(viper.GetString("cursor")),
-		vt.WithFilter(viper.GetString("filter")))
+		vt.IteratorLimit(viper.GetInt("limit")),
+		vt.IteratorCursor(viper.GetString("cursor")),
+		vt.IteratorFilter(viper.GetString("filter")))
 	if err != nil {
 		return err
 	}

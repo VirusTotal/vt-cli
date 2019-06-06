@@ -56,10 +56,10 @@ func runSearchCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	it, err := client.Search(args[0],
-		vt.WithLimit(viper.GetInt("limit")),
-		vt.WithCursor(viper.GetString("cursor")),
-		vt.WithBatchSize(batchSize),
-		vt.WithDescriptorsOnly(
+		vt.IteratorLimit(viper.GetInt("limit")),
+		vt.IteratorCursor(viper.GetString("cursor")),
+		vt.IteratorBatchSize(batchSize),
+		vt.IteratorDescriptorsOnly(
 			viper.GetBool("identifiers-only") || viper.GetBool("download")))
 
 	if err != nil {
@@ -180,10 +180,10 @@ func runContentSearchCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	it, err := client.Search(strings.Join(terms, " "),
-		vt.WithLimit(viper.GetInt("limit")),
-		vt.WithCursor(viper.GetString("cursor")),
-		vt.WithBatchSize(batchSize),
-		vt.WithDescriptorsOnly(
+		vt.IteratorLimit(viper.GetInt("limit")),
+		vt.IteratorCursor(viper.GetString("cursor")),
+		vt.IteratorBatchSize(batchSize),
+		vt.IteratorDescriptorsOnly(
 			viper.GetBool("identifiers-only") || viper.GetBool("download")))
 
 	if err != nil {
