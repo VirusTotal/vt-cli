@@ -36,7 +36,7 @@ func retrohuntListTable(cmd *cobra.Command) error {
 
 	for _, flag := range []string{"cursor", "include", "exclude"} {
 		if cmd.Flag(flag).Changed {
-			return fmt.Errorf("--%s must be used with --yaml", flag)
+			return fmt.Errorf("--%s can't be used with --table", flag)
 		}
 	}
 
