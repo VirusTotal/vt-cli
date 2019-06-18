@@ -14,9 +14,12 @@
 package cmd
 
 import (
-	"regexp"
+	"fmt"
+	"strings"
 
+	vt "github.com/VirusTotal/vt-go"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var userCmdHelp = `Get a user.
@@ -29,31 +32,60 @@ If the identifiers are not provided in the command line they will be read from
 the standard input, one per line.`
 
 var userCmdExample = `  vt user joe
-  vt user joe@domain.com
-  cat list_of_usernames | vt user -`
+  vt user joe@domain.com`
+
+func printUserHumanFriendly(u *vt.Object) error {
+
+	fn, _ := u.GetString("first_name")
+	ln, _ := u.GetString("last_name")
+
+	if fn != "" || ln != "" {
+		fmt.Printf("name       : %s\n", strings.Join([]string{fn, ln}, " "))
+	}
+
+	fmt.Printf("username   : %s\n", u.ID)
+	fmt.Printf("email      : %s\n", u.Attributes["email"])
+	fmt.Printf("apikey     : %s\n", u.Attributes["apikey"])
+	fmt.Printf("status     : %s\n", u.Attributes["status"])
+	fmt.Printf("user since : %s\n", u.MustGetTime("user_since"))
+	fmt.Printf("last login : %s\n", u.MustGetTime("last_login"))
+	fmt.Printf("2fa        : %v\n", u.MustGetBool("has_2fa"))
+
+	return nil
+}
 
 // NewUserCmd returns a new instance of the 'user' command.
 func NewUserCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "user [username]...",
+		Use:     "user [username]",
 		Short:   "Get a VirusTotal user",
 		Long:    userCmdHelp,
 		Example: userCmdExample,
-		Args:    cobra.MinimumNArgs(1),
+		Args:    cobra.ExactArgs(1),
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			re, _ := regexp.Compile(`[\w\.\-%@\+]+`)
+			client, err := NewAPIClient()
+			if err != nil {
+				return err
+			}
+			user, err := client.GetObject(vt.URL("users/%s", args[0]))
+			if err != nil {
+				return err
+			}
+			if viper.GetBool("human") {
+				return printUserHumanFriendly(user)
+			}
 			p, err := NewObjectPrinter(cmd)
 			if err != nil {
 				return err
 			}
-			return p.Print("users", args, re)
+			return p.PrintObject(user)
 		},
 	}
 
-	addThreadsFlag(cmd.Flags())
 	addIncludeExcludeFlags(cmd.Flags())
 	addIDOnlyFlag(cmd.Flags())
+	addHumanFlag(cmd.Flags())
 
 	return cmd
 }
