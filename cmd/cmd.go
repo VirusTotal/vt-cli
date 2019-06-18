@@ -22,6 +22,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/gobwas/glob"
 	"github.com/spf13/cobra"
 
 	"github.com/plusvic/go-ansi"
@@ -298,5 +299,12 @@ func (p *ObjectPrinter) PrintObjects(objs []*vt.Object) error {
 		list = append(list, map[string]interface{}{key: m})
 	}
 
-	return yaml.NewColorEncoder(ansi.NewAnsiStdout(), colorScheme).Encode(list)
+	return yaml.NewEncoder(
+		ansi.NewAnsiStdout(),
+		yaml.EncoderColors(&colorScheme),
+		yaml.EncoderDateKeys([]glob.Glob{
+			glob.MustCompile("last_login"),
+			glob.MustCompile("user_since"),
+			glob.MustCompile("*date"),
+		})).Encode(list)
 }

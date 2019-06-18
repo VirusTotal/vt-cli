@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/fatih/color"
+	glob "github.com/gobwas/glob"
 )
 
 // Colors is a structure passed to NewEncoder for specifying the colors used
@@ -39,24 +40,50 @@ type Encoder struct {
 	keyPrinter     func(w io.Writer, format string, a ...interface{})
 	commentPrinter func(w io.Writer, format string, a ...interface{})
 
-	Colors     Colors
-	IndentSize int
+	// List of globs that define the keys whose values should be encoded as a
+	// date. Every key that matches any of the globs are considered a key if
+	// they are a number.
+	dateKeys []glob.Glob
+
+	Colors     *Colors
+	indentSize int
+}
+
+// EncoderOption represents an option for creating a new encoder.
+type EncoderOption func(*Encoder)
+
+// EncoderColors sets the colors for highlighting keys, values and comments.
+func EncoderColors(c *Colors) EncoderOption {
+	return func(e *Encoder) { e.Colors = c }
+}
+
+// EncoderDateKeys sets a list of globs that define the keys whose values
+// should be encoded as a date. Every key that matches any of the globs and
+// have a numeric value are encoded as a date, which means that a comment is
+// added with the human-friendly date.
+func EncoderDateKeys(g []glob.Glob) EncoderOption {
+	return func(e *Encoder) { e.dateKeys = g }
+}
+
+// EncoderIndent sets the indentation size used while encoding the YAML.
+func EncoderIndent(i int) EncoderOption {
+	return func(e *Encoder) { e.indentSize = i }
 }
 
 // NewEncoder returns a new YAML encoder that writes to w.
-func NewEncoder(w io.Writer) *Encoder {
-	c := Colors{
-		KeyColor:     color.New(),
-		ValueColor:   color.New(),
-		CommentColor: color.New(),
+func NewEncoder(w io.Writer, options ...EncoderOption) *Encoder {
+	enc := &Encoder{w: w, indentSize: 2}
+	for _, opt := range options {
+		opt(enc)
 	}
-	return &Encoder{w: w, Colors: c, IndentSize: 2}
-}
-
-// NewColorEncoder returns a new YAML encoder that writes to w and uses
-// the specified colors for highlighting keys, values and comments.
-func NewColorEncoder(w io.Writer, c Colors) *Encoder {
-	return &Encoder{w: w, Colors: c, IndentSize: 2}
+	if enc.Colors == nil {
+		enc.Colors = &Colors{
+			KeyColor:     color.New(),
+			ValueColor:   color.New(),
+			CommentColor: color.New(),
+		}
+	}
+	return enc
 }
 
 // lineBreakV decides whether or not a line break should be written based in
@@ -71,7 +98,7 @@ func (enc *Encoder) lineBreakV(v reflect.Value, indent int) (int, error) {
 		return enc.lineBreakV(v.Elem(), indent)
 	case reflect.Map:
 		if v.Len() > 0 {
-			return enc.IndentSize, enc.lineBreak(indent + enc.IndentSize)
+			return enc.indentSize, enc.lineBreak(indent + enc.indentSize)
 		}
 	case reflect.Slice:
 		if v.Len() > 0 {
@@ -86,6 +113,15 @@ func (enc *Encoder) lineBreakV(v reflect.Value, indent int) (int, error) {
 func (enc *Encoder) lineBreak(indent int) error {
 	_, err := fmt.Fprintf(enc.w, "\n%s", strings.Repeat(" ", indent))
 	return err
+}
+
+func (enc *Encoder) matchDateKey(key string) bool {
+	for _, glob := range enc.dateKeys {
+		if glob.Match(key) {
+			return true
+		}
+	}
+	return false
 }
 
 func (enc *Encoder) encodeMap(m reflect.Value, indent int, prefix string) (err error) {
@@ -122,8 +158,9 @@ func (enc *Encoder) encodeMap(m reflect.Value, indent int, prefix string) (err e
 		ks := k.String()
 		// If key is "date" or ends with "_date" and value is json.Number, this
 		// field is a date.
-		isDate := (ks == "date" || strings.HasSuffix(ks, "_date")) &&
-			vt.Name() == "Number" && vt.PkgPath() == "encoding/json"
+		isDate := enc.matchDateKey(ks) &&
+			vt.Name() == "Number" &&
+			vt.PkgPath() == "encoding/json"
 		// If this field is a date let's add a comment with the date in a
 		// human-readable format.
 		if isDate {

@@ -72,6 +72,7 @@ func NewVTCommand() *cobra.Command {
 	cmd.AddCommand(NewScanCmd())
 	cmd.AddCommand(NewSearchCmd())
 	cmd.AddCommand(NewURLCmd())
+	cmd.AddCommand(NewUserCmd())
 	cmd.AddCommand(NewVersionCmd())
 
 	return cmd

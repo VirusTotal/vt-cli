@@ -16,6 +16,8 @@ package cmd
 import (
 	"os"
 
+	"github.com/gobwas/glob"
+
 	"github.com/VirusTotal/vt-cli/yaml"
 	"github.com/spf13/cobra"
 )
@@ -41,7 +43,12 @@ func NewMetaCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return yaml.NewColorEncoder(os.Stdout, colorScheme).Encode(metadata)
+			return yaml.NewEncoder(os.Stdout,
+				yaml.EncoderColors(&colorScheme),
+				yaml.EncoderDateKeys([]glob.Glob{
+					glob.MustCompile("*date"),
+				}),
+			).Encode(metadata)
 		},
 	}
 }
