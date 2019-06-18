@@ -106,10 +106,10 @@ func addVerboseFlag(flags *pflag.FlagSet) {
 		"verbose output")
 }
 
-func addTableFlag(flags *pflag.FlagSet) {
+func addHumanFlag(flags *pflag.FlagSet) {
 	flags.BoolP(
-		"table", "T", false,
-		"output in table format")
+		"human", "H", false,
+		"output in a human-friendly format")
 }
 
 // ReadFile reads the specified file and returns its content. If filename is "-"
