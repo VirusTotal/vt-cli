@@ -74,8 +74,8 @@ func retrohuntListTable(cmd *cobra.Command) error {
 		status := job.Attributes["status"]
 
 		startDate := "not yet"
-		if s, ok := job.Attributes["start_date"].(int64); ok {
-			startDate = humanize.Time(time.Unix(s, 0))
+		if s, err := job.GetAttributeTime("start_date"); err == nil {
+			startDate = humanize.Time(s)
 		}
 
 		if status == "queued" || status == "running" {
@@ -83,31 +83,36 @@ func retrohuntListTable(cmd *cobra.Command) error {
 		}
 
 		eta := "-"
-		if e, ok := job.Attributes["eta_seconds"].(int64); ok {
+		if e, err := job.GetAttributeInt64("eta_seconds"); err == nil {
 			eta = time.Duration(e * 1000000000).String()
 		}
 
-		matches := rulesPattern.FindAllStringSubmatch(job.Attributes["rules"].(string), 5)
+		rules, _ := job.GetAttributeString("rules")
+		matches := rulesPattern.FindAllStringSubmatch(rules, 5)
 		ruleNames := make([]string, len(matches))
 
 		for i, m := range matches {
 			ruleNames[i] = m[1]
 		}
 
-		rules := strings.Join(ruleNames, ", ")
+		rules = strings.Join(ruleNames, ", ")
 
 		if len(rules) > 40 {
 			rules = rules[0:40] + "…"
 		}
 
+		creationDate, _ := job.GetAttributeTime("creation_date")
+		scannedBytes, _ := job.GetAttributeInt64("scanned_bytes")
+		numMatches, _ := job.GetAttributeInt64("num_matches")
+
 		table.AddRow(
 			job.ID,
-			humanize.Time(time.Unix(job.Attributes["creation_date"].(int64), 0)),
+			humanize.Time(creationDate),
 			startDate,
 			status,
 			eta,
-			humanize.Bytes(uint64(job.Attributes["scanned_bytes"].(int64))),
-			humanize.Comma(job.Attributes["num_matches"].(int64)),
+			humanize.Bytes(uint64(scannedBytes)),
+			humanize.Comma(numMatches),
 			rules)
 	}
 
