@@ -74,7 +74,7 @@ func retrohuntListTable(cmd *cobra.Command) error {
 		status := job.Attributes["status"]
 
 		startDate := "not yet"
-		if s, err := job.GetAttributeTime("start_date"); err == nil {
+		if s, err := job.GetTime("start_date"); err == nil {
 			startDate = humanize.Time(s)
 		}
 
@@ -83,11 +83,11 @@ func retrohuntListTable(cmd *cobra.Command) error {
 		}
 
 		eta := "-"
-		if e, err := job.GetAttributeInt64("eta_seconds"); err == nil {
+		if e, err := job.GetInt64("eta_seconds"); err == nil {
 			eta = time.Duration(e * 1000000000).String()
 		}
 
-		rules, _ := job.GetAttributeString("rules")
+		rules, _ := job.GetString("rules")
 		matches := rulesPattern.FindAllStringSubmatch(rules, 5)
 		ruleNames := make([]string, len(matches))
 
@@ -101,9 +101,9 @@ func retrohuntListTable(cmd *cobra.Command) error {
 			rules = rules[0:40] + "…"
 		}
 
-		creationDate, _ := job.GetAttributeTime("creation_date")
-		scannedBytes, _ := job.GetAttributeInt64("scanned_bytes")
-		numMatches, _ := job.GetAttributeInt64("num_matches")
+		creationDate, _ := job.GetTime("creation_date")
+		scannedBytes, _ := job.GetInt64("scanned_bytes")
+		numMatches, _ := job.GetInt64("num_matches")
 
 		table.AddRow(
 			job.ID,
@@ -146,7 +146,7 @@ func NewRetrohuntListCmd() *cobra.Command {
 	addFilterFlag(cmd.Flags())
 	addLimitFlag(cmd.Flags())
 	addCursorFlag(cmd.Flags())
-	addTableFlag(cmd.Flags())
+	addHumanFlag(cmd.Flags())
 
 	return cmd
 }

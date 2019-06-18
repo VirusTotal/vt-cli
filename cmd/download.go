@@ -150,7 +150,7 @@ func (z *zipDownloader) Download(hashes utils.StringReader, password string) err
 		if err != nil {
 			return err
 		}
-		switch status, _ := obj.GetAttributeString("status"); status {
+		switch status, _ := obj.GetString("status"); status {
 		case "error-starting":
 			return errors.New("Error starting ZIP file creation")
 		case "error-creating":
@@ -158,7 +158,7 @@ func (z *zipDownloader) Download(hashes utils.StringReader, password string) err
 		case "timeout":
 			return errors.New("ZIP file creation is taking too long")
 		}
-		progress, _ := obj.GetAttributeFloat64("progress")
+		progress, _ := obj.GetFloat64("progress")
 		spin.Suffix = fmt.Sprintf(" creating ZIP... %2.0f%%", progress*100)
 		time.Sleep(2 * time.Second)
 	}

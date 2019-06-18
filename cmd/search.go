@@ -131,9 +131,9 @@ func (m *matchPrinter) Do(fileObj interface{}, ds *utils.DoerState) string {
 		line = f.ID
 	} else {
 		var s string
-		confidence, _ := f.GetContextAttributeFloat64("confidence")
-		snippetID, _ := f.GetContextAttributeString("snippet")
-		inSubFile, _ := f.GetContextAttributeString("match_in_subfile")
+		confidence, _ := f.GetContextFloat64("confidence")
+		snippetID, _ := f.GetContextString("snippet")
+		inSubFile, _ := f.GetContextString("match_in_subfile")
 		snippets := make([]string, 0)
 		_, err := m.client.GetData(vt.URL("intelligence/search/snippets/%s", snippetID), &snippets)
 		if err == nil {
