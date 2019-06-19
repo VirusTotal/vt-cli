@@ -285,8 +285,12 @@ func (p *ObjectPrinter) PrintObjects(objs []*vt.Object) error {
 				m, viper.GetStringSlice("include"), viper.GetStringSlice("exclude"))
 		}
 		for name, r := range obj.Relationships {
-			if r.IsOneToOne && len(r.RelatedObjects) > 0 {
-				m[name] = r.RelatedObjects[0].ID
+			if r.IsOneToOne {
+				if len(r.RelatedObjects) > 0 {
+					m[name] = r.RelatedObjects[0].ID
+				} else {
+					m[name] = nil
+				}
 			} else {
 				l := make([]string, 0)
 				for _, obj := range r.RelatedObjects {

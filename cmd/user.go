@@ -68,7 +68,15 @@ func NewUserCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			user, err := client.GetObject(vt.URL("users/%s", args[0]))
+			user, err := client.GetObject(
+				vt.URL("users/%s?relationships=%s",
+					args[0],
+					strings.Join([]string{
+						"groups",
+						"api_quota_group",
+						"intelligence_quota_group",
+						"monitor_quota_group",
+					}, ",")))
 			if err != nil {
 				return err
 			}
