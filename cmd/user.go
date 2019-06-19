@@ -22,7 +22,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-var userCmdHelp = `Get information about a user.`
+var userCmdHelp = `Get information about a VirusTotal user.`
 
 var userCmdExample = `  vt user joe
   vt user joe@domain.com`
@@ -51,7 +51,7 @@ func printUserHumanFriendly(u *vt.Object) error {
 func NewUserCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "user [username]",
-		Short:   "Get a VirusTotal user",
+		Short:   "Get information about a VirusTotal user",
 		Long:    userCmdHelp,
 		Example: userCmdExample,
 		Args:    cobra.ExactArgs(1),
@@ -74,6 +74,11 @@ func NewUserCmd() *cobra.Command {
 				return err
 			}
 			if viper.GetBool("human") {
+				for _, flag := range []string{"include", "exclude"} {
+					if cmd.Flag(flag).Changed {
+						return fmt.Errorf("--%s can't be used with --human", flag)
+					}
+				}
 				return printUserHumanFriendly(user)
 			}
 			p, err := NewObjectPrinter(cmd)

@@ -34,7 +34,7 @@ func printGroupHumanFriendly(g *vt.Object) error {
 func NewGroupCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "group [groupname]",
-		Short:   "Get a VirusTotal group",
+		Short:   "Get information about a VirusTotal group",
 		Long:    groupCmdHelp,
 		Example: groupCmdExample,
 		Args:    cobra.ExactArgs(1),
@@ -49,6 +49,11 @@ func NewGroupCmd() *cobra.Command {
 				return err
 			}
 			if viper.GetBool("human") {
+				for _, flag := range []string{"include", "exclude"} {
+					if cmd.Flag(flag).Changed {
+						return fmt.Errorf("--%s can't be used with --human", flag)
+					}
+				}
 				return printGroupHumanFriendly(group)
 			}
 			p, err := NewObjectPrinter(cmd)

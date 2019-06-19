@@ -34,12 +34,6 @@ var rulesPattern = regexp.MustCompile(`rule\s+(\w+)\s*(:(\s*\w+\s*)+)?{`)
 
 func retrohuntListTable(cmd *cobra.Command) error {
 
-	for _, flag := range []string{"cursor", "include", "exclude"} {
-		if cmd.Flag(flag).Changed {
-			return fmt.Errorf("--%s can't be used with --human", flag)
-		}
-	}
-
 	client, err := NewAPIClient()
 	if err != nil {
 		return err
@@ -132,6 +126,11 @@ func NewRetrohuntListCmd() *cobra.Command {
 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if viper.GetBool("human") {
+				for _, flag := range []string{"cursor", "include", "exclude"} {
+					if cmd.Flag(flag).Changed {
+						return fmt.Errorf("--%s can't be used with --human", flag)
+					}
+				}
 				return retrohuntListTable(cmd)
 			}
 			p, err := NewObjectPrinter(cmd)
