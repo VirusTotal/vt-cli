@@ -18,6 +18,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/gobwas/glob"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -177,15 +179,20 @@ func TestYAML(t *testing.T) {
 	var b bytes.Buffer
 
 	for _, test := range tests {
-		enc := NewEncoder(&b)
-		enc.IndentSize = 1
+		enc := NewEncoder(&b,
+			EncoderIndent(1),
+			EncoderDateKeys([]glob.Glob{
+				glob.MustCompile("*_date"),
+			}))
 		assert.NoError(t, enc.Encode(test.data))
 		assert.Equal(t, test.yaml, b.String(), "Test %v", test.data)
 		b.Reset()
 	}
 
-	enc := NewEncoder(&b)
-	enc.IndentSize = 1
+	enc := NewEncoder(&b, EncoderIndent(1),
+		EncoderDateKeys([]glob.Glob{
+			glob.MustCompile("*_date"),
+		}))
 	assert.NoError(t, enc.Encode(tests[5].data))
 	assert.Equal(t, tests[5].yaml, b.String())
 }
