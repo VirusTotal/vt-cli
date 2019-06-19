@@ -22,14 +22,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-var userCmdHelp = `Get a user.
-
-This command receives one or more analysis identifiers and returns information
-about the analysis. The data is returned in the same order as the identifiers
-appear in the command line.
-
-If the identifiers are not provided in the command line they will be read from
-the standard input, one per line.`
+var userCmdHelp = `Get information about a user.`
 
 var userCmdExample = `  vt user joe
   vt user joe@domain.com`

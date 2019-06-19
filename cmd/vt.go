@@ -64,6 +64,7 @@ func NewVTCommand() *cobra.Command {
 	cmd.AddCommand(NewDownloadCmd())
 	cmd.AddCommand(NewFileCmd())
 	cmd.AddCommand(NewGenDocCmd())
+	cmd.AddCommand(NewGroupCmd())
 	cmd.AddCommand(NewHuntingCmd())
 	cmd.AddCommand(NewInitCmd())
 	cmd.AddCommand(NewIPCmd())
