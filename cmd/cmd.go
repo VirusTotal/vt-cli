@@ -309,6 +309,7 @@ func (p *ObjectPrinter) PrintObjects(objs []*vt.Object) error {
 		yaml.EncoderDateKeys([]glob.Glob{
 			glob.MustCompile("last_login"),
 			glob.MustCompile("user_since"),
-			glob.MustCompile("*date"),
+			glob.MustCompile("date"),
+			glob.MustCompile("*_date"),
 		})).Encode(list)
 }

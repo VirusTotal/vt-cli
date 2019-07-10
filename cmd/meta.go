@@ -45,9 +45,7 @@ func NewMetaCmd() *cobra.Command {
 			}
 			return yaml.NewEncoder(os.Stdout,
 				yaml.EncoderColors(&colorScheme),
-				yaml.EncoderDateKeys([]glob.Glob{
-					glob.MustCompile("*date"),
-				}),
+				yaml.EncoderDateKeys([]glob.Glob{}),
 			).Encode(metadata)
 		},
 	}
