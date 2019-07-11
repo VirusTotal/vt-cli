@@ -166,16 +166,13 @@ func NewHuntingRulesetListCmd() *cobra.Command {
 	return cmd
 }
 
-func patchRuleset(id string, attrs map[string]interface{}) error {
+func patchRuleset(id, attr string, value interface{}) error {
 	client, err := NewAPIClient()
 	if err != nil {
 		return err
 	}
-	obj := &vt.Object{
-		ID:         id,
-		Type:       "hunting_ruleset",
-		Attributes: attrs,
-	}
+	obj := vt.NewObjectWithID("hunting_ruleset", id)
+	obj.Set(attr, value)
 	return client.PatchObject(vt.URL("intelligence/hunting_rulesets/%s", id), obj)
 }
 
@@ -187,9 +184,7 @@ func NewHuntingRulesetDisableCmd() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return patchRuleset(args[0], map[string]interface{}{
-				"enabled": false,
-			})
+			return patchRuleset(args[0], "enabled", false)
 		},
 	}
 }
@@ -202,9 +197,7 @@ func NewHuntingRulesetEnableCmd() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return patchRuleset(args[0], map[string]interface{}{
-				"enabled": true,
-			})
+			return patchRuleset(args[0], "enabled", true)
 		},
 	}
 }
@@ -217,9 +210,7 @@ func NewHuntingRulesetRenameCmd() *cobra.Command {
 		Args:  cobra.ExactArgs(2),
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return patchRuleset(args[0], map[string]interface{}{
-				"name": args[1],
-			})
+			return patchRuleset(args[0], "name", args[1])
 		},
 	}
 }
@@ -236,9 +227,7 @@ func NewHuntingRulesetSetLimitCmd() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("invalid limit: %s", args[1])
 			}
-			return patchRuleset(args[0], map[string]interface{}{
-				"limit": limit,
-			})
+			return patchRuleset(args[0], "limit", limit)
 		},
 	}
 }
@@ -255,9 +244,7 @@ func NewHuntingRulesetUpdateCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return patchRuleset(args[0], map[string]interface{}{
-				"rules": string(rules),
-			})
+			return patchRuleset(args[0], "rules", string(rules))
 		},
 	}
 }
@@ -325,14 +312,14 @@ func NewHuntingRulesetAddCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			obj := vt.NewObject()
-			obj.Type = "hunting_ruleset"
 			rules, err := ReadFile(args[1])
 			if err != nil {
 				return err
 			}
-			obj.Attributes["name"] = args[0]
-			obj.Attributes["rules"] = string(rules)
+			obj := vt.NewObject("hunting_ruleset")
+			obj.SetString("name", args[0])
+			obj.SetString("rules", string(rules))
+
 			err = client.PostObject(vt.URL("intelligence/hunting_rulesets"), obj)
 			if err != nil {
 				return err

@@ -65,15 +65,14 @@ func retrohuntListTable(cmd *cobra.Command) error {
 
 	for it.Next() {
 		job := it.Get()
-		status := job.Attributes["status"]
-
+		status := job.MustGetString("status")
 		startDate := "not yet"
 		if s, err := job.GetTime("start_date"); err == nil {
 			startDate = humanize.Time(s)
 		}
 
 		if status == "queued" || status == "running" {
-			status = fmt.Sprintf("%s (%d%%)", status, job.Attributes["progress"])
+			status = fmt.Sprintf("%s (%d%%)", status, job.MustGetString("progress"))
 		}
 
 		eta := "-"
@@ -168,9 +167,6 @@ func NewRetrohuntStartCmd() *cobra.Command {
 				return err
 			}
 
-			obj := vt.NewObject()
-			obj.Type = "retrohunt_job"
-
 			var rules []byte
 			if args[0] == "-" {
 				rules, err = ioutil.ReadAll(os.Stdin)
@@ -181,8 +177,9 @@ func NewRetrohuntStartCmd() *cobra.Command {
 				return err
 			}
 
-			obj.Attributes["rules"] = string(rules)
-			obj.Attributes["corpus"] = viper.GetString("corpus")
+			obj := vt.NewObject("retrohunt_job")
+			obj.SetString("rules", string(rules))
+			obj.SetString("corpus", viper.GetString("corpus"))
 
 			before := viper.GetString("before")
 			after := viper.GetString("after")
@@ -191,7 +188,7 @@ func NewRetrohuntStartCmd() *cobra.Command {
 
 			if before != "" || after != "" {
 				timeRange = make(map[string]int64)
-				obj.Attributes["time_range"] = timeRange
+				obj.Set("time_range", timeRange)
 			}
 
 			if after != "" {

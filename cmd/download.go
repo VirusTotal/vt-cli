@@ -75,7 +75,7 @@ func (d *downloader) Do(file interface{}, ds *utils.DoerState) string {
 
 	var hash string
 	if f, isObject := file.(*vt.Object); isObject {
-		hash = f.ID
+		hash = f.ID()
 	} else {
 		hash = file.(string)
 	}
@@ -145,7 +145,7 @@ func (z *zipDownloader) Download(hashes utils.StringReader, password string) err
 		return err
 	}
 
-	for obj.Attributes["status"] != "finished" {
+	for obj.MustGetString("status") != "finished" {
 		obj, err = z.client.GetObject(vt.URL("intelligence/zip_files/%s", obj.ID))
 		if err != nil {
 			return err

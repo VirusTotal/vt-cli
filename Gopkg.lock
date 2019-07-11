@@ -5,7 +5,7 @@
   branch = "master"
   name = "github.com/VirusTotal/vt-go"
   packages = ["."]
-  revision = "de6497b1665fac43ed07ff9a74c8005442cdb234"
+  revision = "5ecfd923cb69e363927f87c8e33d5fd641c64269"
 
 [[projects]]
   name = "github.com/briandowns/spinner"

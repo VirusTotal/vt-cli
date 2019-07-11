@@ -37,9 +37,9 @@ func printUserHumanFriendly(u *vt.Object) error {
 	}
 
 	fmt.Printf("username   : %s\n", u.ID)
-	fmt.Printf("email      : %s\n", u.Attributes["email"])
-	fmt.Printf("apikey     : %s\n", u.Attributes["apikey"])
-	fmt.Printf("status     : %s\n", u.Attributes["status"])
+	fmt.Printf("email      : %s\n", u.MustGetString("email"))
+	fmt.Printf("apikey     : %s\n", u.MustGetString("apikey"))
+	fmt.Printf("status     : %s\n", u.MustGetString("status"))
 	fmt.Printf("user since : %s\n", u.MustGetTime("user_since"))
 	fmt.Printf("last login : %s\n", u.MustGetTime("last_login"))
 	fmt.Printf("2fa        : %v\n", u.MustGetBool("has_2fa"))

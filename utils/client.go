@@ -36,7 +36,9 @@ func NewAPIClient(apiKey, agent string) (*APIClient, error) {
 	return &APIClient{c}, nil
 }
 
-// RetrieveObjects ...
+// RetrieveObjects retrieves all objects of the specified objType that have the
+// identifiers listed in objIDs. The objects are put into the outCh as they are
+// retrieved.
 func (c *APIClient) RetrieveObjects(objType string, objIDs []string, outCh chan *vt.Object, errCh chan error) error {
 
 	// Make sure outCh is closed

@@ -128,7 +128,7 @@ func (m *matchPrinter) Do(fileObj interface{}, ds *utils.DoerState) string {
 	f := fileObj.(*vt.Object)
 	var line string
 	if m.idOnly {
-		line = f.ID
+		line = f.ID()
 	} else {
 		var s string
 		confidence, _ := f.GetContextFloat64("confidence")

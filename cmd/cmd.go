@@ -273,28 +273,38 @@ func (p *ObjectPrinter) PrintObject(obj *vt.Object) error {
 	return p.PrintObjects(objs)
 }
 
+func objectAttributesMap(obj *vt.Object) map[string]interface{} {
+	attrNames := obj.Attributes()
+	attrMap := make(map[string]interface{}, len(attrNames))
+	for _, attr := range attrNames {
+		attrMap[attr], _ = obj.Get(attr)
+	}
+	return attrMap
+}
+
 // PrintObjects prints all the specified objects to stdout.
 func (p *ObjectPrinter) PrintObjects(objs []*vt.Object) error {
 
 	list := make([]map[string]interface{}, 0)
 
 	for _, obj := range objs {
-		m := obj.Attributes
+		m := objectAttributesMap(obj)
 		if viper.IsSet("include") && viper.IsSet("exclude") {
 			m = utils.FilterMap(
 				m, viper.GetStringSlice("include"), viper.GetStringSlice("exclude"))
 		}
-		for name, r := range obj.Relationships {
+		for _, name := range obj.Relationships() {
+			r, _ := obj.GetRelationship(name)
 			if r.IsOneToOne {
 				if len(r.RelatedObjects) > 0 {
-					m[name] = r.RelatedObjects[0].ID
+					m[name] = r.RelatedObjects[0].ID()
 				} else {
 					m[name] = nil
 				}
 			} else {
 				l := make([]string, 0)
 				for _, obj := range r.RelatedObjects {
-					l = append(l, obj.ID)
+					l = append(l, obj.ID())
 				}
 				m[name] = l
 			}
