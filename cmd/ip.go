@@ -43,11 +43,11 @@ func NewIPCmd() *cobra.Command {
 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			re, _ := regexp.Compile(`\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`)
-			p, err := NewObjectPrinter(cmd)
+			p, err := NewPrinter(cmd)
 			if err != nil {
 				return err
 			}
-			return p.Print("ip_addresses", args, re)
+			return p.GetAndPrintObjects("ip_addresses", args, re)
 		},
 	}
 

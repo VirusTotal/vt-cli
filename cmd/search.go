@@ -80,11 +80,12 @@ func runSearchCmd(cmd *cobra.Command, args []string) error {
 		return it.Error()
 	}
 
-	p, err := NewObjectPrinter(cmd)
+	p, err := NewPrinter(cmd)
 	if err != nil {
 		return err
 	}
-	return p.PrintIter(it)
+
+	return p.PrintIterator(it)
 }
 
 var cmdSearchHelp = `Search for files using VirusTotal Intelligence's query language.`
@@ -145,7 +146,7 @@ func (m *matchPrinter) Do(fileObj interface{}, ds *utils.DoerState) string {
 		}
 		line = fmt.Sprintf(
 			"%s\n\nsha256  : %s\nscore   : %03.1f \nsubfile : %v\n\n%s\n",
-			strings.Repeat("_", 76), f.ID, confidence, inSubFile, s)
+			strings.Repeat("_", 76), f.ID(), confidence, inSubFile, s)
 	}
 	return line
 }
@@ -208,7 +209,12 @@ func runContentSearchCmd(cmd *cobra.Command, args []string) error {
 			strings.Join(ignored, "\n"))
 	}
 
-	PrintCommandLineWithCursor(cmd, it)
+	p, err := NewPrinter(cmd)
+	if err != nil {
+		return err
+	}
+	p.PrintCommandLineWithCursor(it)
+
 	return it.Error()
 }
 

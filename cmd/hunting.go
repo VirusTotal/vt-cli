@@ -91,7 +91,7 @@ func NewHuntingNotificationListCmd() *cobra.Command {
 		Long:    notificationsListCmdHelp,
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			p, err := NewObjectPrinter(cmd)
+			p, err := NewPrinter(cmd)
 			if err != nil {
 				return err
 			}
@@ -119,11 +119,11 @@ func NewHuntingNotificationCmd() *cobra.Command {
 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			re, _ := regexp.Compile("\\d+")
-			p, err := NewObjectPrinter(cmd)
+			p, err := NewPrinter(cmd)
 			if err != nil {
 				return err
 			}
-			return p.Print("intelligence/hunting_notifications", args, re)
+			return p.GetAndPrintObjects("intelligence/hunting_notifications", args, re)
 		},
 	}
 
@@ -149,7 +149,7 @@ func NewHuntingRulesetListCmd() *cobra.Command {
 		Long:    rulesetsListCmdHelp,
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			p, err := NewObjectPrinter(cmd)
+			p, err := NewPrinter(cmd)
 			if err != nil {
 				return err
 			}
@@ -308,7 +308,7 @@ func NewHuntingRulesetAddCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			p, err := NewObjectPrinter(cmd)
+			p, err := NewPrinter(cmd)
 			if err != nil {
 				return err
 			}
@@ -340,11 +340,11 @@ func NewHuntingRulesetCmd() *cobra.Command {
 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			re, _ := regexp.Compile("\\d+")
-			p, err := NewObjectPrinter(cmd)
+			p, err := NewPrinter(cmd)
 			if err != nil {
 				return err
 			}
-			return p.Print("intelligence/hunting_rulesets", args, re)
+			return p.GetAndPrintObjects("intelligence/hunting_rulesets", args, re)
 		},
 	}
 

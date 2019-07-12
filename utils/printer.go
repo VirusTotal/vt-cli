@@ -1,0 +1,239 @@
+// Copyright © 2019 The VirusTotal CLI authors. All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package utils
+
+import (
+	"fmt"
+	"net/url"
+	"os"
+	"regexp"
+	"strings"
+	"sync"
+
+	"github.com/VirusTotal/vt-cli/yaml"
+	vt "github.com/VirusTotal/vt-go"
+	"github.com/fatih/color"
+	glob "github.com/gobwas/glob"
+	ansi "github.com/k0kubun/go-ansi"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
+)
+
+// Printer prints objects to stdout.
+type Printer struct {
+	client *APIClient
+	colors *yaml.Colors
+	cmd    *cobra.Command
+}
+
+// NewPrinter creates a new object printer.
+func NewPrinter(client *APIClient, cmd *cobra.Command, colors *yaml.Colors) (*Printer, error) {
+	return &Printer{client: client, cmd: cmd, colors: colors}, nil
+}
+
+// Print prints the provided data to stdout.
+func (p *Printer) Print(data interface{}) error {
+	return yaml.NewEncoder(
+		ansi.NewAnsiStdout(),
+		yaml.EncoderColors(p.colors),
+		yaml.EncoderDateKeys([]glob.Glob{
+			glob.MustCompile("last_login"),
+			glob.MustCompile("user_since"),
+			glob.MustCompile("date"),
+			glob.MustCompile("*_date"),
+		})).Encode(data)
+}
+
+// PrintSyncMap prints a sync.Map.
+func (p *Printer) PrintSyncMap(sm *sync.Map) error {
+	m := make(map[string]interface{})
+	sm.Range(func(key, value interface{}) bool {
+		m[key.(string)] = value
+		return true
+	})
+	return p.Print(m)
+}
+
+// ObjectToMap function that returns the attributes for an object as a map.
+// Keys are attribute names and values are the attribute's value. Two special
+// keys _id and _type are also included in the map with object's identifier
+// and type respectively. The map is filtered according to the filters specified
+// in the --include and --exclude command-line arguments.
+func ObjectToMap(obj *vt.Object) map[string]interface{} {
+	m := make(map[string]interface{})
+	m["_id"] = obj.ID()
+	m["_type"] = obj.Type()
+	for _, attr := range obj.Attributes() {
+		m[attr], _ = obj.Get(attr)
+	}
+	for _, name := range obj.Relationships() {
+		r, _ := obj.GetRelationship(name)
+		relatedObjs := r.Objects()
+		if r.IsOneToOne() {
+			if len(relatedObjs) > 0 {
+				m[name] = relatedObjs[0].ID()
+			} else {
+				m[name] = nil
+			}
+		} else {
+			l := make([]string, 0)
+			for _, obj := range relatedObjs {
+				l = append(l, obj.ID())
+			}
+			m[name] = l
+		}
+	}
+	if viper.IsSet("include") && viper.IsSet("exclude") {
+		m = FilterMap(m,
+			viper.GetStringSlice("include"),
+			viper.GetStringSlice("exclude"))
+	}
+	return m
+}
+
+// PrintObjects prints all the specified objects to stdout.
+func (p *Printer) PrintObjects(objs []*vt.Object) error {
+	list := make([]map[string]interface{}, 0)
+	for _, obj := range objs {
+		list = append(list, ObjectToMap(obj))
+	}
+	return p.Print(list)
+}
+
+// PrintObject prints the specified object to stdout.
+func (p *Printer) PrintObject(obj *vt.Object) error {
+	objs := make([]*vt.Object, 1)
+	objs[0] = obj
+	return p.PrintObjects(objs)
+}
+
+// GetAndPrintObjects retrieves a set of objects of the specified object type with objects
+// IDs specified in the args array. If args contains a single "-" string, the
+// object IDs are read from stdin one per line.
+func (p *Printer) GetAndPrintObjects(objType string, args []string, argRe *regexp.Regexp) error {
+
+	var r StringReader
+
+	if len(args) == 1 && args[0] == "-" {
+		r = NewStringIOReader(os.Stdin)
+	} else {
+		r = NewStringArrayReader(args)
+	}
+
+	if argRe != nil {
+		r = NewFilteredStringReader(r, argRe)
+	}
+
+	filteredArgs := make([]string, 0)
+	for s, err := r.ReadString(); s != "" || err == nil; s, err = r.ReadString() {
+		filteredArgs = append(filteredArgs, s)
+	}
+
+	objectsCh := make(chan *vt.Object)
+	errorsCh := make(chan error, len(filteredArgs))
+
+	go p.client.RetrieveObjects(objType, filteredArgs, objectsCh, errorsCh)
+
+	objs := make([]*vt.Object, 0)
+
+	for obj := range objectsCh {
+		if viper.GetBool("identifiers-only") {
+			fmt.Printf("%s\n", obj.ID())
+		} else {
+			objs = append(objs, obj)
+		}
+	}
+
+	if len(objs) > 0 {
+		if err := p.PrintObjects(objs); err != nil {
+			return err
+		}
+	}
+
+	for err := range errorsCh {
+		fmt.Fprintln(os.Stderr, err)
+	}
+
+	return nil
+}
+
+// PrintCollection prints a collection of objects retrieved from the collection
+// specified by the collection URL.
+func (p *Printer) PrintCollection(collection *url.URL) error {
+	it, err := p.client.Iterator(collection,
+		vt.IteratorLimit(viper.GetInt("limit")),
+		vt.IteratorCursor(viper.GetString("cursor")),
+		vt.IteratorFilter(viper.GetString("filter")))
+	if err != nil {
+		return err
+	}
+	return p.PrintIterator(it)
+}
+
+// PrintIterator prints the objects returned by an object iterator.
+func (p *Printer) PrintIterator(it *vt.Iterator) error {
+
+	objs := make([]*vt.Object, 0)
+	for it.Next() {
+		obj := it.Get()
+		if viper.GetBool("identifiers-only") {
+			fmt.Printf("%s\n", obj.ID())
+		} else {
+			objs = append(objs, obj)
+		}
+	}
+
+	if err := it.Error(); err != nil {
+		return err
+	}
+
+	if len(objs) > 0 {
+		if err := p.PrintObjects(objs); err != nil {
+			return err
+		}
+	}
+	p.PrintCommandLineWithCursor(it)
+	return nil
+}
+
+// PrintCommandLineWithCursor prints the same command-line that was used for
+// executing the program but adding or replacing the --cursor flag with
+// the current cursor for the given iterator.
+func (p *Printer) PrintCommandLineWithCursor(it *vt.Iterator) {
+	if cursor := it.Cursor(); cursor != "" {
+		args := p.cmd.Flags().Args()
+		for i, arg := range args {
+			args[i] = fmt.Sprintf("'%s'", arg)
+		}
+		flags := make([]string, 0)
+		p.cmd.Flags().Visit(func(flag *pflag.Flag) {
+			if flag.Name != "cursor" {
+				var f string
+				switch flag.Value.Type() {
+				case "stringSlice":
+					ss, _ := p.cmd.Flags().GetStringSlice(flag.Name)
+					f = fmt.Sprintf("--%s='%s'", flag.Name, strings.Join(ss, ","))
+				default:
+					f = fmt.Sprintf("--%s=%v", flag.Name, flag.Value.String())
+				}
+				flags = append(flags, f)
+			}
+		})
+		flags = append(flags, fmt.Sprintf("--cursor=%s", cursor))
+		color.New(color.Faint).Fprintf(
+			ansi.NewAnsiStderr(), "\nMORE WITH:\n%s %s %s\n",
+			p.cmd.CommandPath(), strings.Join(args, " "), strings.Join(flags, " "))
+	}
+}

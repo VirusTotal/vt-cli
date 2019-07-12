@@ -41,11 +41,11 @@ func NewDomainCmd() *cobra.Command {
 		Args:    cobra.MinimumNArgs(1),
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			p, err := NewObjectPrinter(cmd)
+			p, err := NewPrinter(cmd)
 			if err != nil {
 				return err
 			}
-			p.Print("domains", args, nil)
+			p.GetAndPrintObjects("domains", args, nil)
 			return nil
 		},
 	}

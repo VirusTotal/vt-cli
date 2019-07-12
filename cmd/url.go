@@ -43,7 +43,7 @@ func NewURLCmd() *cobra.Command {
 		Args:    cobra.MinimumNArgs(1),
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			p, err := NewObjectPrinter(cmd)
+			p, err := NewPrinter(cmd)
 			if err != nil {
 				return err
 			}
@@ -51,7 +51,7 @@ func NewURLCmd() *cobra.Command {
 			for i, arg := range args {
 				ids[i] = base64.RawURLEncoding.EncodeToString([]byte(arg))
 			}
-			return p.Print("urls", ids, nil)
+			return p.GetAndPrintObjects("urls", ids, nil)
 		},
 	}
 

@@ -56,7 +56,7 @@ func NewGroupCmd() *cobra.Command {
 				}
 				return printGroupHumanFriendly(group)
 			}
-			p, err := NewObjectPrinter(cmd)
+			p, err := NewPrinter(cmd)
 			if err != nil {
 				return err
 			}

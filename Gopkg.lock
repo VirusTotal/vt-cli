@@ -5,7 +5,7 @@
   branch = "master"
   name = "github.com/VirusTotal/vt-go"
   packages = ["."]
-  revision = "5ecfd923cb69e363927f87c8e33d5fd641c64269"
+  revision = "1daa0c878197498efcb7fe07ac7ecbc53ba45cc8"
 
 [[projects]]
   name = "github.com/briandowns/spinner"
@@ -96,6 +96,12 @@
   packages = ["."]
   revision = "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75"
   version = "v1.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/k0kubun/go-ansi"
+  packages = ["."]
+  revision = "3bf9e290321332340cd6915d2386f733fbf7233a"
 
 [[projects]]
   name = "github.com/magiconair/properties"
@@ -233,6 +239,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e8cabc55feb43e566d388cc7ace87dadd588df77c08444b03aec73e06a0e0273"
+  inputs-digest = "8ea6ca917ee51c71cb2c01c2b3788f05544b3b377113211121f20a21860d1e3c"
   solver-name = "gps-cdcl"
   solver-version = 1

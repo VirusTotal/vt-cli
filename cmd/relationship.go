@@ -16,14 +16,16 @@ package cmd
 import (
 	"encoding/base64"
 	"encoding/gob"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path"
+	"sync"
 
+	"github.com/VirusTotal/vt-cli/utils"
 	vt "github.com/VirusTotal/vt-go"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var objectRelationshipsMap map[string][]vt.RelationshipMeta
@@ -38,46 +40,51 @@ func init() {
 	}
 }
 
+func getRelatedObjects(collection, objectID, relationship string, limit int) ([]map[string]interface{}, error) {
+	if collection == "urls" {
+		// If collections is "urls" the objectID is the URL itself and
+		// it needs to be encoded in base64.
+		objectID = base64.RawURLEncoding.EncodeToString([]byte(objectID))
+	}
+	client, err := NewAPIClient()
+	if err != nil {
+		return nil, err
+	}
+	it, err := client.Iterator(
+		vt.URL("%s/%s/%s", collection, objectID, relationship),
+		vt.IteratorLimit(limit))
+	if err != nil {
+		return nil, err
+	}
+	defer it.Close()
+	result := make([]map[string]interface{}, 0)
+	for it.Next() {
+		obj := it.Get()
+		result = append(result, utils.ObjectToMap(obj))
+	}
+	if err := it.Error(); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func NewRelationshipCmd(collection, relationship, use, description string) *cobra.Command {
 	cmd := &cobra.Command{
 		Args:  cobra.ExactArgs(1),
 		Use:   fmt.Sprintf("%s %s", relationship, use),
 		Short: description,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := NewAPIClient()
-			if err != nil {
-				return err
-			}
 			objectID := args[0]
 			if collection == "urls" {
 				// If collections is "urls" let's encode the objectID is the
 				// URL itself and it needs to be encoded in base64.
 				objectID = base64.RawURLEncoding.EncodeToString([]byte(objectID))
 			}
-			url := vt.URL("%s/%s/%s", collection, objectID, relationship)
-			// A relationship can return a single object or a collection, so
-			// we retrieve the data but do not unmarshall it as we don't know
-			// the kind of data that we are receiving.
-			var data json.RawMessage
-			if _, err = client.GetData(url, &data); err != nil {
-				return err
-			}
-			p, err := NewObjectPrinter(cmd)
+			p, err := NewPrinter(cmd)
 			if err != nil {
 				return err
 			}
-			obj := &vt.Object{}
-			// Try to unmarshall the data into an object, if it succeeds we
-			// can proceed to print the object, if not the relationship returns
-			// a collection.
-			if err := json.Unmarshal(data, obj); err == nil {
-				return p.PrintObject(obj)
-			}
-			// If the returned data was not an object let's use PrintCollection.
-			// This is not the most efficient solution as it sends another
-			// request to the server.
-			// TODO(vmalvarez): Avoid the extra API request by reusing the data
-			// that we already have.
+			url := vt.URL("%s/%s/%s", collection, objectID, relationship)
 			return p.PrintCollection(url)
 		},
 	}
@@ -90,9 +97,50 @@ func NewRelationshipCmd(collection, relationship, use, description string) *cobr
 	return cmd
 }
 
+// NewRelationshipsCmd returns a new instance of the 'relationships' command.
+func NewRelationshipsCmd(collection, objectType, use string) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   fmt.Sprintf("relationships %s", use),
+		Short: "Get all relationships.",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var wg sync.WaitGroup
+			var m sync.Map
+			for _, r := range objectRelationshipsMap[objectType] {
+				wg.Add(1)
+				go func(relationshipName string) {
+					objs, err := getRelatedObjects(
+						collection,
+						args[0],
+						relationshipName,
+						viper.GetInt("limit"))
+					if err != nil {
+						fmt.Println(err)
+					} else if len(objs) > 0 {
+						m.Store(relationshipName, objs)
+					}
+					wg.Done()
+				}(r.Name)
+			}
+			wg.Wait()
+			p, err := NewPrinter(cmd)
+			if err != nil {
+				return err
+			}
+			return p.PrintSyncMap(&m)
+		},
+	}
+
+	addIncludeExcludeFlags(cmd.Flags())
+	addLimitFlag(cmd.Flags())
+
+	return cmd
+}
+
 func addRelationshipCmds(cmd *cobra.Command, collection, objectType, use string) {
 	relationships := objectRelationshipsMap[objectType]
 	for _, r := range relationships {
 		cmd.AddCommand(NewRelationshipCmd(collection, r.Name, use, r.Description))
 	}
+	cmd.AddCommand(NewRelationshipsCmd(collection, objectType, use))
 }

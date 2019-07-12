@@ -81,7 +81,7 @@ func NewUserCmd() *cobra.Command {
 				}
 				return printUserHumanFriendly(user)
 			}
-			p, err := NewObjectPrinter(cmd)
+			p, err := NewPrinter(cmd)
 			if err != nil {
 				return err
 			}

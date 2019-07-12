@@ -88,17 +88,18 @@ If you are going to use this tool frequently you may want to have command auto-c
 	$ vt scan file test.txt
 	test.txt MDJiY2FiZmZmZmQxNmZlMGZjMjUwZjA4Y2FkOTVlMGM6MTU0NjQ1NDUyMA==
 	$ vt analysis MDJiY2FiZmZmZmQxNmZlMGZjMjUwZjA4Y2FkOTVlMGM6MTU0NjQ1NDUyMA==
-	- analysis <MDJiY2FiZmZmZmQxNmZlMGZjMjUwZjA4Y2FkOTVlMGM6MTU0NjQ1NDUyMA==>:
-	    date: 1546454520  # 2019-01-02 13:42:00 -0500 EST
-	    stats:
-	      failure: 0
-	      harmless: 0
-	      malicious: 0
-	      suspicious: 0
-	      timeout: 0
-	      type-unsupported: 0
-	      undetected: 0
-	    status: "queued"
+  - _id: "MDJiY2FiZmZmZmQxNmZlMGZjMjUwZjA4Y2FkOTVlMGM6MTU0NjQ1NDUyMA=="
+    _type: "analysis"
+	  date: 1546454520  # 2019-01-02 13:42:00 -0500 EST
+	  stats:
+	    failure: 0
+	    harmless: 0
+	    malicious: 0
+	    suspicious: 0
+	    timeout: 0
+	    type-unsupported: 0
+	    undetected: 0
+	  status: "queued"
 	```
 
 * Download files given a list of hashes in a text file, one hash per line:
@@ -128,52 +129,48 @@ When you ask for information about a file, URL, domain, IP address or any other 
 These options accept patterns that are matched against the fields composing the data, and allow you to include only a subset of them, or exclude any field that is not interesting for you. Let's see how it works using the data we have about `http://www.virustotal.com` as an example:
 
 ```
-- url <1db0ad7dbcec0676710ea0eaacd35d5e471d3e11944d53bcbd31f0cbd11bce31>:
-    first_submission_date: 1275391445  # 2010-06-01 13:24:05 +0200 CEST
-    last_analysis_date: 1532442650  # 2018-07-24 16:30:50 +0200 CEST
-    last_analysis_results:
-      ADMINUSLabs:
-        category: "harmless"
-        engine_name: "ADMINUSLabs"
-        method: "blacklist"
-        result: "clean"
-      AegisLab WebGuard:
-        category: "harmless"
-        engine_name: "AegisLab WebGuard"
-        method: "blacklist"
-        result: "clean"
-      AlienVault:
-        category: "harmless"
-        engine_name: "AlienVault"
-        method: "blacklist"
-        result: "clean"
-    last_http_response_code: 200
-    last_http_response_content_length: 7216
-    last_http_response_content_sha256: "7ed66734d9fb8c5a922fffd039c1cd5d85f8c2bb39d14803983528437852ba94"
-    last_http_response_headers:
-      age: "26"
-      cache-control: "public, max-age=60"
-      content-length: "7216"
-      content-type: "text/html"
-      date: "Tue, 24 Jul 2018 14:30:24 GMT"
-      etag: "\"bGPKJQ\""
-      expires: "Tue, 24 Jul 2018 14:31:24 GMT"
-      server: "Google Frontend"
-      x-cloud-trace-context: "131ac6cb5e2cdb7970d54ee42fd5ce4a"
-      x-frame-options: "DENY"
-    last_submission_date: 1532442650  # 2018-07-24 16:30:50 +0200 CEST
-    private: false
-    reputation: 1484
-    times_submitted: 213227
-    total_votes:
-      harmless: 660
-      malicious: 197
-```
-
-The data shown above can be retrieved with:
-
-```
 $ vt url http://www.virustotal.com
+- _id: 1db0ad7dbcec0676710ea0eaacd35d5e471d3e11944d53bcbd31f0cbd11bce31
+  _type: "url"
+  first_submission_date: 1275391445  # 2010-06-01 13:24:05 +0200 CEST
+  last_analysis_date: 1532442650  # 2018-07-24 16:30:50 +0200 CEST
+  last_analysis_results:
+    ADMINUSLabs:
+      category: "harmless"
+      engine_name: "ADMINUSLabs"
+      method: "blacklist"
+      result: "clean"
+    AegisLab WebGuard:
+      category: "harmless"
+      engine_name: "AegisLab WebGuard"
+      method: "blacklist"
+      result: "clean"
+    AlienVault:
+      category: "harmless"
+      engine_name: "AlienVault"
+      method: "blacklist"
+      result: "clean"
+  last_http_response_code: 200
+  last_http_response_content_length: 7216
+  last_http_response_content_sha256: "7ed66734d9fb8c5a922fffd039c1cd5d85f8c2bb39d14803983528437852ba94"
+  last_http_response_headers:
+    age: "26"
+    cache-control: "public, max-age=60"
+    content-length: "7216"
+    content-type: "text/html"
+    date: "Tue, 24 Jul 2018 14:30:24 GMT"
+    etag: "\"bGPKJQ\""
+    expires: "Tue, 24 Jul 2018 14:31:24 GMT"
+    server: "Google Frontend"
+    x-cloud-trace-context: "131ac6cb5e2cdb7970d54ee42fd5ce4a"
+    x-frame-options: "DENY"
+  last_submission_date: 1532442650  # 2018-07-24 16:30:50 +0200 CEST
+  private: false
+  reputation: 1484
+  times_submitted: 213227
+  total_votes:
+    harmless: 660
+    malicious: 197
 ```
 
 Notice that the returned data usually follows a hierarchical structure, with some top-level fields that may contain subfields which in turn can contain their own subfields. In the example above `last_http_response_headers` has subfields `age`, `cache-control`, `content-lengt` and so on, while `total_votes` has `harmless` and `malicious`. For refering to a particular field within the hierarchy we can use a path, similarly to how we identify a file in our computers, but in this case we are going to use a dot character (.) as the separator for path components, instead of the slashes (or backslashes) used by most file systems. The following ones are valid paths for our example structure:
@@ -196,71 +193,81 @@ $ vt url http://www.virustotal.com --include=reputation,total_votes.*
 Here you have different examples with their outputs (assuming that `vt url http://www.virustotal.com` returns the structure shown above):
 
 ```
-$ vt url http://www.virustotal.com --include=last_http_response_headers.age
-- url <1db0ad7dbcec0676710ea0eaacd35d5e471d3e11944d53bcbd31f0cbd11bce31>:
-    last_http_response_headers:
-      age: "26"
+$ vt url http://www.virustotal.com --include=last_http_response_headers.server
+- last_http_response_headers:
+    server: "Google Frontend"
 ```
 
 ```
 $ vt url http://www.virustotal.com --include=last_http_response_headers.*
-- url <1db0ad7dbcec0676710ea0eaacd35d5e471d3e11944d53bcbd31f0cbd11bce31>:
-    last_http_response_headers:
-      age: "26"
-      cache-control: "public, max-age=60"
-      content-length: "7216"
-      content-type: "text/html"
-      date: "Tue, 24 Jul 2018 14:30:24 GMT"
-      etag: "\"bGPKJQ\""
-      expires: "Tue, 24 Jul 2018 14:31:24 GMT"
-      server: "Google Frontend"
-      x-cloud-trace-context: "131ac6cb5e2cdb7970d54ee42fd5ce4a"
-      x-frame-options: "DENY"
+- last_http_response_headers:
+    age: "26"
+    cache-control: "public, max-age=60"
+    content-length: "7216"
+    content-type: "text/html"
+    date: "Tue, 24 Jul 2018 14:30:24 GMT"
+    etag: "\"bGPKJQ\""
+    expires: "Tue, 24 Jul 2018 14:31:24 GMT"
+    server: "Google Frontend"
+    x-cloud-trace-context: "131ac6cb5e2cdb7970d54ee42fd5ce4a"
+    x-frame-options: "DENY"
 ```
 
 ```
 $ vt url http://www.virustotal.com --include=last_analysis_results.**
-- url <1db0ad7dbcec0676710ea0eaacd35d5e471d3e11944d53bcbd31f0cbd11bce31>:
-    last_analysis_results:
-      ADMINUSLabs:
-        category: "harmless"
-        engine_name: "ADMINUSLabs"
-        method: "blacklist"
-        result: "clean"
-      AegisLab WebGuard:
-        category: "harmless"
-        engine_name: "AegisLab WebGuard"
-        method: "blacklist"
-        result: "clean"
-      AlienVault:
-        category: "harmless"
-        engine_name: "AlienVault"
-        method: "blacklist"
-        result: "clean"
+- last_analysis_results:
+    ADMINUSLabs:
+      category: "harmless"
+      engine_name: "ADMINUSLabs"
+      method: "blacklist"
+      result: "clean"
+    AegisLab WebGuard:
+      category: "harmless"
+      engine_name: "AegisLab WebGuard"
+      method: "blacklist"
+      result: "clean"
+    AlienVault:
+      category: "harmless"
+      engine_name: "AlienVault"
+      method: "blacklist"
+      result: "clean"
 ```
 
 ```
 $ vt url http://www.virustotal.com --include=last_analysis_results.*.result
-- url <1db0ad7dbcec0676710ea0eaacd35d5e471d3e11944d53bcbd31f0cbd11bce31>:
-    last_analysis_results:
-      ADMINUSLabs:
-        result: "clean"
-      AegisLab WebGuard:
-        result: "clean"
-      AlienVault:
-        result: "clean"
+- last_analysis_results:
+    ADMINUSLabs:
+      result: "clean"
+    AegisLab WebGuard:
+      result: "clean"
+    AlienVault:
+      result: "clean"
 ```
 
 ```
 $ vt url http://www.virustotal.com --include=**.result
-- url <1db0ad7dbcec0676710ea0eaacd35d5e471d3e11944d53bcbd31f0cbd11bce31>:
-    last_analysis_results:
-      ADMINUSLabs:
-        result: "clean"
-      AegisLab WebGuard:
-        result: "clean"
-      AlienVault:
-        result: "clean"
+- last_analysis_results:
+    ADMINUSLabs:
+      result: "clean"
+    AegisLab WebGuard:
+      result: "clean"
+    AlienVault:
+      result: "clean"
+```
+
+Also notice that `_id` and `_type` are also field names and therefore you can use them in your filters:
+
+```
+$ vt url http://www.virustotal.com --include=_id,_type,**.result
+- _id: "1db0ad7dbcec0676710ea0eaacd35d5e471d3e11944d53bcbd31f0cbd11bce31"
+  _type: "file"
+  last_analysis_results:
+    ADMINUSLabs:
+      result: "clean"
+    AegisLab WebGuard:
+      result: "clean"
+    AlienVault:
+      result: "clean"
 ```
 
 The `--exclude` option works similarly to `--include` but instead of including the matching fields in the output, it includes everything except the matching fields. You can use this option when you want keep most of the fields, but leave out a few of them that are not interesting. If you use `--include` and `--exclude` simultaneuosly `--include` enters in action first, allowing to pass only the fields that match the include patterns, while `--exclude` comes in after that, removing any remaining field that matches the exclude patterns.

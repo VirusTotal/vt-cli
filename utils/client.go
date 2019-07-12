@@ -15,6 +15,7 @@ package utils
 
 import (
 	"container/heap"
+	"errors"
 	"fmt"
 	"os"
 	"sync"
@@ -30,8 +31,13 @@ type APIClient struct {
 
 // NewAPIClient returns a new VirusTotal API client using the API key configured
 // either using the program configuration file or the --apikey command-line flag.
-func NewAPIClient(apiKey, agent string) (*APIClient, error) {
-	c := vt.NewClient(apiKey)
+func NewAPIClient(agent string) (*APIClient, error) {
+	apikey := viper.GetString("apikey")
+	if apikey == "" {
+		return nil, errors.New(
+			"An API key is needed. Either use the --apikey flag or run \"vt init\" to set up your API key")
+	}
+	c := vt.NewClient(apikey)
 	c.Agent = agent
 	return &APIClient{c}, nil
 }

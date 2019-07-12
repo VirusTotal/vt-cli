@@ -132,7 +132,7 @@ func NewRetrohuntListCmd() *cobra.Command {
 				}
 				return retrohuntListTable(cmd)
 			}
-			p, err := NewObjectPrinter(cmd)
+			p, err := NewPrinter(cmd)
 			if err != nil {
 				return err
 			}
@@ -289,7 +289,7 @@ func NewRetrohuntMatchesCmd() *cobra.Command {
 		Short: "Get matches for a retrohunt job",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			p, err := NewObjectPrinter(cmd)
+			p, err := NewPrinter(cmd)
 			if err != nil {
 				return err
 			}
@@ -317,11 +317,11 @@ func NewRetrohuntCmd() *cobra.Command {
 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			re, _ := regexp.Compile("\\w+-\\d+")
-			p, err := NewObjectPrinter(cmd)
+			p, err := NewPrinter(cmd)
 			if err != nil {
 				return err
 			}
-			return p.Print("intelligence/retrohunt_jobs", args, re)
+			return p.GetAndPrintObjects("intelligence/retrohunt_jobs", args, re)
 		},
 	}
 
