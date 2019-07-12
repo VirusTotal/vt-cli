@@ -68,6 +68,7 @@ func getRelatedObjects(collection, objectID, relationship string, limit int) ([]
 	return result, nil
 }
 
+// NewRelationshipCmd returns a new instance of the 'relationship' command.
 func NewRelationshipCmd(collection, relationship, use, description string) *cobra.Command {
 	cmd := &cobra.Command{
 		Args:  cobra.ExactArgs(1),

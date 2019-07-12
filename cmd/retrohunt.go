@@ -72,7 +72,7 @@ func retrohuntListTable(cmd *cobra.Command) error {
 		}
 
 		if status == "queued" || status == "running" {
-			status = fmt.Sprintf("%s (%d%%)", status, job.MustGetString("progress"))
+			status = fmt.Sprintf("%s (%.1f%%)", status, job.MustGetFloat64("progress"))
 		}
 
 		eta := "-"
