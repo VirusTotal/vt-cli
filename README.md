@@ -48,79 +48,79 @@ This command will ask for your API key, and save it to a config file in your hom
 If you are going to use this tool frequently you may want to have command auto-completion. It saves both precious time and keystrokes. Notice however that you must configure your API as described in the previous section *before* following the steps listed below. The API is necessary for determining the commands that you will have access to.
 
 * Linux:
-	```
-	$ vt completion bash > /etc/bash_completion.d/vt
-	```
+  ```
+  $ vt completion bash > /etc/bash_completion.d/vt
+  ```
 
 * Mac OS X:
-	```
-	$ brew install bash-completion
-	$ vt completion bash > $(brew --prefix)/etc/bash_completion.d/vt
-	```
-	Add the  following lines to `~/.bash_profile`
+  ```
+  $ brew install bash-completion
+  $ vt completion bash > $(brew --prefix)/etc/bash_completion.d/vt
+  ```
+  Add the  following lines to `~/.bash_profile`
     ```
-	if [ -f $(brew --prefix)/etc/bash_completion ]; then
-	. $(brew --prefix)/etc/bash_completion
-	fi
-	```
+  if [ -f $(brew --prefix)/etc/bash_completion ]; then
+  . $(brew --prefix)/etc/bash_completion
+  fi
+  ```
 
 * Cygwin:
 
-	Make sure the `bash-completion` package is installed (Cygwin doesn't installed it by default) and type:
-	```
-	$ vt completion bash > /usr/share/bash-completion/completions/vt
-	```
+  Make sure the `bash-completion` package is installed (Cygwin doesn't installed it by default) and type:
+  ```
+  $ vt completion bash > /usr/share/bash-completion/completions/vt
+  ```
 
 :heavy_exclamation_mark: You may need to restart your shell in order for autocompletion to start working.
 
 ## Usage examples
 
 * Get information about a file from the result of its most recent analysis:
-	```
-	$ vt file 8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85
-	```
+  ```
+  $ vt file 8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85
+  ```
 
 * Get a specific analyses report for a file:
-	```
-	$ # File analysis IDs can be given as `f-<file_SHA256_hash>-<UNIX timestamp>`...
-	$ vt analysis f-8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85-1546309359
-	$ # ...or as a Base64 encoded string, retrieved from the `vt scan file` command:
-	$ vt scan file test.txt
-	test.txt MDJiY2FiZmZmZmQxNmZlMGZjMjUwZjA4Y2FkOTVlMGM6MTU0NjQ1NDUyMA==
-	$ vt analysis MDJiY2FiZmZmZmQxNmZlMGZjMjUwZjA4Y2FkOTVlMGM6MTU0NjQ1NDUyMA==
+  ```
+  $ # File analysis IDs can be given as `f-<file_SHA256_hash>-<UNIX timestamp>`...
+  $ vt analysis f-8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85-1546309359
+  $ # ...or as a Base64 encoded string, retrieved from the `vt scan file` command:
+  $ vt scan file test.txt
+  test.txt MDJiY2FiZmZmZmQxNmZlMGZjMjUwZjA4Y2FkOTVlMGM6MTU0NjQ1NDUyMA==
+  $ vt analysis MDJiY2FiZmZmZmQxNmZlMGZjMjUwZjA4Y2FkOTVlMGM6MTU0NjQ1NDUyMA==
   - _id: "MDJiY2FiZmZmZmQxNmZlMGZjMjUwZjA4Y2FkOTVlMGM6MTU0NjQ1NDUyMA=="
     _type: "analysis"
-	  date: 1546454520  # 2019-01-02 13:42:00 -0500 EST
-	  stats:
-	    failure: 0
-	    harmless: 0
-	    malicious: 0
-	    suspicious: 0
-	    timeout: 0
-	    type-unsupported: 0
-	    undetected: 0
-	  status: "queued"
-	```
+    date: 1546454520  # 2019-01-02 13:42:00 -0500 EST
+    stats:
+      failure: 0
+      harmless: 0
+      malicious: 0
+      suspicious: 0
+      timeout: 0
+      type-unsupported: 0
+      undetected: 0
+    status: "queued"
+  ```
 
 * Download files given a list of hashes in a text file, one hash per line:
-	```
-	$ cat /path/list_of_hashes.txt | vt download -
-	```
+  ```
+  $ cat /path/list_of_hashes.txt | vt download -
+  ```
 
 * Get information about a URL:
-	```
-	$ vt url http://www.virustotal.com
-	```
+  ```
+  $ vt url http://www.virustotal.com
+  ```
 
 * Get the IP address that served a URL:
-	```
-	$ vt url last_serving_ip_address http://www.virustotal.com
-	```
+  ```
+  $ vt url last_serving_ip_address http://www.virustotal.com
+  ```
 
 * Search for files:
-	```
-	$ vt search "positives:5+ type:pdf"
-	```
+  ```
+  $ vt search "positives:5+ type:pdf"
+  ```
 
 ## Getting only what you want
 
