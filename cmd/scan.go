@@ -53,7 +53,7 @@ func (s *fileScanner) Do(path interface{}, ds *utils.DoerState) string {
 		return fmt.Sprintf("%s", err)
 	}
 
-	return fmt.Sprintf("%s %s", path.(string), analysis.ID)
+	return fmt.Sprintf("%s %s", path.(string), analysis.ID())
 }
 
 var scanFileCmdHelp = `Scan one or more files.
@@ -109,7 +109,7 @@ func (s *urlScanner) Do(url interface{}, ds *utils.DoerState) string {
 	if err != nil {
 		return fmt.Sprintf("%s", err)
 	}
-	return fmt.Sprintf("%s %s", url, analysis.ID)
+	return fmt.Sprintf("%s %s", url, analysis.ID())
 }
 
 var scanURLCmdHelp = `Scan one or more URLs.

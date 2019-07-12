@@ -36,7 +36,7 @@ func printUserHumanFriendly(u *vt.Object) error {
 		fmt.Printf("name       : %s\n", strings.Join([]string{fn, ln}, " "))
 	}
 
-	fmt.Printf("username   : %s\n", u.ID)
+	fmt.Printf("username   : %s\n", u.ID())
 	fmt.Printf("email      : %s\n", u.MustGetString("email"))
 	fmt.Printf("apikey     : %s\n", u.MustGetString("apikey"))
 	fmt.Printf("status     : %s\n", u.MustGetString("status"))

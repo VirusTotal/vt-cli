@@ -71,7 +71,7 @@ func runSearchCmd(cmd *cobra.Command, args []string) error {
 		go func() {
 			for it.Next() {
 				obj := it.Get()
-				ch <- obj.ID
+				ch <- obj.ID()
 			}
 			close(ch)
 		}()

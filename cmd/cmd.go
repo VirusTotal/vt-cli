@@ -309,7 +309,7 @@ func (p *ObjectPrinter) PrintObjects(objs []*vt.Object) error {
 				m[name] = l
 			}
 		}
-		key := fmt.Sprintf("%s <%s>", obj.Type, obj.ID)
+		key := fmt.Sprintf("%s <%s>", obj.Type(), obj.ID())
 		list = append(list, map[string]interface{}{key: m})
 	}
 

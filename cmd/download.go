@@ -163,7 +163,7 @@ func (z *zipDownloader) Download(hashes utils.StringReader, password string) err
 		time.Sleep(2 * time.Second)
 	}
 
-	url := vt.URL("intelligence/zip_files/%s/download", obj.ID)
+	url := vt.URL("intelligence/zip_files/%s/download", obj.ID())
 	dstPath := viper.GetString("output")
 
 	err = downloadFile(z.client, url.String(), dstPath, func(resp *grab.Response) {

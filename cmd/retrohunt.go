@@ -99,7 +99,7 @@ func retrohuntListTable(cmd *cobra.Command) error {
 		numMatches, _ := job.GetInt64("num_matches")
 
 		table.AddRow(
-			job.ID,
+			job.ID(),
 			humanize.Time(creationDate),
 			startDate,
 			status,
@@ -212,7 +212,7 @@ func NewRetrohuntStartCmd() *cobra.Command {
 				return err
 			}
 
-			fmt.Println(obj.ID)
+			fmt.Println(obj.ID())
 			return nil
 		},
 	}

@@ -26,7 +26,7 @@ var groupCmdHelp = `Get information about a group.`
 var groupCmdExample = `  vt group mygroup`
 
 func printGroupHumanFriendly(g *vt.Object) error {
-	fmt.Printf("group   : %s\n", g.ID)
+	fmt.Printf("group   : %s\n", g.ID())
 	return nil
 }
 
