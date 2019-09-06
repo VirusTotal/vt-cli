@@ -14,12 +14,7 @@
 package cmd
 
 import (
-	"fmt"
-	"strings"
-
-	vt "github.com/VirusTotal/vt-go"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var userCmdHelp = `Get information about a VirusTotal user.`
@@ -27,71 +22,27 @@ var userCmdHelp = `Get information about a VirusTotal user.`
 var userCmdExample = `  vt user joe
   vt user joe@domain.com`
 
-func printUserHumanFriendly(u *vt.Object) error {
-
-	fn, _ := u.GetString("first_name")
-	ln, _ := u.GetString("last_name")
-
-	if fn != "" || ln != "" {
-		fmt.Printf("name       : %s\n", strings.Join([]string{fn, ln}, " "))
-	}
-
-	fmt.Printf("username   : %s\n", u.ID())
-	fmt.Printf("email      : %s\n", u.MustGetString("email"))
-	fmt.Printf("apikey     : %s\n", u.MustGetString("apikey"))
-	fmt.Printf("status     : %s\n", u.MustGetString("status"))
-	fmt.Printf("user since : %s\n", u.MustGetTime("user_since"))
-	fmt.Printf("last login : %s\n", u.MustGetTime("last_login"))
-	fmt.Printf("2fa        : %v\n", u.MustGetBool("has_2fa"))
-
-	return nil
-}
-
 // NewUserCmd returns a new instance of the 'user' command.
 func NewUserCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "user [username]",
-		Short:   "Get information about a VirusTotal user",
+		Use:     "user [username]...",
+		Short:   "Get information about VirusTotal users",
 		Long:    userCmdHelp,
 		Example: userCmdExample,
-		Args:    cobra.ExactArgs(1),
+		Args:    cobra.MinimumNArgs(1),
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := NewAPIClient()
-			if err != nil {
-				return err
-			}
-			user, err := client.GetObject(
-				vt.URL("users/%s?relationships=%s",
-					args[0],
-					strings.Join([]string{
-						"groups",
-						"api_quota_group",
-						"intelligence_quota_group",
-						"monitor_quota_group",
-					}, ",")))
-			if err != nil {
-				return err
-			}
-			if viper.GetBool("human") {
-				for _, flag := range []string{"include", "exclude"} {
-					if cmd.Flag(flag).Changed {
-						return fmt.Errorf("--%s can't be used with --human", flag)
-					}
-				}
-				return printUserHumanFriendly(user)
-			}
 			p, err := NewPrinter(cmd)
 			if err != nil {
 				return err
 			}
-			return p.PrintObject(user)
+			return p.GetAndPrintObjects("users/%s", args, nil)
 		},
 	}
 
 	addIncludeExcludeFlags(cmd.Flags())
 	addIDOnlyFlag(cmd.Flags())
-	addHumanFlag(cmd.Flags())
+	addThreadsFlag(cmd.Flags())
 
 	return cmd
 }

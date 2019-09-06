@@ -14,59 +14,34 @@
 package cmd
 
 import (
-	"fmt"
-
-	vt "github.com/VirusTotal/vt-go"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var groupCmdHelp = `Get information about a group.`
 
 var groupCmdExample = `  vt group mygroup`
 
-func printGroupHumanFriendly(g *vt.Object) error {
-	fmt.Printf("group   : %s\n", g.ID())
-	return nil
-}
-
 // NewGroupCmd returns a new instance of the 'group' command.
 func NewGroupCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "group [groupname]",
-		Short:   "Get information about a VirusTotal group",
+		Use:     "group [groupname]...",
+		Short:   "Get information about VirusTotal groups",
 		Long:    groupCmdHelp,
 		Example: groupCmdExample,
-		Args:    cobra.ExactArgs(1),
+		Args:    cobra.MinimumNArgs(1),
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := NewAPIClient()
-			if err != nil {
-				return err
-			}
-			group, err := client.GetObject(vt.URL("groups/%s", args[0]))
-			if err != nil {
-				return err
-			}
-			if viper.GetBool("human") {
-				for _, flag := range []string{"include", "exclude"} {
-					if cmd.Flag(flag).Changed {
-						return fmt.Errorf("--%s can't be used with --human", flag)
-					}
-				}
-				return printGroupHumanFriendly(group)
-			}
 			p, err := NewPrinter(cmd)
 			if err != nil {
 				return err
 			}
-			return p.PrintObject(group)
+			return p.GetAndPrintObjects("groups/%s", args, nil)
 		},
 	}
 
 	addIncludeExcludeFlags(cmd.Flags())
 	addIDOnlyFlag(cmd.Flags())
-	addHumanFlag(cmd.Flags())
+	addThreadsFlag(cmd.Flags())
 
 	return cmd
 }
