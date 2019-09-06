@@ -47,7 +47,7 @@ func NewIPCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return p.GetAndPrintObjects("ip_addresses", args, re)
+			return p.GetAndPrintObjects("ip_addresses/%s", args, re)
 		},
 	}
 

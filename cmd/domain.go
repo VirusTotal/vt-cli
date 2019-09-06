@@ -45,7 +45,7 @@ func NewDomainCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			p.GetAndPrintObjects("domains", args, nil)
+			p.GetAndPrintObjects("domains/%s", args, nil)
 			return nil
 		},
 	}

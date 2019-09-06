@@ -119,10 +119,12 @@ func (p *Printer) PrintObject(obj *vt.Object) error {
 	return p.PrintObjects(objs)
 }
 
-// GetAndPrintObjects retrieves a set of objects of the specified object type with objects
-// IDs specified in the args array. If args contains a single "-" string, the
-// object IDs are read from stdin one per line.
-func (p *Printer) GetAndPrintObjects(objType string, args []string, argRe *regexp.Regexp) error {
+// GetAndPrintObjects retrieves objects from the specified endpoint and prints
+// them. The endpoint must contain a %s placeholder that will be replaced with
+// items from the args slice. If args contains a single "-" string, the args are
+// read from stdin one per line. If argRe is non-nil, only args that match the
+// regular expression are used and the rest are discarded.
+func (p *Printer) GetAndPrintObjects(endpoint string, args []string, argRe *regexp.Regexp) error {
 
 	var r StringReader
 
@@ -144,7 +146,7 @@ func (p *Printer) GetAndPrintObjects(objType string, args []string, argRe *regex
 	objectsCh := make(chan *vt.Object)
 	errorsCh := make(chan error, len(filteredArgs))
 
-	go p.client.RetrieveObjects(objType, filteredArgs, objectsCh, errorsCh)
+	go p.client.RetrieveObjects(endpoint, filteredArgs, objectsCh, errorsCh)
 
 	objs := make([]*vt.Object, 0)
 

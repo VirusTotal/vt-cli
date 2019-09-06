@@ -123,7 +123,7 @@ func NewHuntingNotificationCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return p.GetAndPrintObjects("intelligence/hunting_notifications", args, re)
+			return p.GetAndPrintObjects("intelligence/hunting_notifications/%s", args, re)
 		},
 	}
 
@@ -344,7 +344,7 @@ func NewHuntingRulesetCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return p.GetAndPrintObjects("intelligence/hunting_rulesets", args, re)
+			return p.GetAndPrintObjects("intelligence/hunting_rulesets/%s", args, re)
 		},
 	}
 

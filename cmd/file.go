@@ -49,7 +49,7 @@ func NewFileCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return p.GetAndPrintObjects("files", args, re)
+			return p.GetAndPrintObjects("files/%s", args, re)
 		},
 	}
 

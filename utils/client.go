@@ -42,10 +42,10 @@ func NewAPIClient(agent string) (*APIClient, error) {
 	return &APIClient{c}, nil
 }
 
-// RetrieveObjects retrieves all objects of the specified objType that have the
-// identifiers listed in objIDs. The objects are put into the outCh as they are
-// retrieved.
-func (c *APIClient) RetrieveObjects(objType string, objIDs []string, outCh chan *vt.Object, errCh chan error) error {
+// RetrieveObjects retrieves objects from the specified endpoint. The endpoint
+// must contain a %s placeholder that will be replaced with items from the args
+// slice. The objects are put into the outCh as they are retrieved.
+func (c *APIClient) RetrieveObjects(endpoint string, args []string, outCh chan *vt.Object, errCh chan error) error {
 
 	// Make sure outCh is closed
 	defer close(outCh)
@@ -70,11 +70,11 @@ func (c *APIClient) RetrieveObjects(objType string, objIDs []string, outCh chan 
 	// their order in the input. As gorutines run in parallel the objects can
 	// be sent out of order to objCh, but the order number is used to reorder
 	// them.
-	for order, objID := range objIDs {
+	for order, arg := range args {
 		getWg.Add(1)
-		go func(order int, objID string) {
+		go func(order int, arg string) {
 			throttler <- nil
-			obj, err := c.GetObject(vt.URL("%s/%s", objType, objID))
+			obj, err := c.GetObject(vt.URL(endpoint, arg))
 			if err == nil {
 				objCh <- PQueueNode{Priority: order, Data: obj}
 			} else {
@@ -87,7 +87,7 @@ func (c *APIClient) RetrieveObjects(objType string, objIDs []string, outCh chan 
 			}
 			getWg.Done()
 			<-throttler
-		}(order, objID)
+		}(order, arg)
 	}
 
 	outWg := &sync.WaitGroup{}

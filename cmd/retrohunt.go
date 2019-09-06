@@ -321,7 +321,7 @@ func NewRetrohuntCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return p.GetAndPrintObjects("intelligence/retrohunt_jobs", args, re)
+			return p.GetAndPrintObjects("intelligence/retrohunt_jobs/%s", args, re)
 		},
 	}
 

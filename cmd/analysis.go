@@ -48,7 +48,7 @@ func NewAnalysisCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return p.GetAndPrintObjects("analyses", args, re)
+			return p.GetAndPrintObjects("analyses/%s", args, re)
 		},
 	}
 

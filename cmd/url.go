@@ -51,7 +51,7 @@ func NewURLCmd() *cobra.Command {
 			for i, arg := range args {
 				ids[i] = base64.RawURLEncoding.EncodeToString([]byte(arg))
 			}
-			return p.GetAndPrintObjects("urls", ids, nil)
+			return p.GetAndPrintObjects("urls/%s", ids, nil)
 		},
 	}
 
