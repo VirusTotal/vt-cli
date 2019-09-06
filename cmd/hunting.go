@@ -344,7 +344,7 @@ func NewHuntingRulesetCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return p.GetAndPrintObjects("intelligence/hunting_rulesets/%s", args, re)
+			return p.GetAndPrintObjects("intelligence/hunting_rulesets/%s?relationships=owner,editors", args, re)
 		},
 	}
 
