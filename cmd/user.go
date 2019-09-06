@@ -14,6 +14,8 @@
 package cmd
 
 import (
+	"strings"
+
 	"github.com/spf13/cobra"
 )
 
@@ -36,7 +38,14 @@ func NewUserCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return p.GetAndPrintObjects("users/%s", args, nil)
+			return p.GetAndPrintObjects(
+				"users/%s?relationships="+strings.Join([]string{
+					"groups",
+					"api_quota_group",
+					"intelligence_quota_group",
+					"monitor_quota_group",
+				}, ","), args, nil)
+
 		},
 	}
 
