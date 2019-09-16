@@ -27,20 +27,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var monitorCmdHelp = `Get information about one or more files.
-
-This command receives one or more hashes (SHA-256, SHA-1 or MD5) and returns
-information about the corresponding files. The information for each file appears
-in the same order as the hashes are passed to the command.
-
-If the command receives a single hypen (-) the hashes are read from the standard
-input, one per line.
-`
-
-var monitorCmdExample = `  vt monitor items list
-  vt monitor items list --filter "path:/myfolder/" --include path
-  vt monitor items list --filter "tag:detected" --include path,last_analysis_results.*.result,last_detections_count`
-
 var base64RegExp = `^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$`
 
 // NewMonitorItemsListCmd returns a list or monitor_items according to a filter.
@@ -183,6 +169,8 @@ func NewMonitorItemsUploadCmd() *cobra.Command {
 					ch <- params
 					close(ch)
 				}()
+			default:
+				panic("Not a regular file or folder")
 			}
 
 			client, err := NewAPIClient()
@@ -200,12 +188,16 @@ func NewMonitorItemsUploadCmd() *cobra.Command {
 	return cmd
 }
 
+var monitorItemsCmdExample = `  vt monitor items list
+  vt monitor items list --filter "path:/myfolder/" --include path
+  vt monitor items list --filter "tag:detected" --include path,last_analysis_results.*.result,last_detections_count`
+
 // NewMonitorItemsCmd returns a new instance of the 'monitor_item' command.
 func NewMonitorItemsCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "items [monitor_id]...",
 		Short:   "Manage monitor items",
-		Example: monitorCmdExample,
+		Example: monitorItemsCmdExample,
 		Args:    cobra.MinimumNArgs(1),
 
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -228,12 +220,21 @@ func NewMonitorItemsCmd() *cobra.Command {
 	return cmd
 }
 
+var monitorCmdHelp = `Manage your VirusTotal Monitor account.
+
+This command allows you to manage the contents of your account and retrieve
+information about analyses performed to your collection.
+
+Reference:
+  https://developers.virustotal.com/v3.0/reference#monitor`
+
 // NewMonitorCmd returns a new instance of the 'monitor' command.
 func NewMonitorCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "monitor [subcommand]",
 		Short: "Manage your monitor account",
+		Long:  monitorCmdHelp,
 	}
 
 	cmd.AddCommand(NewMonitorItemsCmd())
