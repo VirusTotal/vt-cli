@@ -75,6 +75,7 @@ func NewVTCommand() *cobra.Command {
 	cmd.AddCommand(NewURLCmd())
 	cmd.AddCommand(NewUserCmd())
 	cmd.AddCommand(NewVersionCmd())
+	cmd.AddCommand(NewMonitorCmd())
 
 	return cmd
 }

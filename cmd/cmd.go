@@ -85,9 +85,13 @@ func addOutputFlag(flags *pflag.FlagSet) {
 		"directory where downloaded files are put")
 }
 
-func addFilterFlag(flags *pflag.FlagSet) {
+func addFilterFlag(flags *pflag.FlagSet, defaultFilter ...string) {
+	defaultFilterStr := ""
+	if len(defaultFilter) > 0 {
+		defaultFilterStr = defaultFilter[0]
+	}
 	flags.StringP(
-		"filter", "f", "",
+		"filter", "f", defaultFilterStr,
 		"filter")
 }
 
