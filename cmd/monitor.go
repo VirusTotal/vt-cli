@@ -195,7 +195,7 @@ var monitorItemsCmdExample = `  vt monitor items list
 // NewMonitorItemsCmd returns a new instance of the 'monitor_item' command.
 func NewMonitorItemsCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "items [monitor_id]...",
+		Use:     "items [monitor_id] [flags]",
 		Short:   "Manage monitor items",
 		Example: monitorItemsCmdExample,
 		Args:    cobra.MinimumNArgs(1),
