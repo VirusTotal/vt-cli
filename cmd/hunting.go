@@ -153,7 +153,7 @@ func NewHuntingRulesetListCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return p.PrintCollection(vt.URL("intelligence/hunting_rulesets"))
+			return p.PrintCollection(vt.URL("intelligence/hunting_rulesets?relationships=owner,editors"))
 		},
 	}
 
