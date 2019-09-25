@@ -22,12 +22,13 @@ import (
 var userCmdHelp = `Get information about a VirusTotal user.`
 
 var userCmdExample = `  vt user joe
+  vt user 1ebb658141155c16d8bf89629379098b4cf31d4613b13784a108c6a4805c963b
   vt user joe@domain.com`
 
 // NewUserCmd returns a new instance of the 'user' command.
 func NewUserCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "user [username]...",
+		Use:     "user [username | apikey | email]...",
 		Short:   "Get information about VirusTotal users",
 		Long:    userCmdHelp,
 		Example: userCmdExample,
