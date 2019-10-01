@@ -76,7 +76,7 @@ func runSearchCmd(cmd *cobra.Command, args []string) error {
 			close(ch)
 		}()
 		c := utils.NewCoordinator(viper.GetInt("threads"))
-		c.DoWithItemsFromChannel(&downloader{client: client}, ch)
+		c.DoWithItemsFromChannel(&downloader{newFileDownloader(client)}, ch)
 		return it.Error()
 	}
 
@@ -195,7 +195,7 @@ func runContentSearchCmd(cmd *cobra.Command, args []string) error {
 
 	var doer utils.Doer
 	if viper.GetBool("download") {
-		doer = &downloader{client: client}
+		doer = &downloader{newFileDownloader(client)}
 	} else {
 		doer = &matchPrinter{client, viper.GetBool("identifiers-only")}
 		c.EnableSpinner()

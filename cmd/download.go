@@ -33,18 +33,27 @@ import (
 
 type downloadCallback func(grabResp *grab.Response)
 
-// downloadFile downloads a file given a hash (SHA-256, SHA-1 or MD5)
-func downloadFile(client *utils.APIClient, downloadURL, dstPath string, callback downloadCallback) error {
+type fileDownloader struct {
+	grab   *grab.Client
+	client *utils.APIClient
+}
 
-	c := grab.NewClient()
+func newFileDownloader(client *utils.APIClient) fileDownloader {
+	return fileDownloader{
+		grab:   grab.NewClient(),
+		client: client}
+}
+
+func (d *fileDownloader) DownloadFile(downloadURL, dstPath string, callback downloadCallback) error {
+
 	req, err := grab.NewRequest(dstPath, downloadURL)
 	if err != nil {
 		return err
 	}
 
-	req.HTTPRequest.Header.Add("x-apikey", client.APIKey)
+	req.HTTPRequest.Header.Add("x-apikey", d.client.APIKey)
 
-	resp := c.Do(req)
+	resp := d.grab.Do(req)
 	t := time.NewTicker(500 * time.Millisecond)
 	defer t.Stop()
 
@@ -67,7 +76,7 @@ Loop:
 // Standard downloader, it implements the Doer interface and downloads
 // individual files.
 type downloader struct {
-	client *utils.APIClient
+	fileDownloader
 }
 
 func (d *downloader) Do(file interface{}, ds *utils.DoerState) string {
@@ -87,7 +96,7 @@ func (d *downloader) Do(file interface{}, ds *utils.DoerState) string {
 
 	if err == nil {
 		dstPath := path.Join(viper.GetString("output"), hash)
-		err = downloadFile(d.client, downloadURL, dstPath, func(resp *grab.Response) {
+		err = d.DownloadFile(downloadURL, dstPath, func(resp *grab.Response) {
 			progress := 100 * resp.Progress()
 			if progress < 100 {
 				ds.Progress = fmt.Sprintf("%s %4.1f%% %6.1f KBi/s",
@@ -110,7 +119,7 @@ func (d *downloader) Do(file interface{}, ds *utils.DoerState) string {
 
 // ZIP downloader, uses the API for creating ZIP files in the backend.
 type zipDownloader struct {
-	client *utils.APIClient
+	fileDownloader
 }
 
 func (z *zipDownloader) Download(hashes utils.StringReader, password string) error {
@@ -165,7 +174,7 @@ func (z *zipDownloader) Download(hashes utils.StringReader, password string) err
 	url := vt.URL("intelligence/zip_files/%s/download", obj.ID())
 	dstPath := viper.GetString("output")
 
-	err = downloadFile(z.client, url.String(), dstPath, func(resp *grab.Response) {
+	err = z.DownloadFile(url.String(), dstPath, func(resp *grab.Response) {
 		spin.Suffix = fmt.Sprintf(
 			" downloading ZIP %4.1f%% %6.1f KBi/s",
 			resp.Progress()*100, resp.BytesPerSecond()/1024)
@@ -212,11 +221,13 @@ func NewDownloadCmd() *cobra.Command {
 			re, _ := regexp.Compile(`^([[:xdigit:]]{64}|[[:xdigit:]]{40}|[[:xdigit:]]{32})$`)
 			hashes := utils.NewFilteredStringReader(argReader, re)
 			if viper.GetBool("zip") {
-				z := zipDownloader{client}
+				z := zipDownloader{newFileDownloader(client)}
 				err = z.Download(hashes, viper.GetString("zip-password"))
 			} else {
 				c := utils.NewCoordinator(viper.GetInt("threads"))
-				c.DoWithStringsFromReader(&downloader{client}, hashes)
+				c.DoWithStringsFromReader(
+					&downloader{newFileDownloader(client)},
+					hashes)
 			}
 			return err
 		},
