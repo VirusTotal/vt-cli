@@ -17,7 +17,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
 	"os"
 	"path"
 	"regexp"
@@ -55,8 +54,8 @@ Loop:
 		case <-t.C:
 			callback(resp)
 		case <-resp.Done:
-			if resp.HTTPResponse.StatusCode != http.StatusOK {
-				return fmt.Errorf("http error: %d", resp.HTTPResponse.StatusCode)
+			if err := resp.Err(); err != nil {
+				return fmt.Errorf("download error: %+v", err)
 			}
 			callback(resp)
 			break Loop
