@@ -14,6 +14,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -93,6 +94,78 @@ func (s *monitorFileUpload) Do(file interface{}, ds *utils.DoerState) string {
 	return fmt.Sprintf("%s %s", params.filePath, item.ID())
 }
 
+// runMonitorItemUpload exectutes the items upload, requesting verification from user
+func runMonitorItemUpload(cmd *cobra.Command, args []string) error {
+	localPath := args[0]
+	remotePath := args[1]
+
+	// Check if first arg is a file or a folder
+	pathStat, err := os.Stat(localPath)
+	if err != nil {
+		return err
+	}
+
+	ch := make(chan interface{})
+
+	switch mode := pathStat.Mode(); {
+	case mode.IsDir():
+		// Upload tree to remote
+		localPathClean := strings.TrimRight(localPath, "/") + "/"
+		remotePathClean := strings.TrimRight(remotePath, "/") + "/"
+
+		filesParams := make([]uploadParams, 0)
+		filepath.Walk(
+			localPathClean, func(path string, info os.FileInfo, err error) error {
+				if !info.Mode().IsRegular() {
+					return nil
+				}
+				relativePath := strings.SplitN(path, localPathClean, 2)[1]
+				remoteAbsoluteFilename := remotePathClean + relativePath
+				filesParams = append(filesParams, uploadParams{path, remoteAbsoluteFilename})
+				return nil
+			})
+
+		// Confirm user want to create those files in remote
+		fmt.Println("Following files are going to be created:")
+		for _, params := range filesParams {
+			fmt.Println(params.filePath + " -> " + params.remotePath)
+		}
+		var s string
+		fmt.Println("Confirm(y/n)?")
+		fmt.Scanln(&s)
+		if s != "y" {
+			return nil
+		}
+
+		go func() {
+			for _, params := range filesParams {
+				ch <- params
+			}
+			close(ch)
+		}()
+
+	case mode.IsRegular():
+		// Upload only one file to remote
+		go func() {
+			params := uploadParams{localPath, remotePath}
+			ch <- params
+			close(ch)
+		}()
+	default:
+		return errors.New("Not a regular file or folder")
+	}
+
+	client, err := NewAPIClient()
+	if err != nil {
+		return err
+	}
+
+	s := &monitorFileUpload{uploader: client.NewMonitorUploader()}
+	c := utils.NewCoordinator(viper.GetInt("threads"))
+	c.DoWithItemsFromChannel(s, ch)
+	return nil
+}
+
 var monitorItemUploadCmdHelp = `Upload a file or files contained in a folder.
 
 This command receives one file or folder path and uploads them to your
@@ -112,77 +185,7 @@ func NewMonitorItemsUploadCmd() *cobra.Command {
 		Long:    monitorItemUploadCmdHelp,
 		Example: monitorItemUploadCmdExample,
 		Args:    cobra.ExactArgs(2),
-
-		RunE: func(cmd *cobra.Command, args []string) error {
-			localPath := args[0]
-			remotePath := args[1]
-
-			// Check if first arg is a file or a folder
-			pathStat, err := os.Stat(localPath)
-			if err != nil {
-				return err
-			}
-
-			ch := make(chan interface{})
-
-			switch mode := pathStat.Mode(); {
-			case mode.IsDir():
-				// Upload tree to remote
-				localPathClean := strings.TrimRight(localPath, "/") + "/"
-				remotePathClean := strings.TrimRight(remotePath, "/") + "/"
-
-				filesParams := make([]uploadParams, 0)
-				filepath.Walk(
-					localPathClean, func(path string, info os.FileInfo, err error) error {
-						if !info.Mode().IsRegular() {
-							return nil
-						}
-						relativePath := strings.SplitN(path, localPathClean, 2)[1]
-						remoteAbsoluteFilename := remotePathClean + relativePath
-						filesParams = append(filesParams, uploadParams{path, remoteAbsoluteFilename})
-						return nil
-					})
-
-				// Confirm user want to create those files in remote
-				fmt.Println("Following files are going to be created:")
-				for _, params := range filesParams {
-					fmt.Println(params.filePath + " -> " + params.remotePath)
-				}
-				var s string
-				fmt.Println("Confirm(y/n)?")
-				fmt.Scanln(&s)
-				if s != "y" {
-					return nil
-				}
-
-				go func() {
-					for _, params := range filesParams {
-						ch <- params
-					}
-					close(ch)
-				}()
-
-			case mode.IsRegular():
-				// Upload only one file to remote
-				go func() {
-					params := uploadParams{localPath, remotePath}
-					ch <- params
-					close(ch)
-				}()
-			default:
-				panic("Not a regular file or folder")
-			}
-
-			client, err := NewAPIClient()
-			if err != nil {
-				return err
-			}
-
-			s := &monitorFileUpload{uploader: client.NewMonitorUploader()}
-			c := utils.NewCoordinator(viper.GetInt("threads"))
-			c.DoWithItemsFromChannel(s, ch)
-			return nil
-		},
+		RunE:    runMonitorItemUpload,
 	}
 	addThreadsFlag(cmd.Flags())
 	return cmd
