@@ -55,7 +55,7 @@ func NewMonitorItemsListCmd() *cobra.Command {
 // Upload files to Monitor
 
 type monitorFileUpload struct {
-	scanner *vt.FileScanner
+	uploader *vt.MonitorUploader
 }
 
 type uploadParams struct {
@@ -85,7 +85,7 @@ func (s *monitorFileUpload) Do(file interface{}, ds *utils.DoerState) string {
 	}
 	defer f.Close()
 
-	item, err := s.scanner.MonitorUploadFilename(f, params.remotePath, progressCh)
+	item, err := s.uploader.UploadFilename(f, params.remotePath, progressCh)
 	if err != nil {
 		return fmt.Sprintf("%s", err)
 	}
@@ -178,7 +178,7 @@ func NewMonitorItemsUploadCmd() *cobra.Command {
 				return err
 			}
 
-			s := &monitorFileUpload{scanner: client.NewFileScanner()}
+			s := &monitorFileUpload{uploader: client.NewMonitorUploader()}
 			c := utils.NewCoordinator(viper.GetInt("threads"))
 			c.DoWithItemsFromChannel(s, ch)
 			return nil
