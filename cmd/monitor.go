@@ -86,7 +86,7 @@ func (s *monitorFileUpload) Do(file interface{}, ds *utils.DoerState) string {
 	}
 	defer f.Close()
 
-	item, err := s.uploader.UploadFilename(f, params.remotePath, progressCh)
+	item, err := s.uploader.Upload(f, params.remotePath, progressCh)
 	if err != nil {
 		return fmt.Sprintf("%s", err)
 	}
