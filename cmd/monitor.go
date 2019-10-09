@@ -46,7 +46,7 @@ func NewMonitorItemsListCmd() *cobra.Command {
 	}
 
 	addIncludeExcludeFlags(cmd.Flags())
-	addFilterFlag(cmd.Flags(), "path:/")
+	addFilterFlag(cmd.Flags())
 	addLimitFlag(cmd.Flags())
 	addCursorFlag(cmd.Flags())
 
@@ -198,7 +198,7 @@ var monitorItemsCmdExample = `  vt monitor items list
 // NewMonitorItemsCmd returns a new instance of the 'monitor_item' command.
 func NewMonitorItemsCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "items [monitor_id] [flags]",
+		Use:     "items [monitor_id]...",
 		Short:   "Manage monitor items",
 		Example: monitorItemsCmdExample,
 		Args:    cobra.MinimumNArgs(1),
@@ -235,7 +235,7 @@ Reference:
 func NewMonitorCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:   "monitor [subcommand]",
+		Use:   "monitor",
 		Short: "Manage your monitor account",
 		Long:  monitorCmdHelp,
 	}
