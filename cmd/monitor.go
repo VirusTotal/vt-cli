@@ -54,6 +54,47 @@ func NewMonitorItemsListCmd() *cobra.Command {
 	return cmd
 }
 
+var monitorItemsDownloadCmdHelp = `Download files from your account.
+
+This command download files in your monitor account using their MonitorItemID.`
+
+// NewMonitorItemsDownloadCmd returns a command for downloading files from your
+// monitor account.
+func NewMonitorItemsDownloadCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "download [monitor_id]...",
+		Short: "Download files from your monitor account",
+		Long:  monitorItemsDownloadCmdHelp,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var argReader utils.StringReader
+			if len(args) == 0 {
+				return errors.New("No item provided")
+			} else if len(args) == 1 && args[0] == "-" {
+				argReader = utils.NewStringIOReader(os.Stdin)
+			} else {
+				argReader = utils.NewStringArrayReader(args)
+			}
+			fmt.Println("args:", args)
+			client, err := NewAPIClient()
+			if err != nil {
+				return err
+			}
+			re, _ := regexp.Compile(base64RegExp)
+			monitorItemIDs := utils.NewFilteredStringReader(argReader, re)
+
+			fmt.Println("re:", monitorItemIDs)
+			c := utils.NewCoordinator(viper.GetInt("threads"))
+
+			fmt.Println("channel", c)
+			s := &monitorDownloader{fileDownloader: newFileDownloader(client)}
+			c.DoWithStringsFromReader(s, monitorItemIDs)
+			return err
+		},
+	}
+
+	return cmd
+}
+
 var monitorItemsDeleteCmdHelp = `Delete files in your account.
 
 This command deletes files in your monitor account using a MonitorItemID,
@@ -255,6 +296,7 @@ func NewMonitorItemsCmd() *cobra.Command {
 	cmd.AddCommand(NewMonitorItemsListCmd())
 	cmd.AddCommand(NewMonitorItemsUploadCmd())
 	cmd.AddCommand(NewMonitorItemsDeleteCmd())
+	cmd.AddCommand(NewMonitorItemsDownloadCmd())
 
 	addRelationshipCmds(cmd, "monitor/items", "monitor_item", "[monitor_id]")
 
