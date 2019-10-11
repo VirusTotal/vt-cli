@@ -16,6 +16,7 @@ package cmd
 import (
 	"fmt"
 	"path"
+	"strings"
 
 	"github.com/VirusTotal/vt-cli/utils"
 	vt "github.com/VirusTotal/vt-go"
@@ -24,15 +25,14 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Standard downloader, it implements the Doer interface and downloads
-// individual files.
+// Monitor downloader, it implements the Doer interface. Retrieves the item
+// path to know the destination filename and downloads and save each individual
+// file using fileDownloader.DownloadFile
 type monitorDownloader struct {
 	fileDownloader
 }
 
 func (d *monitorDownloader) Do(file interface{}, ds *utils.DoerState) string {
-	fmt.Println("000 duh")
-
 	var monitorItemID string
 	if f, isObject := file.(*vt.Object); isObject {
 		monitorItemID = f.ID()
@@ -40,20 +40,35 @@ func (d *monitorDownloader) Do(file interface{}, ds *utils.DoerState) string {
 		monitorItemID = file.(string)
 	}
 
-	ds.Progress = fmt.Sprintf("%s %4.1f%%", monitorItemID, 0.0)
+	// Resolve MonitorItemID to path
+	ds.Progress = fmt.Sprintf("%s [resolving path]", monitorItemID)
+	var obj *vt.Object
+	obj, err := d.client.GetObject(vt.URL("monitor/items/%s", monitorItemID))
+	if err != nil {
+		return fmt.Sprintf("%s [%s]", monitorItemID, color.RedString(err.Error()))
+	}
 
-	fmt.Println(vt.URL("monitor/items/%s/download_url", monitorItemID))
+	monitorPath, err := obj.GetString("path")
+	if err != nil {
+		return fmt.Sprintf("%s [%s]", monitorItemID, color.RedString(err.Error()))
+	}
+
+	monitorPath = strings.TrimPrefix(monitorPath, "/")
+
+	// From now progress shows the path instead of monitorItemID
+	ds.Progress = fmt.Sprintf("%s %4.1f%%", monitorPath, 0.0)
+
 	// Get download URL
 	var downloadURL string
-	_, err := d.client.GetData(vt.URL("monitor/items/%s/download_url", monitorItemID), &downloadURL)
+	_, err = d.client.GetData(vt.URL("monitor/items/%s/download_url", monitorItemID), &downloadURL)
 
 	if err == nil {
-		dstPath := path.Join(viper.GetString("output"), monitorItemID)
+		dstPath := path.Join(viper.GetString("output"), monitorPath)
 		err = d.DownloadFile(downloadURL, dstPath, func(resp *grab.Response) {
 			progress := 100 * resp.Progress()
 			if progress < 100 {
 				ds.Progress = fmt.Sprintf("%s %4.1f%% %6.1f KBi/s",
-					monitorItemID, progress, resp.BytesPerSecond()/1024)
+					monitorPath, progress, resp.BytesPerSecond()/1024)
 			}
 		})
 	}
@@ -67,5 +82,5 @@ func (d *monitorDownloader) Do(file interface{}, ds *utils.DoerState) string {
 		}
 	}
 
-	return fmt.Sprintf("%s [%s]", monitorItemID, msg)
+	return fmt.Sprintf("%s [%s]", monitorPath, msg)
 }

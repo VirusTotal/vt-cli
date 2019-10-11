@@ -74,7 +74,6 @@ func NewMonitorItemsDownloadCmd() *cobra.Command {
 			} else {
 				argReader = utils.NewStringArrayReader(args)
 			}
-			fmt.Println("args:", args)
 			client, err := NewAPIClient()
 			if err != nil {
 				return err
@@ -82,16 +81,16 @@ func NewMonitorItemsDownloadCmd() *cobra.Command {
 			re, _ := regexp.Compile(base64RegExp)
 			monitorItemIDs := utils.NewFilteredStringReader(argReader, re)
 
-			fmt.Println("re:", monitorItemIDs)
 			c := utils.NewCoordinator(viper.GetInt("threads"))
-
-			fmt.Println("channel", c)
-			s := &monitorDownloader{fileDownloader: newFileDownloader(client)}
-			c.DoWithStringsFromReader(s, monitorItemIDs)
+			c.DoWithStringsFromReader(
+				&monitorDownloader{fileDownloader: newFileDownloader(client)},
+				monitorItemIDs)
 			return err
 		},
 	}
 
+	addThreadsFlag(cmd.Flags())
+	addOutputFlag(cmd.Flags())
 	return cmd
 }
 
