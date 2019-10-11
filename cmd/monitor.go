@@ -20,6 +20,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
 
 	"github.com/VirusTotal/vt-cli/utils"
 	vt "github.com/VirusTotal/vt-go"
@@ -49,6 +50,42 @@ func NewMonitorItemsListCmd() *cobra.Command {
 	addFilterFlag(cmd.Flags())
 	addLimitFlag(cmd.Flags())
 	addCursorFlag(cmd.Flags())
+
+	return cmd
+}
+
+var monitorItemsDeleteCmdHelp = `Delete files in your account.
+
+This command deletes files in your monitor account using a MonitorItemID,
+deleting a folder deletes all files inside it.`
+
+// NewMonitorItemsDeleteCmd returns a command for deleting files in your monitor
+// account.
+func NewMonitorItemsDeleteCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "delete [monitor_id]...",
+		Short: "Delete monitor files",
+		Long:  monitorItemsDeleteCmdHelp,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client, err := NewAPIClient()
+			if err != nil {
+				return err
+			}
+			var waitGroup sync.WaitGroup
+			for _, arg := range args {
+				waitGroup.Add(1)
+				go func(monitorItemID string) {
+					url := vt.URL("monitor/items/%s", monitorItemID)
+					if _, err := client.Delete(url); err != nil {
+						fmt.Fprintf(os.Stderr, "%v\n", err)
+					}
+					waitGroup.Done()
+				}(arg)
+			}
+			waitGroup.Wait()
+			return err
+		},
+	}
 
 	return cmd
 }
@@ -217,6 +254,7 @@ func NewMonitorItemsCmd() *cobra.Command {
 
 	cmd.AddCommand(NewMonitorItemsListCmd())
 	cmd.AddCommand(NewMonitorItemsUploadCmd())
+	cmd.AddCommand(NewMonitorItemsDeleteCmd())
 
 	addRelationshipCmds(cmd, "monitor/items", "monitor_item", "[monitor_id]")
 
