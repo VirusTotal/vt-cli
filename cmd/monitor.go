@@ -190,7 +190,7 @@ func NewMonitorItemsDeleteDetailsCmd() *cobra.Command {
 var monitorItemsDeleteCmdHelp = `Delete files in your account.
 
 This command deletes files in your monitor account using a MonitorItemID,
-deleting a folder deletes all files inside it.`
+deleting a folder recursivelly deletes all files and folders inside it.`
 
 // NewMonitorItemsDeleteCmd returns a command for deleting files in your monitor
 // account.
