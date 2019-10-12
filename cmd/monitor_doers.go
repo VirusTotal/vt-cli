@@ -1,4 +1,4 @@
-// Copyright © 2017 The VirusTotal CLI authors. All Rights Reserved.
+// Copyright © 2019 The VirusTotal CLI authors. All Rights Reserved.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -15,6 +15,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"strings"
 
@@ -83,4 +84,45 @@ func (d *monitorDownloader) Do(file interface{}, ds *utils.DoerState) string {
 	}
 
 	return fmt.Sprintf("%s [%s]", monitorPath, msg)
+}
+
+// MonitorFileUpload doer
+
+type monitorFileUpload struct {
+	uploader *vt.MonitorUploader
+}
+
+type uploadParams struct {
+	filePath   string
+	remotePath string
+}
+
+func (s *monitorFileUpload) Do(file interface{}, ds *utils.DoerState) string {
+	params := file.(uploadParams)
+
+	progressCh := make(chan float32)
+	defer close(progressCh)
+
+	go func() {
+		for progress := range progressCh {
+			if progress < 100 {
+				ds.Progress = fmt.Sprintf("%s uploading... %4.1f%%", params.filePath, progress)
+			} else {
+				ds.Progress = fmt.Sprintf("%s done.", params.filePath)
+			}
+		}
+	}()
+
+	f, err := os.Open(params.filePath)
+	if err != nil {
+		return fmt.Sprintf("%s", err)
+	}
+	defer f.Close()
+
+	item, err := s.uploader.Upload(f, params.remotePath, progressCh)
+	if err != nil {
+		return fmt.Sprintf("%s", err)
+	}
+
+	return fmt.Sprintf("%s %s", params.filePath, item.ID())
 }

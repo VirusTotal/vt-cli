@@ -16,6 +16,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -58,13 +59,18 @@ var monitorItemsDownloadCmdHelp = `Download files from your account.
 
 This command download files in your monitor account using their MonitorItemID.`
 
+var monitorItemsDownloadCmdExample = `  vt monitor items download "MonitorItemID"
+  vt monitor items download "MonitorItemID1" "MonitorItemID2" ...
+  cat list_of_monitor_ids | vt monitor items download -`
+
 // NewMonitorItemsDownloadCmd returns a command for downloading files from your
 // monitor account.
 func NewMonitorItemsDownloadCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "download [monitor_id]...",
-		Short: "Download files from your monitor account",
-		Long:  monitorItemsDownloadCmdHelp,
+		Use:     "download [monitor_id]...",
+		Short:   "Download files from your monitor account",
+		Long:    monitorItemsDownloadCmdHelp,
+		Example: monitorItemsDownloadCmdExample,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var argReader utils.StringReader
 			if len(args) == 0 {
@@ -91,6 +97,93 @@ func NewMonitorItemsDownloadCmd() *cobra.Command {
 
 	addThreadsFlag(cmd.Flags())
 	addOutputFlag(cmd.Flags())
+	return cmd
+}
+
+var monitorItemsSetDetailsCmdHelp = `Set details metadata for a file.
+
+This command sets details metadata for a file in your monitor account
+referenced by a MonitorItemID.`
+
+var monitorItemsSetDetailsCmdExample = `  vt monitor items setdetails "MonitorItemID" "Some file metadata."
+  cat multiline_details | vt monitor items setdetails "MonitorItemID"`
+
+// NewMonitorItemsSetDetailsCmd returns a command for configuring item details.
+func NewMonitorItemsSetDetailsCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "setdetails [monitor_id] [details_string]",
+		Short:   "Download files from your monitor account",
+		Long:    monitorItemsSetDetailsCmdHelp,
+		Example: monitorItemsSetDetailsCmdExample,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var monitorItemID, details string
+			if len(args) == 0 {
+				return errors.New("No item provided")
+			} else if len(args) == 1 {
+				detailsBytes, err := ioutil.ReadAll(os.Stdin)
+				details = string(detailsBytes)
+				if err != nil {
+					return err
+				}
+			} else {
+				details = args[1]
+			}
+			monitorItemID = args[0]
+
+			client, err := NewAPIClient()
+			if err != nil {
+				return err
+			}
+			re, _ := regexp.Compile(base64RegExp)
+			if !re.MatchString(monitorItemID) {
+				return errors.New("Bad MonitorItemID")
+			}
+
+			obj := vt.NewObjectWithID("monitor_item", monitorItemID)
+			obj.Set("details", details)
+			return client.PatchObject(
+				vt.URL("monitor/items/%s/config", monitorItemID), obj)
+		},
+	}
+
+	return cmd
+}
+
+var monitorItemsDeleteDetailsCmdHelp = `Delete details metadata from files.
+
+This command delete details metadata from a file or files in your monitor
+account that was previously set.`
+
+// NewMonitorItemsDeleteDetailsCmd returns a command for removing item details.
+func NewMonitorItemsDeleteDetailsCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "deletedetails [monitor_id]...",
+		Short: "Download files from your monitor account",
+		Long:  monitorItemsSetDetailsCmdHelp,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client, err := NewAPIClient()
+			if err != nil {
+				return err
+			}
+
+			var waitGroup sync.WaitGroup
+			for _, arg := range args {
+				waitGroup.Add(1)
+				go func(monitorItemID string) {
+					url := vt.URL("monitor/items/%s/config", monitorItemID)
+					obj := vt.NewObjectWithID("monitor_item", monitorItemID)
+					obj.Set("details", nil)
+
+					if err := client.PatchObject(url, obj); err != nil {
+						fmt.Fprintf(os.Stderr, "%v\n", err)
+					}
+					waitGroup.Done()
+				}(arg)
+			}
+			waitGroup.Wait()
+			return nil
+		},
+	}
 	return cmd
 }
 
@@ -128,47 +221,6 @@ func NewMonitorItemsDeleteCmd() *cobra.Command {
 	}
 
 	return cmd
-}
-
-// Upload files to Monitor
-
-type monitorFileUpload struct {
-	uploader *vt.MonitorUploader
-}
-
-type uploadParams struct {
-	filePath   string
-	remotePath string
-}
-
-func (s *monitorFileUpload) Do(file interface{}, ds *utils.DoerState) string {
-	params := file.(uploadParams)
-
-	progressCh := make(chan float32)
-	defer close(progressCh)
-
-	go func() {
-		for progress := range progressCh {
-			if progress < 100 {
-				ds.Progress = fmt.Sprintf("%s uploading... %4.1f%%", params.filePath, progress)
-			} else {
-				ds.Progress = fmt.Sprintf("%s done.", params.filePath)
-			}
-		}
-	}()
-
-	f, err := os.Open(params.filePath)
-	if err != nil {
-		return fmt.Sprintf("%s", err)
-	}
-	defer f.Close()
-
-	item, err := s.uploader.Upload(f, params.remotePath, progressCh)
-	if err != nil {
-		return fmt.Sprintf("%s", err)
-	}
-
-	return fmt.Sprintf("%s %s", params.filePath, item.ID())
 }
 
 // runMonitorItemUpload exectutes the items upload, requesting verification from user
@@ -286,16 +338,19 @@ func NewMonitorItemsCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return p.GetAndPrintObjects("monitor/items", args, re)
+			return p.GetAndPrintObjects("monitor/items/%s", args, re)
 		},
 	}
 
 	addThreadsFlag(cmd.Flags())
+	addIncludeExcludeFlags(cmd.Flags())
 
 	cmd.AddCommand(NewMonitorItemsListCmd())
 	cmd.AddCommand(NewMonitorItemsUploadCmd())
 	cmd.AddCommand(NewMonitorItemsDeleteCmd())
 	cmd.AddCommand(NewMonitorItemsDownloadCmd())
+	cmd.AddCommand(NewMonitorItemsSetDetailsCmd())
+	cmd.AddCommand(NewMonitorItemsDeleteDetailsCmd())
 
 	addRelationshipCmds(cmd, "monitor/items", "monitor_item", "[monitor_id]")
 
