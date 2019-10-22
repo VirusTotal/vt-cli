@@ -367,7 +367,7 @@ func NewHuntingCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Aliases: []string{"ht"},
-		Use:     "hunting [subcommand]",
+		Use:     "hunting",
 		Short:   "Manage malware hunting rules and notifications",
 	}
 
