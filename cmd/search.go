@@ -220,7 +220,9 @@ func runContentSearchCmd(cmd *cobra.Command, args []string) error {
 
 var cmdContentSearchHelp = `Search for content within files in VirusTotal`
 
-var cmdContentSearchExample = `  vt search content '{cafebabe}'
+var cmdContentSearchExample = `  vt search content foobarbaz
+  vt search content '"foo bar baz"'
+  vt search content {cafebabe}
   vt search content '{70 6C 75 73 76 69 63 [1] 79 61 72 61}'
   vt search content '/virustotal(.org|.com)/'`
 
