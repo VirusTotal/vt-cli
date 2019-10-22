@@ -134,7 +134,7 @@ func (m *matchPrinter) Do(fileObj interface{}, ds *utils.DoerState) string {
 		var s string
 		confidence, _ := f.GetContextFloat64("confidence")
 		snippetID, _ := f.GetContextString("snippet")
-		inSubFile, _ := f.GetContextString("match_in_subfile")
+		inSubFile, _ := f.GetContextBool("match_in_subfile")
 		snippets := make([]string, 0)
 		_, err := m.client.GetData(vt.URL("intelligence/search/snippets/%s", snippetID), &snippets)
 		if err == nil {
