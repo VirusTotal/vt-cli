@@ -154,7 +154,7 @@ func (z *zipDownloader) Download(hashes utils.StringReader, password string) err
 	}
 
 	for obj.MustGetString("status") != "finished" {
-		obj, err = z.client.GetObject(vt.URL("intelligence/zip_files/%s", obj.ID))
+		obj, err = z.client.GetObject(vt.URL("intelligence/zip_files/%s", obj.ID()))
 		if err != nil {
 			return err
 		}
