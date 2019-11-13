@@ -348,8 +348,6 @@ func NewHuntingRulesetCmd() *cobra.Command {
 		},
 	}
 
-	addThreadsFlag(cmd.Flags())
-
 	cmd.AddCommand(NewHuntingRulesetAddCmd())
 	cmd.AddCommand(NewHuntingRulesetDeleteCmd())
 	cmd.AddCommand(NewHuntingRulesetDisableCmd())
