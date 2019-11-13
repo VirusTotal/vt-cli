@@ -141,6 +141,7 @@ func NewRetrohuntListCmd() *cobra.Command {
 	}
 
 	addIncludeExcludeFlags(cmd.Flags())
+	addIDOnlyFlag(cmd.Flags())
 	addFilterFlag(cmd.Flags())
 	addLimitFlag(cmd.Flags())
 	addCursorFlag(cmd.Flags())
