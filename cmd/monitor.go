@@ -16,13 +16,18 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
 
 	"github.com/VirusTotal/vt-cli/utils"
 	vt "github.com/VirusTotal/vt-go"
+	"github.com/cavaliercoder/grab"
+	"github.com/fatih/color"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -30,12 +35,16 @@ import (
 
 var base64RegExp = `^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$`
 
+var monitorItemsCmdExample = `  vt monitor list
+  vt monitor list --filter "path:/myfolder/" --include path
+  vt monitor list --filter "tag:detected" --include path,last_analysis_results.*.result,last_detections_count`
+
 // NewMonitorItemsListCmd returns a list or monitor_items according to a filter.
 func NewMonitorItemsListCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list",
-		Short: "List monitor items in your account",
-
+		Use:     "list",
+		Short:   "List monitor in your account",
+		Example: monitorItemsCmdExample,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			p, err := NewPrinter(cmd)
 			if err != nil {
@@ -53,7 +62,243 @@ func NewMonitorItemsListCmd() *cobra.Command {
 	return cmd
 }
 
-// Upload files to Monitor
+// Monitor downloader, it implements the Doer interface. Retrieves the item
+// path to know the destination filename and downloads and save each individual
+// file using fileDownloader.DownloadFile
+type monitorDownloader struct {
+	fileDownloader
+}
+
+func (d *monitorDownloader) Do(file interface{}, ds *utils.DoerState) string {
+	var monitorItemID string
+	if f, isObject := file.(*vt.Object); isObject {
+		monitorItemID = f.ID()
+	} else {
+		monitorItemID = file.(string)
+	}
+
+	// Resolve MonitorItemID to path
+	ds.Progress = fmt.Sprintf("%s [resolving path]", monitorItemID)
+	var obj *vt.Object
+	obj, err := d.client.GetObject(vt.URL("monitor/items/%s", monitorItemID))
+	if err != nil {
+		return fmt.Sprintf("%s [%s]", monitorItemID, color.RedString(err.Error()))
+	}
+
+	monitorPath, err := obj.GetString("path")
+	if err != nil {
+		return fmt.Sprintf("%s [%s]", monitorItemID, color.RedString(err.Error()))
+	}
+
+	monitorPath = strings.TrimPrefix(monitorPath, "/")
+
+	// From now progress shows the path instead of monitorItemID
+	ds.Progress = fmt.Sprintf("%s %4.1f%%", monitorPath, 0.0)
+
+	// Get download URL
+	var downloadURL string
+	_, err = d.client.GetData(vt.URL("monitor/items/%s/download_url", monitorItemID), &downloadURL)
+
+	if err == nil {
+		dstPath := path.Join(viper.GetString("output"), monitorPath)
+		err = d.DownloadFile(downloadURL, dstPath, func(resp *grab.Response) {
+			progress := 100 * resp.Progress()
+			if progress < 100 {
+				ds.Progress = fmt.Sprintf("%s %4.1f%% %6.1f KBi/s",
+					monitorPath, progress, resp.BytesPerSecond()/1024)
+			}
+		})
+	}
+
+	msg := color.GreenString("ok")
+	if err != nil {
+		if apiErr, ok := err.(vt.Error); ok && apiErr.Code == "NotFoundError" {
+			msg = color.RedString("not found")
+		} else {
+			msg = color.RedString(err.Error())
+		}
+	}
+
+	return fmt.Sprintf("%s [%s]", monitorPath, msg)
+}
+
+var monitorItemsDownloadCmdHelp = `Download files from your account.
+
+This command download files in your monitor account using their MonitorItemID.`
+
+var monitorItemsDownloadCmdExample = `  vt monitor download "MonitorItemID"
+  vt monitor download "MonitorItemID1" "MonitorItemID2" ...
+  cat list_of_monitor_ids | vt monitor download -`
+
+// NewMonitorItemsDownloadCmd returns a command for downloading files from your
+// monitor account.
+func NewMonitorItemsDownloadCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "download [monitor_id]...",
+		Short:   "Download files from your monitor account",
+		Long:    monitorItemsDownloadCmdHelp,
+		Example: monitorItemsDownloadCmdExample,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var argReader utils.StringReader
+			if len(args) == 0 {
+				return errors.New("No item provided")
+			} else if len(args) == 1 && args[0] == "-" {
+				argReader = utils.NewStringIOReader(os.Stdin)
+			} else {
+				argReader = utils.NewStringArrayReader(args)
+			}
+			client, err := NewAPIClient()
+			if err != nil {
+				return err
+			}
+			re, _ := regexp.Compile(base64RegExp)
+			monitorItemIDs := utils.NewFilteredStringReader(argReader, re)
+
+			c := utils.NewCoordinator(viper.GetInt("threads"))
+			c.DoWithStringsFromReader(
+				&monitorDownloader{fileDownloader: newFileDownloader(client)},
+				monitorItemIDs)
+			return err
+		},
+	}
+
+	addThreadsFlag(cmd.Flags())
+	addOutputFlag(cmd.Flags())
+	return cmd
+}
+
+var monitorItemsSetDetailsCmdHelp = `Set details metadata for a file.
+
+This command sets details metadata for a file in your monitor account
+referenced by a MonitorItemID.`
+
+var monitorItemsSetDetailsCmdExample = `  vt monitor setdetails "MonitorItemID" "Some file metadata."
+  cat multiline_details | vt monitor setdetails "MonitorItemID"`
+
+// NewMonitorItemsSetDetailsCmd returns a command for configuring item details.
+func NewMonitorItemsSetDetailsCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "setdetails [monitor_id] [details_string]",
+		Short:   "Sets details metadata for a monitor file",
+		Long:    monitorItemsSetDetailsCmdHelp,
+		Example: monitorItemsSetDetailsCmdExample,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var monitorItemID, details string
+			if len(args) == 0 {
+				return errors.New("No item provided")
+			} else if len(args) == 1 {
+				detailsBytes, err := ioutil.ReadAll(os.Stdin)
+				details = string(detailsBytes)
+				if err != nil {
+					return err
+				}
+			} else {
+				details = args[1]
+			}
+			monitorItemID = args[0]
+
+			client, err := NewAPIClient()
+			if err != nil {
+				return err
+			}
+			re, _ := regexp.Compile(base64RegExp)
+			if !re.MatchString(monitorItemID) {
+				return errors.New("Bad MonitorItemID")
+			}
+
+			obj := vt.NewObjectWithID("monitor_item", monitorItemID)
+			obj.Set("details", details)
+			return client.PatchObject(
+				vt.URL("monitor/items/%s/config", monitorItemID), obj)
+		},
+	}
+
+	return cmd
+}
+
+var monitorItemsDeleteDetailsCmdHelp = `Delete details metadata from files.
+
+This command delete details metadata from a file or files in your monitor
+account that was previously set.`
+
+// NewMonitorItemsDeleteDetailsCmd returns a command for removing item details.
+func NewMonitorItemsDeleteDetailsCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "deletedetails [monitor_id]...",
+		Short: "Download files from your monitor account",
+		Long:  monitorItemsSetDetailsCmdHelp,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				return errors.New("No item provided")
+			}
+
+			client, err := NewAPIClient()
+			if err != nil {
+				return err
+			}
+
+			var waitGroup sync.WaitGroup
+			for _, arg := range args {
+				waitGroup.Add(1)
+				go func(monitorItemID string) {
+					url := vt.URL("monitor/items/%s/config", monitorItemID)
+					obj := vt.NewObjectWithID("monitor_item", monitorItemID)
+					obj.Set("details", nil)
+
+					if err := client.PatchObject(url, obj); err != nil {
+						fmt.Fprintf(os.Stderr, "%v\n", err)
+					}
+					waitGroup.Done()
+				}(arg)
+			}
+			waitGroup.Wait()
+			return nil
+		},
+	}
+	return cmd
+}
+
+var monitorItemsDeleteCmdHelp = `Delete files in your account.
+
+This command deletes files in your monitor account using a MonitorItemID,
+deleting a folder recursivelly deletes all files and folders inside it.`
+
+// NewMonitorItemsDeleteCmd returns a command for deleting files in your monitor
+// account.
+func NewMonitorItemsDeleteCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "delete [monitor_id]...",
+		Short: "Delete monitor files",
+		Long:  monitorItemsDeleteCmdHelp,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				return errors.New("No item provided")
+			}
+
+			client, err := NewAPIClient()
+			if err != nil {
+				return err
+			}
+			var waitGroup sync.WaitGroup
+			for _, arg := range args {
+				waitGroup.Add(1)
+				go func(monitorItemID string) {
+					url := vt.URL("monitor/items/%s", monitorItemID)
+					if _, err := client.Delete(url); err != nil {
+						fmt.Fprintf(os.Stderr, "%v\n", err)
+					}
+					waitGroup.Done()
+				}(arg)
+			}
+			waitGroup.Wait()
+			return err
+		},
+	}
+
+	return cmd
+}
+
+// MonitorFileUpload doer
 
 type monitorFileUpload struct {
 	uploader *vt.MonitorUploader
@@ -171,7 +416,7 @@ var monitorItemUploadCmdHelp = `Upload a file or files contained in a folder.
 This command receives one file or folder path and uploads them to your
 VirusTotal Monitor account. It returns uploaded the file paths followed by their
 corresponding monitor ID.
-You can use the "vt monitor items [monitor_id]" command for retrieving
+You can use the "vt monitor [monitor_id]" command for retrieving
 information about the it.`
 
 var monitorItemUploadCmdExample = `  vt monitor item upload foo.exe /remote_folder/foo.exe
@@ -191,38 +436,6 @@ func NewMonitorItemsUploadCmd() *cobra.Command {
 	return cmd
 }
 
-var monitorItemsCmdExample = `  vt monitor items list
-  vt monitor items list --filter "path:/myfolder/" --include path
-  vt monitor items list --filter "tag:detected" --include path,last_analysis_results.*.result,last_detections_count`
-
-// NewMonitorItemsCmd returns a new instance of the 'monitor_item' command.
-func NewMonitorItemsCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "items [monitor_id]...",
-		Short:   "Manage monitor items",
-		Example: monitorItemsCmdExample,
-		Args:    cobra.MinimumNArgs(1),
-
-		RunE: func(cmd *cobra.Command, args []string) error {
-			re, _ := regexp.Compile(base64RegExp)
-			p, err := NewPrinter(cmd)
-			if err != nil {
-				return err
-			}
-			return p.GetAndPrintObjects("monitor/items", args, re)
-		},
-	}
-
-	addThreadsFlag(cmd.Flags())
-
-	cmd.AddCommand(NewMonitorItemsListCmd())
-	cmd.AddCommand(NewMonitorItemsUploadCmd())
-
-	addRelationshipCmds(cmd, "monitor/items", "monitor_item", "[monitor_id]")
-
-	return cmd
-}
-
 var monitorCmdHelp = `Manage your VirusTotal Monitor account.
 
 This command allows you to manage the contents of your account and retrieve
@@ -231,15 +444,35 @@ information about analyses performed to your collection.
 Reference:
   https://developers.virustotal.com/v3.0/reference#monitor`
 
-// NewMonitorCmd returns a new instance of the 'monitor' command.
+// NewMonitorCmd returns a new instance of the 'monitor_item' command.
 func NewMonitorCmd() *cobra.Command {
-
 	cmd := &cobra.Command{
-		Use:   "monitor",
+		Use:   "monitor [monitor_id]...",
 		Short: "Manage your monitor account",
 		Long:  monitorCmdHelp,
+		Args:  cobra.MinimumNArgs(1),
+
+		RunE: func(cmd *cobra.Command, args []string) error {
+			re, _ := regexp.Compile(base64RegExp)
+			p, err := NewPrinter(cmd)
+			if err != nil {
+				return err
+			}
+			return p.GetAndPrintObjects("monitor/items/%s", args, re)
+		},
 	}
 
-	cmd.AddCommand(NewMonitorItemsCmd())
+	addThreadsFlag(cmd.Flags())
+	addIncludeExcludeFlags(cmd.Flags())
+
+	cmd.AddCommand(NewMonitorItemsListCmd())
+	cmd.AddCommand(NewMonitorItemsUploadCmd())
+	cmd.AddCommand(NewMonitorItemsDeleteCmd())
+	cmd.AddCommand(NewMonitorItemsDownloadCmd())
+	cmd.AddCommand(NewMonitorItemsSetDetailsCmd())
+	cmd.AddCommand(NewMonitorItemsDeleteDetailsCmd())
+
+	addRelationshipCmds(cmd, "monitor/items", "monitor_item", "[monitor_id]")
+
 	return cmd
 }
