@@ -96,7 +96,10 @@ func NewScanFileCmd() *cobra.Command {
 			return nil
 		},
 	}
+
 	addThreadsFlag(cmd.Flags())
+	cmd.MarkZshCompPositionalArgumentFile(1)
+
 	return cmd
 }
 

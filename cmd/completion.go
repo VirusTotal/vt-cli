@@ -39,7 +39,7 @@ Note for zsh users: [1] zsh completions are only supported in versions of zsh >=
 
 // NewCompletionCmd returns command 'completion'
 func NewCompletionCmd() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "completion <shell>",
 		Short: "Output shell completion code for the specified shell (bash or zsh)",
 		Long:  completionCmdHelp,
@@ -58,4 +58,8 @@ func NewCompletionCmd() *cobra.Command {
 			run(os.Stdout, cmd.Parent())
 		},
 	}
+
+	cmd.MarkZshCompPositionalArgumentWords(1, "bash", "zsh")
+
+	return cmd
 }

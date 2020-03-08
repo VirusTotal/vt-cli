@@ -230,6 +230,8 @@ func NewRetrohuntStartCmd() *cobra.Command {
 		"corpus", "main",
 		"specify the corpus that will be scanned, possible values are \"main\" and \"goodware\"")
 
+	cmd.MarkZshCompPositionalArgumentFile(1)
+
 	return cmd
 }
 

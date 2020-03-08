@@ -23,8 +23,9 @@ This command receives one or more Internet domains and returns information about
 them. The data is returned in the same order as the domains appear in the
 command line.
 
-If the domains are not provided in the command line they will be read from
-the standard input, one per line.`
+If the command receives a single hypen (-) the domains are read from the standard
+input, one per line.
+`
 
 var domainCmdExample = `  vt domain virustotal.com
   vt domain virustotal.com google.com

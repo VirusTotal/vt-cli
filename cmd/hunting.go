@@ -299,7 +299,7 @@ func NewHuntingRulesetDeleteCmd() *cobra.Command {
 
 // NewHuntingRulesetAddCmd returns a command for adding a new ruleset.
 func NewHuntingRulesetAddCmd() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "add [ruleset name] [rules file]",
 		Short: "Add a new ruleset",
 		Args:  cobra.ExactArgs(2),
@@ -328,6 +328,11 @@ func NewHuntingRulesetAddCmd() *cobra.Command {
 			return p.PrintObject(obj)
 		},
 	}
+
+	cmd.MarkZshCompPositionalArgumentFile(2)
+
+	return cmd
+
 }
 
 // NewHuntingRulesetCmd returns a new instance of the 'rulesets' command.

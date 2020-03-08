@@ -26,8 +26,9 @@ hashes as returned in the "object_id" field are also accepted. The information
 about each URL is returned in the same order as the URLs are passed to the
 command.
 
-If the URLs are not provided in the command line they will be read from the
-standard input, one per line.`
+If the command receives a single hypen (-) the URLs are read from the standard
+input, one per line.
+`
 
 var urlCmdExample = `  vt url https://www.virustotal.com
   vt url f1177df4692356280844e1d5af67cc4a9eccecf77aa61c229d483b7082c70a8e

@@ -25,8 +25,9 @@ This command receives one or more analysis identifiers and returns information
 about the analysis. The data is returned in the same order as the identifiers
 appear in the command line.
 
-If the identifiers are not provided in the command line they will be read from
-the standard input, one per line.`
+If the command receives a single hypen (-) the analysis identifiers are read 
+from the standard input, one per line.
+`
 
 var analysisCmdExample = `  vt analysis f-e04b82f7f8afc6e599d4913bee5eb571921ec8958d1ea5e3bbffe9c7ea9a0960-1542306475
   vt analysis u-1db0ad7dbcec0676710ea0eaacd35d5e471d3e11944d53bcbd31f0cbd11bce31-1542292491
