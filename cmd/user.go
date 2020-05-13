@@ -54,5 +54,7 @@ func NewUserCmd() *cobra.Command {
 	addIDOnlyFlag(cmd.Flags())
 	addThreadsFlag(cmd.Flags())
 
+	cmd.AddCommand(NewPrivilegeCmd("user"))
+
 	return cmd
 }

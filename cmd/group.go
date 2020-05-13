@@ -43,5 +43,7 @@ func NewGroupCmd() *cobra.Command {
 	addIDOnlyFlag(cmd.Flags())
 	addThreadsFlag(cmd.Flags())
 
+	cmd.AddCommand(NewPrivilegeCmd("group"))
+
 	return cmd
 }
