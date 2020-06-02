@@ -15,8 +15,10 @@ package yaml
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/gobwas/glob"
 
@@ -168,9 +170,9 @@ var tests = []T{
 		}{
 			Foo_date: "10000",
 		},
-		yaml: Y(`
-			Foo_date: 10000  # 1970-01-01 03:46:40 +0100 CET
-			`),
+		yaml: Y(fmt.Sprintf(`
+			Foo_date: 10000  # %v
+			`,  time.Unix(10000, 0))),
 	},
 }
 
