@@ -17,7 +17,7 @@ install:
 
 # Build the project for multiple architectures
 all:
-	gox ${LDFLAGS} -output "build/{{.OS}}/{{.Arch}}/{{.Dir}}" github.com/VirusTotal/vt-cli/vt
+	gox ${LDFLAGS} -osarch="linux/amd64 windows/amd64 darwin/amd64" -output "build/{{.OS}}/{{.Arch}}/{{.Dir}}" github.com/VirusTotal/vt-cli/vt
 
 # Cleans our project: deletes binaries
 clean:
