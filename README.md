@@ -2,13 +2,13 @@
 
 Welcome to the VirusTotal CLI, a tool designed for those who love both VirusTotal and command-line interfaces. With this tool you can do everything you'd normally do using the VirusTotal's web page, including:
 
-* Retrieve information about a file, URL, domain name, IP address, etc.
-* Search for files using VirusTotal Intelligence query syntax.
-* Download files.
-* Manage your Malware Hunting YARA rules.
-* Launch Retrohunt jobs and get their results.
+* Retrieve information about a [file](doc/vt_file.md), [URL](doc/vt_url.md), [domain name](doc/vt_domain.md), [IP address](doc/vt_ip.md), etc.
+* [Search](doc/vt_search.md) for files and URLs using VirusTotal Intelligence query syntax.
+* [Download files](doc/vt_download.md).
+* [Manage your LiveHunt YARA rules](doc/vt_hunting_ruleset.md).
+* [Launch Retrohunt jobs](doc/vt_retrohunt_start.md) and [get their results](doc/vt_retrohunt_matches.md).
 
-See the supported [commands](doc/vt.md) 
+And much [more](doc/vt.md)... 
 
 ## See it in action
 
@@ -74,12 +74,12 @@ If you are going to use this tool frequently you may want to have command auto-c
 
 ## Usage examples
 
-* Get information about a file from the result of its most recent analysis:
+* Get information about a file:
   ```
   $ vt file 8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85
   ```
 
-* Get a specific analyses report for a file:
+* Get a specific analysis report for a file:
   ```
   $ # File analysis IDs can be given as `f-<file_SHA256_hash>-<UNIX timestamp>`...
   $ vt analysis f-8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85-1546309359
@@ -182,7 +182,7 @@ Notice that the returned data usually follows a hierarchical structure, with som
 The filters accepted by both `--include` and `--exclude` are paths in which we can use `*` and `**` as placeholders for one and many path elements respectively. For example `foo.*` matches `foo.bar` but not `foo.bar.baz`, while `foo.**` matches `foo.bar`, `foo.bar.baz` and `foo.bar.baz.qux`. In the other hand, `foo.*.qux` matches `foo.bar.qux` and `foo.baz.qux` but not `foo.bar.baz.qux`, while `foo.**.qux` matches
 `foo.bar.baz.qux` and any other path starting with `foo` and ending with `qux`.
 
-For cherry-picking only some of the fields you should use `--include` followed by a path pattern as explained above. You can also include more than one pattern either by using the `--include` argument multiple times, or by using it with a comma-separated list of patterns. The following two options are equivalent:
+For cherry-picking only the fields you want, you should use `--include` followed by a path pattern as explained above. You can also include more than one pattern either by using the `--include` argument multiple times, or by using it with a comma-separated list of patterns. The following two options are equivalent:
 
 ```
 $ vt url http://www.virustotal.com --include=reputation --include=total_votes.*
@@ -269,4 +269,4 @@ $ vt url http://www.virustotal.com --include=_id,_type,**.result
       result: "clean"
 ```
 
-The `--exclude` option works similarly to `--include` but instead of including the matching fields in the output, it includes everything except the matching fields. You can use this option when you want keep most of the fields, but leave out a few of them that are not interesting. If you use `--include` and `--exclude` simultaneuosly `--include` enters in action first, allowing to pass only the fields that match the include patterns, while `--exclude` comes in after that, removing any remaining field that matches the exclude patterns.
+The `--exclude` option works similarly to `--include` but instead of including the matching fields in the output, it includes everything except the matching fields. You can use this option when you want to keep most of the fields, but leave out a few of them that are not interesting. If you use `--include` and `--exclude` simultaneously `--include` enters in action first, including only the fields that match the `--include` patterns, while `--exclude` comes in after that, removing any remaining field that matches the `--exclude` patterns.
