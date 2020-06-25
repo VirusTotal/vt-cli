@@ -129,6 +129,8 @@ func NewHuntingNotificationCmd() *cobra.Command {
 	}
 
 	addThreadsFlag(cmd.Flags())
+	addIDOnlyFlag(cmd.Flags())
+	addIncludeExcludeFlags(cmd.Flags())
 
 	cmd.AddCommand(NewHuntingNotificationListCmd())
 	cmd.AddCommand(NewHuntingNotificationDeleteCmd())
@@ -355,6 +357,8 @@ func NewHuntingRulesetCmd() *cobra.Command {
 	}
 
 	addThreadsFlag(cmd.Flags())
+	addIDOnlyFlag(cmd.Flags())
+	addIncludeExcludeFlags(cmd.Flags())
 
 	cmd.AddCommand(NewHuntingRulesetAddCmd())
 	cmd.AddCommand(NewHuntingRulesetDeleteCmd())

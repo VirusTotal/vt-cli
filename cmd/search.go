@@ -106,7 +106,9 @@ func NewSearchCmd() *cobra.Command {
 		RunE:    runSearchCmd,
 	}
 
-	cmd.Flags().BoolP("download", "d", false, "download files")
+	cmd.Flags().BoolP(
+		"download", "d", false,
+		"download files that match the query")
 
 	addIDOnlyFlag(cmd.Flags())
 	addIncludeExcludeFlags(cmd.Flags())
@@ -238,8 +240,12 @@ func NewContentSearchCmd() *cobra.Command {
 		RunE:    runContentSearchCmd,
 	}
 
-	cmd.Flags().BoolP("download", "d", false, "download files")
-	cmd.Flags().BoolP("exact-matches-only", "e", false, "exact matches only")
+	cmd.Flags().BoolP(
+		"download", "d", false,
+		"download files that match the query")
+	cmd.Flags().BoolP(
+		"exact-matches-only", "e", false,
+		"exact matches only")
 
 	addThreadsFlag(cmd.Flags())
 	addIDOnlyFlag(cmd.Flags())

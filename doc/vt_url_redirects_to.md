@@ -1,0 +1,34 @@
+## vt url redirects_to
+
+URLs that this url redirects to.
+
+### Synopsis
+
+URLs that this url redirects to.
+
+```
+vt url redirects_to [url] [flags]
+```
+
+### Options
+
+```
+  -c, --cursor string      cursor for continuing where the previous request left
+  -x, --exclude strings    exclude fields matching the provided pattern
+  -h, --help               help for redirects_to
+  -I, --identifiers-only   print identifiers only
+  -i, --include strings    include fields matching the provided pattern (default [**])
+  -n, --limit int          maximum number of results (default 10)
+```
+
+### Options inherited from parent commands
+
+```
+  -k, --apikey string   api key
+  -v, --verbose         verbose output
+```
+
+### SEE ALSO
+
+* [vt url](vt_url.md)	 - Get information about URLs
+

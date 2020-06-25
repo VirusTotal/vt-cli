@@ -1,0 +1,29 @@
+## vt hunting ruleset setlimit
+
+Set ruleset limit
+
+### Synopsis
+
+Set ruleset limit
+
+```
+vt hunting ruleset setlimit [ruleset id] [limit] [flags]
+```
+
+### Options
+
+```
+  -h, --help   help for setlimit
+```
+
+### Options inherited from parent commands
+
+```
+  -k, --apikey string   api key
+  -v, --verbose         verbose output
+```
+
+### SEE ALSO
+
+* [vt hunting ruleset](vt_hunting_ruleset.md)	 - Manage hunting rulesets
+
