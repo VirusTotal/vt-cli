@@ -8,6 +8,8 @@ Welcome to the VirusTotal CLI, a tool designed for those who love both VirusTota
 * Manage your Malware Hunting YARA rules.
 * Launch Retrohunt jobs and get their results.
 
+See the supported [commands](doc/vt.md) 
+
 ## See it in action
 
 [![asciicast](https://asciinema.org/a/179696.png)](https://asciinema.org/a/179696)
