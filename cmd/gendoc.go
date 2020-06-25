@@ -30,6 +30,7 @@ func NewGenDocCmd() *cobra.Command {
 			if len(args) == 1 {
 				outputDir = args[0]
 			}
+			cmd.Root().DisableAutoGenTag = true
 			return doc.GenMarkdownTree(cmd.Parent(), outputDir)
 		},
 	}
