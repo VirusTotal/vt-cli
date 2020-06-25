@@ -20,8 +20,8 @@ vt search [query] [flags]
 ### Options
 
 ```
-  -c, --cursor string      cursor
-  -d, --download           download files
+  -c, --cursor string      cursor for continuing where the previous request left
+  -d, --download           download files that match the query
   -x, --exclude strings    exclude fields matching the provided pattern
   -h, --help               help for search
   -I, --identifiers-only   print identifiers only

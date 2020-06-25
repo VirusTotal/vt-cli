@@ -13,7 +13,7 @@ vt monitor analyses [monitor_id] [flags]
 ### Options
 
 ```
-  -c, --cursor string      cursor
+  -c, --cursor string      cursor for continuing where the previous request left
   -x, --exclude strings    exclude fields matching the provided pattern
   -h, --help               help for analyses
   -I, --identifiers-only   print identifiers only

@@ -13,7 +13,7 @@ vt file carbonblack_children [hash] [flags]
 ### Options
 
 ```
-  -c, --cursor string      cursor
+  -c, --cursor string      cursor for continuing where the previous request left
   -x, --exclude strings    exclude fields matching the provided pattern
   -h, --help               help for carbonblack_children
   -I, --identifiers-only   print identifiers only

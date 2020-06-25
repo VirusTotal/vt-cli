@@ -23,8 +23,8 @@ vt search content [query] [flags]
 ### Options
 
 ```
-  -c, --cursor string        cursor
-  -d, --download             download files
+  -c, --cursor string        cursor for continuing where the previous request left
+  -d, --download             download files that match the query
   -e, --exact-matches-only   exact matches only
   -h, --help                 help for content
   -I, --identifiers-only     print identifiers only

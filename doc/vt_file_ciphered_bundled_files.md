@@ -13,7 +13,7 @@ vt file ciphered_bundled_files [hash] [flags]
 ### Options
 
 ```
-  -c, --cursor string      cursor
+  -c, --cursor string      cursor for continuing where the previous request left
   -x, --exclude strings    exclude fields matching the provided pattern
   -h, --help               help for ciphered_bundled_files
   -I, --identifiers-only   print identifiers only

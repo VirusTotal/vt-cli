@@ -13,7 +13,7 @@ vt ip related_comments [ip] [flags]
 ### Options
 
 ```
-  -c, --cursor string      cursor
+  -c, --cursor string      cursor for continuing where the previous request left
   -x, --exclude strings    exclude fields matching the provided pattern
   -h, --help               help for related_comments
   -I, --identifiers-only   print identifiers only

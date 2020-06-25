@@ -21,7 +21,7 @@ vt monitor list [flags]
 ### Options
 
 ```
-  -c, --cursor string     cursor
+  -c, --cursor string     cursor for continuing where the previous request left
   -x, --exclude strings   exclude fields matching the provided pattern
   -f, --filter string     filter
   -h, --help              help for list

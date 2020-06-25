@@ -76,7 +76,7 @@ func addLimitFlag(flags *pflag.FlagSet) {
 func addCursorFlag(flags *pflag.FlagSet) {
 	flags.StringP(
 		"cursor", "c", "",
-		"cursor")
+		"cursor for continuing where the previous request left")
 }
 
 func addOutputFlag(flags *pflag.FlagSet) {
