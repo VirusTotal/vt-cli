@@ -18,5 +18,5 @@ deploy:
     script: ./deploy.sh
     skip_cleanup: true
     on:
-      go: "1.14"
+      go: "1.14.x"
       tags: true
