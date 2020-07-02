@@ -35,13 +35,20 @@ var colorScheme = yaml.Colors{
 func addAPIKeyFlag(flags *pflag.FlagSet) {
 	flags.StringP(
 		"apikey", "k", "",
-		"api key")
+		"API key")
 }
 
 func addHostFlag(flags *pflag.FlagSet) {
 	flags.String(
 		"host", "www.virustotal.com",
 		"API host name")
+	flags.MarkHidden("host")
+}
+
+func addProxyFlag(flags *pflag.FlagSet) {
+	flags.String(
+		"proxy", "",
+		"HTTP proxy")
 	flags.MarkHidden("host")
 }
 

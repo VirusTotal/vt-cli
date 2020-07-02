@@ -29,7 +29,7 @@ $ make install
 
 ### A note on Window's console
 
-If you plan to use vt-cli in Windows on a regular basis we highly recommend you to avoid the standard Windows's console and use [Cygwin](https://www.cygwin.com/) instead. The Windows's console is *very* slow when printing large amounts of text (as vt-cli usually does) while Cygwin performs much better. Additionally you can benefit of Cygwin's support for command auto-completion, a handy feature that Window's console doesn't offer. In order to take advantage of auto-completion make sure to include the `bash-completion` package while installing Cygwin.
+If you plan to use vt-cli in Windows on a regular basis we highly recommend you to avoid the standard Windows's console and use [Cygwin](https://www.cygwin.com/) instead. The Windows's console is *very* slow when printing large amounts of text (as vt-cli usually does) while Cygwin performs much better. Additionally, you can benefit of Cygwin's support for command auto-completion, a handy feature that Window's console doesn't offer. In order to take advantage of auto-completion make sure to include the `bash-completion` package while installing Cygwin.
 
 
 ### Configuring your API key
@@ -40,7 +40,21 @@ Once you have installed the vt-cli tool you may want to configure it with your A
 $ vt init
 ```
 
-This command will ask for your API key, and save it to a config file in your home directory (~/.vt.toml)
+This command will ask for your API key, and save it to a config file in your home directory (~/.vt.toml). You can also specify your API key using the  `VTCLI_APIKEY` environment variable. If you specify your API key in multiple ways, the `--apikey` option will have the highest precedence, followed by the `VTCLI_APIKEY` environment variable, the API key in the configuration file will be used as the last resort.
+
+### Use with a proxy
+
+If you are behind a HTTP proxy you can tell `vt-cli` which is the address of your proxy server by multiple ways. One is using the `--proxy` option, like in:
+
+```
+$ vt --proxy http://myproxy.com:1234 <command>
+```
+
+You can also use the `VTCLI_PROXY` environment variable, or add the following line to the config file:
+
+```
+proxy="http://myproxy.com:1234"
+```
 
 ### Setup Bash completion
 

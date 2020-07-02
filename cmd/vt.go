@@ -40,6 +40,10 @@ func NewVTCommand() *cobra.Command {
 			if host != "" {
 				vt.SetHost(host)
 			}
+			proxy := viper.GetString("proxy")
+			if proxy != "" {
+				os.Setenv("http_proxy", proxy)
+			}
 			if viper.GetBool("verbose") {
 				if configFile := viper.ConfigFileUsed(); configFile != "" {
 					fmt.Fprintf(os.Stderr, "* Config file: %s\n", configFile)
@@ -55,6 +59,7 @@ func NewVTCommand() *cobra.Command {
 
 	addAPIKeyFlag(cmd.PersistentFlags())
 	addHostFlag(cmd.PersistentFlags())
+	addProxyFlag(cmd.PersistentFlags())
 	addVerboseFlag(cmd.PersistentFlags())
 
 	cmd.AddCommand(NewAnalysisCmd())
