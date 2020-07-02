@@ -2,6 +2,7 @@ language: go
 
 go:
   - "1.13.x"
+  - "1.14.x"
   - master
 
 before_install:
@@ -17,5 +18,5 @@ deploy:
     script: ./deploy.sh
     skip_cleanup: true
     on:
-      go: "1.13"
+      go: "1.14"
       tags: true
