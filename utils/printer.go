@@ -148,19 +148,13 @@ func (p *Printer) GetAndPrintObjects(endpoint string, args []string, argRe *rege
 
 	go p.client.RetrieveObjects(endpoint, filteredArgs, objectsCh, errorsCh)
 
-	objs := make([]*vt.Object, 0)
-
 	for obj := range objectsCh {
 		if viper.GetBool("identifiers-only") {
 			fmt.Printf("%s\n", obj.ID())
 		} else {
-			objs = append(objs, obj)
-		}
-	}
-
-	if len(objs) > 0 {
-		if err := p.PrintObjects(objs); err != nil {
-			return err
+			if err := p.PrintObject(obj); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -186,25 +180,18 @@ func (p *Printer) PrintCollection(collection *url.URL) error {
 
 // PrintIterator prints the objects returned by an object iterator.
 func (p *Printer) PrintIterator(it *vt.Iterator) error {
-
-	objs := make([]*vt.Object, 0)
 	for it.Next() {
 		obj := it.Get()
 		if viper.GetBool("identifiers-only") {
 			fmt.Printf("%s\n", obj.ID())
 		} else {
-			objs = append(objs, obj)
+			if err := p.PrintObject(obj); err != nil {
+				return err
+			}
 		}
 	}
-
 	if err := it.Error(); err != nil {
 		return err
-	}
-
-	if len(objs) > 0 {
-		if err := p.PrintObjects(objs); err != nil {
-			return err
-		}
 	}
 	p.PrintCommandLineWithCursor(it)
 	return nil
