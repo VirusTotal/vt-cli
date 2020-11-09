@@ -101,7 +101,7 @@ func (d *monitorPartnerDownloader) Do(file interface{}, ds *utils.DoerState) str
 
 var monitorPartnerHashDownloadCmdHelp = `Download files from your partner account.
 
-This command download files in your monitor partner account using their sha256.`
+This command download files from your monitor partner account using their sha256.`
 
 var monitorPartnerHashDownloadCmdExample = `  vt monitorpartner download <sha256-1> <sha256-2> ...
   cat list_of_monitor_ids | vt monitorpartner download -`
@@ -153,7 +153,7 @@ Reference:
 // NewMonitorPartnerCmd returns a new instance of the 'monitor_hash' command.
 func NewMonitorPartnerCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "monitorpartner [sha256]...",
+		Use:   "monitorpartner",
 		Short: "Manage your monitor partner account",
 		Long:  monitorPartnerCmdHelp,
 		Args:  cobra.MinimumNArgs(1),
