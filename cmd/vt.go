@@ -15,10 +15,11 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+
 	vt "github.com/VirusTotal/vt-go"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"os"
 )
 
 // NewVTCommand creates the `vt` command and its nested children.
@@ -80,6 +81,7 @@ func NewVTCommand() *cobra.Command {
 	cmd.AddCommand(NewUserCmd())
 	cmd.AddCommand(NewVersionCmd())
 	cmd.AddCommand(NewMonitorCmd())
+	cmd.AddCommand(NewMonitorPartnerCmd())
 
 	return cmd
 }
