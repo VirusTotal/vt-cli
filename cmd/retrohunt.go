@@ -15,6 +15,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/VirusTotal/vt-cli/utils"
 	"io/ioutil"
 	"os"
 	"regexp"
@@ -324,7 +325,10 @@ func NewRetrohuntCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return p.GetAndPrintObjects("intelligence/retrohunt_jobs/%s", args, re)
+			return p.GetAndPrintObjects(
+				"intelligence/retrohunt_jobs/%s",
+				utils.StringReaderFromCmdArgs(args),
+				re)
 		},
 	}
 

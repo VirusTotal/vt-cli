@@ -458,7 +458,9 @@ func NewMonitorCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return p.GetAndPrintObjects("monitor/items/%s", args, re)
+			return p.GetAndPrintObjects("monitor/items/%s",
+				utils.StringReaderFromCmdArgs(args),
+				re)
 		},
 	}
 

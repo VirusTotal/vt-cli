@@ -14,6 +14,7 @@
 package cmd
 
 import (
+	"github.com/VirusTotal/vt-cli/utils"
 	"regexp"
 
 	"github.com/spf13/cobra"
@@ -47,7 +48,10 @@ func NewIPCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return p.GetAndPrintObjects("ip_addresses/%s", args, re)
+			return p.GetAndPrintObjects(
+				"ip_addresses/%s",
+				utils.StringReaderFromCmdArgs(args),
+				re)
 		},
 	}
 

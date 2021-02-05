@@ -124,16 +124,7 @@ func (p *Printer) PrintObject(obj *vt.Object) error {
 // items from the args slice. If args contains a single "-" string, the args are
 // read from stdin one per line. If argRe is non-nil, only args that match the
 // regular expression are used and the rest are discarded.
-func (p *Printer) GetAndPrintObjects(endpoint string, args []string, argRe *regexp.Regexp) error {
-
-	var r StringReader
-
-	if len(args) == 1 && args[0] == "-" {
-		r = NewStringIOReader(os.Stdin)
-	} else {
-		r = NewStringArrayReader(args)
-	}
-
+func (p *Printer) GetAndPrintObjects(endpoint string, r StringReader, argRe *regexp.Regexp) error {
 	if argRe != nil {
 		r = NewFilteredStringReader(r, argRe)
 	}

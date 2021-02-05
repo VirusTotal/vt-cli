@@ -14,6 +14,7 @@
 package cmd
 
 import (
+	"github.com/VirusTotal/vt-cli/utils"
 	"regexp"
 
 	"github.com/spf13/cobra"
@@ -49,7 +50,10 @@ func NewAnalysisCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return p.GetAndPrintObjects("analyses/%s", args, re)
+			return p.GetAndPrintObjects(
+				"analyses/%s",
+				utils.StringReaderFromCmdArgs(args),
+				re)
 		},
 	}
 

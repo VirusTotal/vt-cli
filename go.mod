@@ -15,7 +15,6 @@ require (
 	github.com/mattn/go-isatty v0.0.10 // indirect
 	github.com/mattn/go-runewidth v0.0.5 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/mitchellh/gox v1.0.1 // indirect
 	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/plusvic/go-ansi v0.0.0-20180516115420-9879244c4340
 	github.com/spf13/afero v1.2.2 // indirect

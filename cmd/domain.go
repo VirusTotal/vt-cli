@@ -14,6 +14,7 @@
 package cmd
 
 import (
+	"github.com/VirusTotal/vt-cli/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -46,8 +47,10 @@ func NewDomainCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			p.GetAndPrintObjects("domains/%s", args, nil)
-			return nil
+			return p.GetAndPrintObjects(
+				"domains/%s",
+				utils.StringReaderFromCmdArgs(args),
+				nil)
 		},
 	}
 

@@ -17,6 +17,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"github.com/VirusTotal/vt-cli/utils"
 	"os"
 	"regexp"
 	"strconv"
@@ -124,7 +125,10 @@ func NewHuntingNotificationCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return p.GetAndPrintObjects("intelligence/hunting_notifications/%s", args, re)
+			return p.GetAndPrintObjects(
+				"intelligence/hunting_notifications/%s",
+				utils.StringReaderFromCmdArgs(args),
+				re)
 		},
 	}
 
@@ -352,7 +356,10 @@ func NewHuntingRulesetCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return p.GetAndPrintObjects("intelligence/hunting_rulesets/%s?relationships=owner,editors", args, re)
+			return p.GetAndPrintObjects(
+				"intelligence/hunting_rulesets/%s?relationships=owner,editors",
+				utils.StringReaderFromCmdArgs(args),
+				re)
 		},
 	}
 

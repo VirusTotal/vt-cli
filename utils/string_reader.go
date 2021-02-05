@@ -16,6 +16,7 @@ package utils
 import (
 	"bufio"
 	"io"
+	"os"
 	"regexp"
 	"strings"
 )
@@ -86,9 +87,9 @@ func NewFilteredStringReader(r StringReader, re *regexp.Regexp) *FilteredStringR
 	return &FilteredStringReader{r: r, re: re}
 }
 
-// ReadString reads strings from the the underlying StringReader and returns
-// the first one that matches the regular expression specified while creating
-// the FilteredStringReader. If no more strings can be read err is io.EOF.
+// ReadString reads strings from the underlying StringReader and returns the
+// first one that matches the regular expression specified while creating the
+// FilteredStringReader. If no more strings can be read err is io.EOF.
 func (f *FilteredStringReader) ReadString() (s string, err error) {
 	for s, err = f.r.ReadString(); s != "" || err == nil; s, err = f.r.ReadString() {
 		if f.re.MatchString(s) {
@@ -96,4 +97,39 @@ func (f *FilteredStringReader) ReadString() (s string, err error) {
 		}
 	}
 	return s, err
+}
+
+
+// MappedStringReader reads strings from a StringReader and call a map function
+// that transforms the strings in some other string.
+type MappedStringReader struct {
+	r StringReader
+	mapFn func(string) string
+}
+
+// NewMappedStringReader creates a new MappedStringReader that reads strings from
+// r and can call mapFn for transforming the string before returning it.
+func NewMappedStringReader(r StringReader, mapFn func(string) string) *MappedStringReader {
+	return &MappedStringReader{r:r, mapFn: mapFn}
+}
+
+// ReadString reads strings from the underlying StringReader and can call the
+// map function associated to the MappedStringReader with that string, then
+// returns the result produced by the map function.
+func (m *MappedStringReader) ReadString() (s string, err error) {
+	if s, err = m.r.ReadString(); err == nil {
+		return m.mapFn(s), nil
+	}
+	return s, err
+}
+
+// StringReaderFromCmdArgs returns a string reader for reading the arguments
+// passed in the command line. If the arguments consists in single hypen "-",
+// they are read from stdin.
+func StringReaderFromCmdArgs(args []string) StringReader {
+	if len(args) == 1 && args[0] == "-" {
+		return NewStringIOReader(os.Stdin)
+	} else {
+		return NewStringArrayReader(args)
+	}
 }

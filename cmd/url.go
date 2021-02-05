@@ -15,7 +15,7 @@ package cmd
 
 import (
 	"encoding/base64"
-
+	"github.com/VirusTotal/vt-cli/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -48,11 +48,12 @@ func NewURLCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			ids := make([]string, len(args))
-			for i, arg := range args {
-				ids[i] = base64.RawURLEncoding.EncodeToString([]byte(arg))
-			}
-			return p.GetAndPrintObjects("urls/%s", ids, nil)
+			r := utils.NewMappedStringReader(
+				utils.StringReaderFromCmdArgs(args),
+				func (url string) string {
+					return base64.RawURLEncoding.EncodeToString([]byte(url))
+				})
+			return p.GetAndPrintObjects("urls/%s", r, nil)
 		},
 	}
 

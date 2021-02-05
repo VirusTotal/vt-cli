@@ -16,6 +16,7 @@ package cmd
 import (
 	"strings"
 
+	"github.com/VirusTotal/vt-cli/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -45,7 +46,9 @@ func NewUserCmd() *cobra.Command {
 					"api_quota_group",
 					"intelligence_quota_group",
 					"monitor_quota_group",
-				}, ","), args, nil)
+				}, ","),
+				utils.StringReaderFromCmdArgs(args),
+				nil)
 
 		},
 	}

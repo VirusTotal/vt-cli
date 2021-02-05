@@ -14,6 +14,7 @@
 package cmd
 
 import (
+	"github.com/VirusTotal/vt-cli/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -35,7 +36,10 @@ func NewGroupCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return p.GetAndPrintObjects("groups/%s", args, nil)
+			return p.GetAndPrintObjects(
+				"groups/%s",
+				utils.StringReaderFromCmdArgs(args),
+				nil)
 		},
 	}
 
