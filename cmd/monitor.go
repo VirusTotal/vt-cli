@@ -355,7 +355,7 @@ func runMonitorItemUpload(cmd *cobra.Command, args []string) error {
 	switch mode := pathStat.Mode(); {
 	case mode.IsDir():
 		// Upload tree to remote
-		localPathClean := strings.TrimRight(localPath, "/") + "/"
+		localPathClean := strings.TrimRight(localPath, string(os.PathSeparator)) + string(os.PathSeparator)
 		remotePathClean := strings.TrimRight(remotePath, "/") + "/"
 
 		filesParams := make([]uploadParams, 0)
