@@ -98,8 +98,14 @@ var tests = []T{
 			"uno":  "1",
 			"dos":  "2",
 			"tres": "3",
+			"": "empty",
+			"#foo": "bar",
+			"|foo": "bar",
 		},
 		yaml: Y(`
+			"": "empty"
+			"#foo": "bar"
+			"|foo": "bar"
 			dos: "2"
 			tres: "3"
 			uno: "1"

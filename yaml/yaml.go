@@ -21,6 +21,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/fatih/color"
 	glob "github.com/gobwas/glob"
@@ -140,7 +142,14 @@ func (enc *Encoder) encodeMap(m reflect.Value, indent int, prefix string) (err e
 	var indentIncr int
 
 	for i, k := range keys {
-		keyPrinter(enc.w, "%s: ", k)
+		// If the key is an empty string or starts with some non-letter character
+		// let's enclose the key in double quotes.
+		firstChar, kLen := utf8.DecodeRuneInString(k.String())
+		if kLen == 0 || !unicode.IsLetter(firstChar)  {
+			keyPrinter(enc.w, "\"%s\": ", k)
+		} else {
+			keyPrinter(enc.w, "%s: ", k)
+		}
 		v := m.MapIndex(k)
 		if indentIncr, err = enc.lineBreakV(v, indent); err != nil {
 			return err
