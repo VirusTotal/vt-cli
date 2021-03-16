@@ -145,7 +145,7 @@ func (enc *Encoder) encodeMap(m reflect.Value, indent int, prefix string) (err e
 		// If the key is an empty string or starts with some non-letter character
 		// let's enclose the key in double quotes.
 		firstChar, kLen := utf8.DecodeRuneInString(k.String())
-		if kLen == 0 || !unicode.IsLetter(firstChar)  {
+		if kLen == 0 || (firstChar != '_' && !unicode.IsLetter(firstChar))  {
 			keyPrinter(enc.w, "\"%s\": ", k)
 		} else {
 			keyPrinter(enc.w, "%s: ", k)
