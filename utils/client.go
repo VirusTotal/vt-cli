@@ -67,7 +67,7 @@ func (c *APIClient) RetrieveObjects(endpoint string, args []string, outCh chan *
 
 	// Read object IDs from the input channel, launch goroutines to retrieve the
 	// objects and send them through objCh together with a number indicating
-	// their order in the input. As gorutines run in parallel the objects can
+	// their order in the input. As goroutines run in parallel the objects can
 	// be sent out of order to objCh, but the order number is used to reorder
 	// them.
 	for order, arg := range args {
