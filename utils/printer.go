@@ -95,7 +95,7 @@ func ObjectToMap(obj *vt.Object) map[string]interface{} {
 			m[name] = l
 		}
 	}
-	if viper.IsSet("include") && viper.IsSet("exclude") {
+	if viper.IsSet("include") || viper.IsSet("exclude") {
 		m = FilterMap(m,
 			viper.GetStringSlice("include"),
 			viper.GetStringSlice("exclude"))
