@@ -3,7 +3,7 @@ module github.com/VirusTotal/vt-cli
 go 1.14
 
 require (
-	github.com/VirusTotal/vt-go v0.0.0-20191029154732-b6fd15b76f39
+	github.com/VirusTotal/vt-go v0.0.0-20210329222805-6a66bdb2ca68
 	github.com/briandowns/spinner v1.7.0
 	github.com/cavaliercoder/grab v2.0.0+incompatible
 	github.com/dustin/go-humanize v1.0.0
@@ -22,5 +22,6 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.4.0
+	github.com/thedevsaddam/gojsonq v2.3.0+incompatible // indirect
 	golang.org/x/sys v0.0.0-20191028164358-195ce5e7f934 // indirect
 )
