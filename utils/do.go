@@ -15,6 +15,7 @@ package utils
 
 import (
 	"fmt"
+	"github.com/fatih/color"
 	"sync"
 	"time"
 
@@ -109,14 +110,30 @@ func (c *Coordinator) DoWithItemsFromChannel(doer Doer, ch <-chan interface{}) {
 	c.printingWg = &sync.WaitGroup{}
 	c.printingWg.Add(1)
 
-	go c.printResults()
+	// Use the NoColor flag from the color library as an indicator of whether
+	// or not stdout is a tty or a file. If NoColor is true it means that
+	// stdout is being redirected to a file and we don't want escape sequences
+	// in the output, in that case print only the final results from the doers,
+	// without any progress indication.
+	if color.NoColor {
+		go c.printResultsOnly()
+	} else {
+		go c.printProgressAndResults()
+	}
 
 	wg.Wait()
 	close(c.resultsCh)
 	c.printingWg.Wait()
 }
 
-func (c *Coordinator) printResults() {
+func (c *Coordinator) printResultsOnly() {
+	for res := range c.resultsCh {
+		ansi.Println(res)
+	}
+	c.printingWg.Done()
+}
+
+func (c *Coordinator) printProgressAndResults() {
 Loop:
 	for {
 		if c.Spinner != nil {
