@@ -17,7 +17,7 @@ script: make all
 deploy:
   - provider: script
     script: ./deploy.sh
-    cleanup: false
+    skip_cleanup: true
     on:
       go: "1.14.x"
       tags: true
