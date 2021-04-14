@@ -12,7 +12,9 @@ before_install:
 before_deploy:
   - go get github.com/tcnksm/ghr
 
-script: make all
+script: |
+  make all
+  go test -v ./...
 
 deploy:
   - provider: script
