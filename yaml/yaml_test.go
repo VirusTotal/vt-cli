@@ -182,6 +182,26 @@ var tests = []T{
 			Foo_date: 10000  # %v
 			`,  time.Unix(10000, 0))),
 	},
+	{
+		data: struct {
+			Bar_date int64
+		}{
+			Bar_date: 10000,
+		},
+		yaml: Y(fmt.Sprintf(`
+			Bar_date: 10000  # %v
+			`,  time.Unix(10000, 0))),
+	},
+	{
+		data: struct {
+			Baz_date float64
+		}{
+			Baz_date: 1618312811,
+		},
+		yaml: Y(fmt.Sprintf(`
+			Baz_date: 1.618312811e+09  # %v
+			`,  time.Unix(1618312811, 0))),
+	},
 }
 
 func TestYAML(t *testing.T) {

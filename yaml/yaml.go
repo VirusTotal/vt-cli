@@ -166,17 +166,24 @@ func (enc *Encoder) encodeMap(m reflect.Value, indent int, prefix string) (err e
 		if v.IsValid() {
 			vt := v.Type()
 			ks := k.String()
-			// If key is "date" or ends with "_date" and value is json.Number, this
-			// field is a date.
-			isDate := enc.matchDateKey(ks) &&
-				vt.Name() == "Number" &&
-				vt.PkgPath() == "encoding/json"
-			// If this field is a date let's add a comment with the date in a
-			// human-readable format.
-			if isDate {
-				ts, err := strconv.ParseInt(v.String(), 10, 64)
-				if err != nil {
-					panic(err)
+			// If key matches any of the patterns specified in the EncoderDateKeys
+			// option while creating the YAML encoder, this field should be treated
+			// as a date, let's add a comment with the date in a human-readable format.
+			if enc.matchDateKey(ks) {
+				var ts int64
+				switch {
+				case vt.Name() == "Number" && vt.PkgPath() == "encoding/json":
+					var err error
+					if ts, err = strconv.ParseInt(v.String(), 10, 64); err != nil {
+						panic(err)
+					}
+				case vt.Name() == "float64":
+					ts = int64(v.Float())
+				case vt.Name() == "int64":
+					panic("int")
+					ts = v.Int()
+				default:
+					return fmt.Errorf("unexpected type for a date field: %s", vt.Name())
 				}
 				commentPrinter(enc.w, "  # %v", time.Unix(ts, 0))
 			}
