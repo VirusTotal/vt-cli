@@ -152,17 +152,14 @@ $ vt url http://www.virustotal.com
     ADMINUSLabs:
       category: "harmless"
       engine_name: "ADMINUSLabs"
-      method: "blacklist"
       result: "clean"
     AegisLab WebGuard:
       category: "harmless"
       engine_name: "AegisLab WebGuard"
-      method: "blacklist"
       result: "clean"
     AlienVault:
       category: "harmless"
       engine_name: "AlienVault"
-      method: "blacklist"
       result: "clean"
   last_http_response_code: 200
   last_http_response_content_length: 7216
@@ -233,17 +230,14 @@ $ vt url http://www.virustotal.com --include=last_analysis_results.**
     ADMINUSLabs:
       category: "harmless"
       engine_name: "ADMINUSLabs"
-      method: "blacklist"
       result: "clean"
     AegisLab WebGuard:
       category: "harmless"
       engine_name: "AegisLab WebGuard"
-      method: "blacklist"
       result: "clean"
     AlienVault:
       category: "harmless"
       engine_name: "AlienVault"
-      method: "blacklist"
       result: "clean"
 ```
 
