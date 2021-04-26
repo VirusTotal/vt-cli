@@ -180,10 +180,7 @@ func (enc *Encoder) encodeMap(m reflect.Value, indent int, prefix string) (err e
 				case vt.Name() == "float64":
 					ts = int64(v.Float())
 				case vt.Name() == "int64":
-					panic("int")
 					ts = v.Int()
-				default:
-					return fmt.Errorf("unexpected type for a date field: %s", vt.Name())
 				}
 				commentPrinter(enc.w, "  # %v", time.Unix(ts, 0))
 			}
