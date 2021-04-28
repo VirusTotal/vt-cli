@@ -17,11 +17,11 @@ import (
 	"encoding/base64"
 	"encoding/gob"
 	"fmt"
+	"github.com/VirusTotal/vt-cli/utils"
 	"os"
 	"path"
 	"sync"
 
-	"github.com/VirusTotal/vt-cli/utils"
 	vt "github.com/VirusTotal/vt-go"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
@@ -106,7 +106,7 @@ func NewRelationshipsCmd(collection, objectType, use string) *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var wg sync.WaitGroup
-			var m sync.Map
+			var sm sync.Map
 			for _, r := range objectRelationshipsMap[objectType] {
 				wg.Add(1)
 				go func(relationshipName string) {
@@ -118,17 +118,30 @@ func NewRelationshipsCmd(collection, objectType, use string) *cobra.Command {
 					if err != nil {
 						fmt.Println(err)
 					} else if len(objs) > 0 {
-						m.Store(relationshipName, objs)
+						sm.Store(relationshipName, objs)
 					}
 					wg.Done()
 				}(r.Name)
 			}
 			wg.Wait()
+
+			m := make(map[string]interface{})
+			sm.Range(func(key, value interface{}) bool {
+				m[key.(string)] = value
+				return true
+			})
+
+			if viper.IsSet("include") || viper.IsSet("exclude") {
+				m = utils.FilterMap(m,
+					viper.GetStringSlice("include"),
+					viper.GetStringSlice("exclude"))
+			}
+
 			p, err := NewPrinter(cmd)
 			if err != nil {
 				return err
 			}
-			return p.PrintSyncMap(&m)
+			return p.Print(m)
 		},
 	}
 

@@ -63,6 +63,11 @@ func (p *Printer) PrintSyncMap(sm *sync.Map) error {
 		m[key.(string)] = value
 		return true
 	})
+	if viper.IsSet("include") || viper.IsSet("exclude") {
+		m = FilterMap(m,
+			viper.GetStringSlice("include"),
+			viper.GetStringSlice("exclude"))
+	}
 	return p.Print(m)
 }
 
@@ -95,11 +100,6 @@ func ObjectToMap(obj *vt.Object) map[string]interface{} {
 			m[name] = l
 		}
 	}
-	if viper.IsSet("include") || viper.IsSet("exclude") {
-		m = FilterMap(m,
-			viper.GetStringSlice("include"),
-			viper.GetStringSlice("exclude"))
-	}
 	return m
 }
 
@@ -107,9 +107,20 @@ func ObjectToMap(obj *vt.Object) map[string]interface{} {
 func (p *Printer) PrintObjects(objs []*vt.Object) error {
 	list := make([]map[string]interface{}, 0)
 	for _, obj := range objs {
-		list = append(list, ObjectToMap(obj))
+		m := ObjectToMap(obj)
+		if viper.IsSet("include") || viper.IsSet("exclude") {
+			m = FilterMap(m,
+				viper.GetStringSlice("include"),
+				viper.GetStringSlice("exclude"))
+		}
+		if len(m) > 0 {
+			list = append(list, m)
+		}
 	}
-	return p.Print(list)
+	if len(list) > 0 {
+		return p.Print(list)
+	}
+	return nil
 }
 
 // PrintObject prints the specified object to stdout.

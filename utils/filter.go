@@ -14,14 +14,14 @@
 package utils
 
 import (
-	"reflect"
-
 	glob "github.com/gobwas/glob"
+	"reflect"
+	"strings"
 )
 
-// FilterMap receives a map with string keys and arbirary values (possibly
+// FilterMap receives a map with string keys and arbitrary values (possibly
 // other maps) and return a new map which is a subset of the original one
-// contaning only the keys matching any of the patterns in "include" and
+// containing only the keys matching any of the patterns in "include" and
 // excluding keys matching any of the patterns in "exclude". The logic for
 // determining if a key matches the pattern goes as follow:
 //
@@ -45,9 +45,26 @@ func FilterMap(m map[string]interface{}, include, exclude []string) map[string]i
 		cp := glob.MustCompile(p, '.')
 		includeGlob[i] = cp
 	}
+	// For each include pattern that do not ends with **, add the same pattern
+	// but ended in .**. This because when someone says that she wants to include
+	// "foo.bar", where "foo.bar" is dictionary, what she actually expects is
+	// getting the dictionary with all its keys, but the keys inside the
+	// dictionary don't match the "foo.bar" pattern, so we add "foo.bar.**".
+	for _, p := range include {
+		if !strings.HasSuffix(p, "**") {
+			includeGlob = append(includeGlob, glob.MustCompile(p+".**", '.'))
+		}
+	}
 	for i, p := range exclude {
 		cp := glob.MustCompile(p, '.')
 		excludeGlob[i] = cp
+	}
+	// The same happens if you exclude "foo.bar", what you actually mean is
+	// excluding "foo.bar" and "foo.bar.**".
+	for _, p := range exclude {
+		if !strings.HasSuffix(p, "**") {
+			excludeGlob = append(excludeGlob, glob.MustCompile(p+".**", '.'))
+		}
 	}
 	filtered := filterMap(reflect.ValueOf(m), includeGlob, excludeGlob, "")
 	return filtered.Interface().(map[string]interface{})

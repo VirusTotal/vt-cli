@@ -74,6 +74,31 @@ var testCases = []testCase{
 	},
 
 	testCase{
+		include: []string{"foo"},
+		exclude: []string{"**.quux"},
+		input:   testMap,
+		output: map[string]interface{}{
+
+		},
+	},
+
+	testCase{
+		include: []string{"foo**"},
+		exclude: []string{"**.key1"},
+		input:   testMap,
+		output: map[string]interface{}{
+			"foo": map[string]interface{}{
+				"qux": map[string]interface{}{
+					"quux": map[string]interface{}{
+						"key2": "val2",
+						"key3": []string{"val3"},
+					},
+				},
+			},
+		},
+	},
+
+	testCase{
 		include: []string{"foo**"},
 		exclude: []string{"**.key1"},
 		input:   testMap,
@@ -172,6 +197,21 @@ var testCases = []testCase{
 		input:   testMap,
 		output: map[string]interface{}{
 			"qux": []interface{}{
+				map[string]interface{}{
+					"key5": "val5",
+				},
+			},
+		},
+	},
+
+	testCase{
+		include: []string{"qux"},
+		input:   testMap,
+		output: map[string]interface{}{
+			"qux": []interface{}{
+				map[string]interface{}{
+					"key4": "val4",
+				},
 				map[string]interface{}{
 					"key5": "val5",
 				},
