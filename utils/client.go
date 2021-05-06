@@ -17,11 +17,10 @@ import (
 	"container/heap"
 	"errors"
 	"fmt"
-	"os"
-	"sync"
-
 	vt "github.com/VirusTotal/vt-go"
 	"github.com/spf13/viper"
+	"os"
+	"sync"
 )
 
 // APIClient represents a VirusTotal API client.
@@ -79,7 +78,7 @@ func (c *APIClient) RetrieveObjects(endpoint string, args []string, outCh chan *
 				objCh <- PQueueNode{Priority: order, Data: obj}
 			} else {
 				if apiErr, ok := err.(vt.Error); ok && apiErr.Code == "NotFoundError" {
-					errCh <- err
+					objCh <- PQueueNode{Priority: order, Data: err}
 				} else {
 					fmt.Fprintln(os.Stderr, err)
 					os.Exit(1)
@@ -103,14 +102,23 @@ func (c *APIClient) RetrieveObjects(endpoint string, args []string, outCh chan *
 			// it can be sent to outCh and removed from the queue, if not, we keep
 			// pushing objects into the queue.
 			if h[0].Priority == order {
-				outCh <- h[0].Data.(*vt.Object)
+				if obj, ok := h[0].Data.(*vt.Object); ok {
+					outCh <- obj
+				} else {
+					errCh <- h[0].Data.(error)
+				}
 				heap.Pop(&h)
 				order++
 			}
 		}
 		// Send to outCh any object remaining in the queue
 		for h.Len() > 0 {
-			outCh <- heap.Pop(&h).(PQueueNode).Data.(*vt.Object)
+			item := heap.Pop(&h).(PQueueNode).Data
+			if obj, ok := item.(*vt.Object); ok {
+				outCh <- obj
+			} else {
+				errCh <- item.(error)
+			}
 		}
 		outWg.Done()
 	}()
