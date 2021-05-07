@@ -46,8 +46,9 @@ func NewAPIClient(agent string) (*APIClient, error) {
 // slice. The objects are put into the outCh as they are retrieved.
 func (c *APIClient) RetrieveObjects(endpoint string, args []string, outCh chan *vt.Object, errCh chan error) error {
 
-	// Make sure outCh is closed
+	// Make sure outCh and errCh are closed
 	defer close(outCh)
+	defer close(errCh)
 
 	h := PQueue{}
 	heap.Init(&h)
@@ -126,11 +127,11 @@ func (c *APIClient) RetrieveObjects(endpoint string, args []string, outCh chan *
 	// Wait for all objects to be retrieved
 	getWg.Wait()
 
-	// Once all object were retrieved is safe to close objCh and errCh
+	// Once all object were retrieved is safe to close objCh.
 	close(objCh)
-	close(errCh)
 
 	// Wait for objects to be sent to outCh
 	outWg.Wait()
+
 	return nil
 }
