@@ -1,15 +1,19 @@
+name: Release
 on:
   push:
     tags:
-      - "*"
+      - "*.*.*"
 jobs:
-  release:
+  create_release:
+    name: Create release
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
+      - id: get_version
+        run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
       - name: Install dependencies
         run: |
           go get github.com/mitchellh/gox
@@ -18,5 +22,9 @@ jobs:
         run: echo `go env GOPATH`/bin >> $GITHUB_PATH
       - name: Build
         run: make all
+        env:
+          VERSION: ${{ steps.get_version.outputs.VERSION }}
       - name: Create release
         run: ./new_release.sh
+        env:
+          VERSION: ${{ steps.get_version.outputs.VERSION }}

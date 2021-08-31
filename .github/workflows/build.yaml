@@ -2,15 +2,10 @@ name: Build
 on: [push, pull_request]
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
-      - name: Install dependencies
-        run: |
-          go get github.com/mitchellh/gox
-          go get github.com/tcnksm/ghr
-      - name: Add GOPATH to search path
-        run: echo `go env GOPATH`/bin >> $GITHUB_PATH
       - name: Build
-        run: make all
+        run: make build
