@@ -19,4 +19,4 @@ jobs:
       - name: Build
         run: make all
       - name: Create release
-        run: new_release.sh
+        run: ./new_release.sh
