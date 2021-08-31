@@ -1,0 +1,15 @@
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          go get github.com/mitchellh/gox
+          go get github.com/tcnksm/ghr
+      - name: Build
+        run: make all
