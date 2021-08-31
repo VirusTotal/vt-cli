@@ -1,9 +1,6 @@
 # This how we want to name the binary output
 BINARY=./build/vt
 
-# These are the value we want to pass for VERSION
-VERSION=`git describe`
-
 # Setup the -ldflags option for go build here, interpolate the variable values
 LDFLAGS=-ldflags "-X github.com/VirusTotal/vt-cli/cmd.Version=${VERSION}"
 
