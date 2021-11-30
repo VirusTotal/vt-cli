@@ -15,12 +15,14 @@ package utils
 
 import (
 	"container/heap"
+	"encoding/json"
 	"errors"
 	"fmt"
-	vt "github.com/VirusTotal/vt-go"
-	"github.com/spf13/viper"
 	"os"
 	"sync"
+
+	vt "github.com/VirusTotal/vt-go"
+	"github.com/spf13/viper"
 )
 
 // APIClient represents a VirusTotal API client.
@@ -134,4 +136,20 @@ func (c *APIClient) RetrieveObjects(endpoint string, args []string, outCh chan *
 	outWg.Wait()
 
 	return nil
+}
+
+// PostAndReturnObject posts to the specified endpoint and returns the VT
+// object from the API response.
+func (c *APIClient) PostAndReturnObject(endpoint string, data interface{}) (*vt.Object, error) {
+	obj := &vt.Object{}
+	response, err := c.PostData(vt.URL(endpoint), data)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(response.Data, obj)
+	if err != nil {
+		return nil, err
+	}
+
+	return obj, nil
 }
