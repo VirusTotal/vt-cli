@@ -46,7 +46,7 @@ func NewCollectionCmd() *cobra.Command {
 		},
 	}
 
-	cmd.AddCommand(createCollectionCmd())
+	cmd.AddCommand(NewCollectionCreateCmd())
 	addRelationshipCmds(cmd, "collections", "collection", "[collection]")
 	addThreadsFlag(cmd.Flags())
 	addIncludeExcludeFlags(cmd.Flags())
@@ -67,7 +67,7 @@ var createCollectionExample = `  vt collection create -n [collection_name] www.e
   vt collection create -n [collection_name] www.example.com 8.8.8.8
   cat list_of_iocs | vt collection create -n [collection_name] -`
 
-func createCollectionCmd() *cobra.Command {
+func NewCollectionCreateCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "create [ioc]...",
 		Short:   "Create a collection.",
