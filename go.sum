@@ -19,6 +19,8 @@ github.com/VirusTotal/vt-go v0.0.0-20210528074736-45bbe34cc8ab h1:96tkQLYmgypA3W
 github.com/VirusTotal/vt-go v0.0.0-20210528074736-45bbe34cc8ab/go.mod h1:u1+HeRyl/gQs67eDgVEWNE7+x+zCyXhdtNVrRJR5YPE=
 github.com/VirusTotal/vt-go v0.0.0-20211116094520-07a92e6467b7 h1:1oIDITWcezvHQXrm2RDiYsVpCeRbvxY4MLBAFdoaPWQ=
 github.com/VirusTotal/vt-go v0.0.0-20211116094520-07a92e6467b7/go.mod h1:u1+HeRyl/gQs67eDgVEWNE7+x+zCyXhdtNVrRJR5YPE=
+github.com/VirusTotal/vt-go v0.0.0-20211209151516-855a1e790678 h1:IVvLDz0INo1rn7wG4OQub9MkyNNaBp0sQgU1apho/mk=
+github.com/VirusTotal/vt-go v0.0.0-20211209151516-855a1e790678/go.mod h1:u1+HeRyl/gQs67eDgVEWNE7+x+zCyXhdtNVrRJR5YPE=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
 github.com/armon/circbuf v0.0.0-20150827004946-bbbad097214e/go.mod h1:3U/XgcO3hCbHZ8TKRvWD2dDTCfh9M9ya+I9JpbB7O8o=

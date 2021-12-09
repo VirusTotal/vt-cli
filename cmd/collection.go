@@ -5,6 +5,8 @@ import (
 	"io"
 	"strings"
 
+	"github.com/VirusTotal/vt-go"
+
 	"github.com/VirusTotal/vt-cli/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -94,33 +96,29 @@ func createCollectionCmd() *cobra.Command {
 			}
 			reader := utils.StringReaderFromCmdArgs(args)
 
-			collection := collection{
-				ObjectType: "collection",
-				Attributes: CollectionAttributes{viper.GetString("name")},
-				Meta:       map[string]string{"raw": rawFromReader(reader)},
-			}
+			collection := vt.NewObject("collection")
+			collection.SetString("name", viper.GetString("name"))
+			collection.SetData("raw_items", rawFromReader(reader))
 
-			obj, err := c.PostAndReturnObject("collections", collection)
-			if err != nil {
+			if err := c.PostObject(vt.URL("collections"), collection); err != nil {
 				return err
 			}
 
 			if viper.GetBool("identifiers-only") {
-				fmt.Printf("%s\n", obj.ID())
+				fmt.Printf("%s\n", collection.ID())
 			} else {
-				if err := p.PrintObject(obj); err != nil {
+				if err := p.PrintObject(collection); err != nil {
 					return err
 				}
 			}
 
-			fmt.Printf("https://www.virustotal.com/gui/collection/%s\n", obj.ID())
 			return nil
 		},
 	}
 
 	cmd.Flags().StringP(
 		"name", "n", "",
-		"Name of the collection (required)")
+		"Collection's name (required)")
 	_ = cmd.MarkFlagRequired("name")
 	addIncludeExcludeFlags(cmd.Flags())
 	addIDOnlyFlag(cmd.Flags())
