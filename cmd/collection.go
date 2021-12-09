@@ -12,16 +12,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-type collection struct {
-	ObjectType string               `json:"type"`
-	Attributes CollectionAttributes `json:"attributes"`
-	Meta       map[string]string    `json:"meta"`
-}
-
-type CollectionAttributes struct {
-	Name string `json:"name"`
-}
-
 var collectionCmdHelp = `Get information about one or more collections.
 
 This command receives one or more collection IDs and returns information about
