@@ -47,6 +47,9 @@ func NewCollectionCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(NewCollectionCreateCmd())
+	cmd.AddCommand(NewCollectionRenameCmd())
+	cmd.AddCommand(NewCollectionUpdateCmd())
+
 	addRelationshipCmds(cmd, "collections", "collection", "[collection]")
 	addThreadsFlag(cmd.Flags())
 	addIncludeExcludeFlags(cmd.Flags())
@@ -67,6 +70,7 @@ var createCollectionExample = `  vt collection create -n [collection_name] www.e
   vt collection create -n [collection_name] www.example.com 8.8.8.8
   cat list_of_iocs | vt collection create -n [collection_name] -`
 
+// NewCollectionCreateCmd returns a command for creating a collection.
 func NewCollectionCreateCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "create [ioc]...",
@@ -114,6 +118,81 @@ func NewCollectionCreateCmd() *cobra.Command {
 	addIDOnlyFlag(cmd.Flags())
 
 	return cmd
+}
+
+func patchCollection(id, attr string, value interface{}) error {
+	client, err := NewAPIClient()
+	if err != nil {
+		return err
+	}
+	obj := vt.NewObjectWithID("collection", id)
+	obj.Set(attr, value)
+	return client.PatchObject(vt.URL("collections/%s", id), obj)
+}
+
+// NewCollectionRenameCmd returns a command for renaming a collection.
+func NewCollectionRenameCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "rename [collection id] [name]",
+		Short: "Rename collection.",
+		Args:  cobra.ExactArgs(2),
+
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return patchCollection(args[0], "name", args[1])
+		},
+	}
+}
+
+var updateCollectionCmdHelp = `Adds new items to a collection.
+
+This command receives a collection ID and one of more IoCs
+(sha256 hashes, URLs, domains, IP addresses) and adds them to the collection.
+
+If the command receives a single hypen (-) the IoCs will be read from the
+standard input.`
+
+var updateCollectionExample = `  vt collection update [collection id] www.example.com
+  vt collection update [collection id] www.example.com 8.8.8.8
+  cat list_of_iocs | vt collection update [collection id] -`
+
+// NewCollectionUpdateCmd returns a command for adding new items to a collection.
+func NewCollectionUpdateCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:     "update [collection id] [ioc]...",
+		Short:   "Add new items to a collection.",
+		Args:    cobra.MinimumNArgs(2),
+		Long:    updateCollectionCmdHelp,
+		Example: updateCollectionExample,
+
+		RunE: func(cmd *cobra.Command, args []string) error {
+			c, err := NewAPIClient()
+			if err != nil {
+				return err
+			}
+			p, err := NewPrinter(cmd)
+			if err != nil {
+				return err
+			}
+
+			collection := vt.NewObjectWithID("collection", args[0])
+			reader := utils.StringReaderFromCmdArgs(args[1:])
+			collection.SetData("raw_items", rawFromReader(reader))
+
+			if err := c.PatchObject(vt.URL("collections/%s", args[0]), collection); err != nil {
+				return err
+			}
+
+			if viper.GetBool("identifiers-only") {
+				fmt.Printf("%s\n", collection.ID())
+			} else {
+				if err := p.PrintObject(collection); err != nil {
+					return err
+				}
+			}
+
+			return nil
+		},
+	}
 }
 
 func rawFromReader(reader utils.StringReader) string {
