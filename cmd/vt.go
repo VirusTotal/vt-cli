@@ -64,6 +64,7 @@ func NewVTCommand() *cobra.Command {
 	addVerboseFlag(cmd.PersistentFlags())
 
 	cmd.AddCommand(NewAnalysisCmd())
+	cmd.AddCommand(NewCollectionCmd())
 	cmd.AddCommand(NewCompletionCmd())
 	cmd.AddCommand(NewDomainCmd())
 	cmd.AddCommand(NewDownloadCmd())

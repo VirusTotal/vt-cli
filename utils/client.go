@@ -17,10 +17,11 @@ import (
 	"container/heap"
 	"errors"
 	"fmt"
-	vt "github.com/VirusTotal/vt-go"
-	"github.com/spf13/viper"
 	"os"
 	"sync"
+
+	vt "github.com/VirusTotal/vt-go"
+	"github.com/spf13/viper"
 )
 
 // APIClient represents a VirusTotal API client.
