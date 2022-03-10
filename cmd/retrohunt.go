@@ -40,14 +40,9 @@ func retrohuntListTable(cmd *cobra.Command) error {
 		return err
 	}
 
-	limit := 0
-	if cmd.Flag("limit").Changed {
-		limit = viper.GetInt("limit")
-	}
-
 	it, err := client.Iterator(
 		vt.URL("intelligence/retrohunt_jobs"),
-		vt.IteratorLimit(limit),
+		vt.IteratorLimit(viper.GetInt("limit")),
 		vt.IteratorFilter(viper.GetString("filter")))
 
 	if err != nil {
@@ -56,7 +51,6 @@ func retrohuntListTable(cmd *cobra.Command) error {
 	defer it.Close()
 
 	table := uitable.New()
-
 	table.AddRow(
 		"JOB ID", "CREATED", "STARTED", "STATUS", "ETA", "SCANNED",
 		"MATCHES", "RULES")
