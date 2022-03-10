@@ -66,9 +66,9 @@ and creates a collection from them.
 If the command receives a single hypen (-) the IoCs will be read from the
 standard input.`
 
-var createCollectionExample = `  vt collection create -n [collection_name] www.example.com
-  vt collection create -n [collection_name] www.example.com 8.8.8.8
-  cat list_of_iocs | vt collection create -n [collection_name] -`
+var createCollectionExample = `  vt collection create -n [collection_name] -d [collection_description] www.example.com
+  vt collection create -n [collection_name] -d [collection_description] www.example.com 8.8.8.8
+  cat list_of_iocs | vt collection create -n [collection_name] -d [collection_description] -`
 
 // NewCollectionCreateCmd returns a command for creating a collection.
 func NewCollectionCreateCmd() *cobra.Command {
@@ -92,6 +92,7 @@ func NewCollectionCreateCmd() *cobra.Command {
 
 			collection := vt.NewObject("collection")
 			collection.SetString("name", viper.GetString("name"))
+			collection.SetString("description", viper.GetString("description"))
 			collection.SetData("raw_items", rawFromReader(reader))
 
 			if err := c.PostObject(vt.URL("collections"), collection); err != nil {
@@ -113,7 +114,11 @@ func NewCollectionCreateCmd() *cobra.Command {
 	cmd.Flags().StringP(
 		"name", "n", "",
 		"Collection's name (required)")
+	cmd.Flags().StringP(
+		"description", "d", "",
+		"Collection's description (required)")
 	_ = cmd.MarkFlagRequired("name")
+	_ = cmd.MarkFlagRequired("description")
 	addIncludeExcludeFlags(cmd.Flags())
 	addIDOnlyFlag(cmd.Flags())
 
