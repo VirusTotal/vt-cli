@@ -8,7 +8,7 @@ Welcome to the VirusTotal CLI, a tool designed for those who love both VirusTota
 * [Manage your LiveHunt YARA rules](doc/vt_hunting_ruleset.md).
 * [Launch Retrohunt jobs](doc/vt_retrohunt_start.md) and [get their results](doc/vt_retrohunt_matches.md).
 
-And much [more](doc/vt.md)... 
+And much [more](doc/vt.md)...
 
 ## See it in action
 
@@ -86,6 +86,16 @@ If you are going to use this tool frequently you may want to have command auto-c
   ```
 
 :heavy_exclamation_mark: You may need to restart your shell in order for autocompletion to start working.
+
+### Setup ZSH completion
+
+The output script from `vt completion zsh` needs to be put somewhere under the `$fpath` directory. For example, `.oh-my-zsh/completions` directory:
+```shellsession
+$ mkdir /Users/$USERNAME/.oh-my-zsh/completions
+$ vt completion zsh > /Users/$USERNAME/.oh-my-zsh/completions/_vt
+```
+
+Restart the shell.
 
 ## Usage examples
 
