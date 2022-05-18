@@ -28,6 +28,9 @@ var bashCompletionGenerators = map[string]func(out io.Writer, cmd *cobra.Command
 	"zsh": func(out io.Writer, cmd *cobra.Command) error {
 		return cmd.GenZshCompletion(out)
 	},
+	"fish": func(out io.Writer, cmd *cobra.Command) error {
+		return cmd.GenFishCompletion(out, true)
+	},
 }
 
 var completionCmdHelp = `Output shell completion code for the specified shell (bash or zsh).
