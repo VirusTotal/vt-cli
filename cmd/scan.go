@@ -84,6 +84,8 @@ func NewScanFileCmd() *cobra.Command {
 			var argReader utils.StringReader
 			if len(args) == 1 && args[0] == "-" {
 				argReader = utils.NewStringIOReader(os.Stdin)
+			} else if len(args) == 1 && utils.IsDir(args[0]) {
+				argReader, _ = utils.NewFileDirReader(args[0])
 			} else {
 				argReader = utils.NewStringArrayReader(args)
 			}
