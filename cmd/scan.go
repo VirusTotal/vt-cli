@@ -64,16 +64,19 @@ You can use the "vt analysis" command for retrieving information about the
 analyses.
 
 If the command receives a single hypen (-) the file paths are read from the standard
-input, one per line.`
+input, one per line.
+
+The command can also receive a directory to scan all files contained on it.`
 
 var scanFileCmdExample = `  vt scan file foo.exe
   vt scan file foo.exe bar.exe
+	vt scan file foo/
   cat list_of_file_paths | vt scan file -`
 
 // NewScanFileCmd returns a new instance of the 'scan file' command.
 func NewScanFileCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "file [file]...",
+		Use:     "file [[dir] | [file]...]",
 		Short:   "Scan one or more files",
 		Long:    scanFileCmdHelp,
 		Example: scanFileCmdExample,
@@ -84,6 +87,8 @@ func NewScanFileCmd() *cobra.Command {
 			var argReader utils.StringReader
 			if len(args) == 1 && args[0] == "-" {
 				argReader = utils.NewStringIOReader(os.Stdin)
+			} else if len(args) == 1 && utils.IsDir(args[0]) {
+				argReader, _ = utils.NewFileDirReader(args[0])
 			} else {
 				argReader = utils.NewStringArrayReader(args)
 			}

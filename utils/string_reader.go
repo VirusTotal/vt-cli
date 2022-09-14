@@ -99,18 +99,17 @@ func (f *FilteredStringReader) ReadString() (s string, err error) {
 	return s, err
 }
 
-
 // MappedStringReader reads strings from a StringReader and call a map function
 // that transforms the strings in some other string.
 type MappedStringReader struct {
-	r StringReader
+	r     StringReader
 	mapFn func(string) string
 }
 
 // NewMappedStringReader creates a new MappedStringReader that reads strings from
 // r and can call mapFn for transforming the string before returning it.
 func NewMappedStringReader(r StringReader, mapFn func(string) string) *MappedStringReader {
-	return &MappedStringReader{r:r, mapFn: mapFn}
+	return &MappedStringReader{r: r, mapFn: mapFn}
 }
 
 // ReadString reads strings from the underlying StringReader and can call the
