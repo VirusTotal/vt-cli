@@ -20,11 +20,13 @@ import (
 	"github.com/VirusTotal/vt-cli/utils"
 	vt "github.com/VirusTotal/vt-go"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
 type fileScanner struct {
-	scanner *vt.FileScanner
+	scanner  *vt.FileScanner
+	showInVT bool
 }
 
 func (s *fileScanner) Do(path interface{}, ds *utils.DoerState) string {
@@ -51,6 +53,13 @@ func (s *fileScanner) Do(path interface{}, ds *utils.DoerState) string {
 	analysis, err := s.scanner.ScanFile(f, progressCh)
 	if err != nil {
 		return fmt.Sprintf("%s", err)
+	}
+
+	if s.showInVT {
+		// Return the analysis URL in VT so users can visit it
+		return fmt.Sprintf(
+			"%s https://www.virustotal.com/gui/file-analysis/%s",
+			path.(string), analysis.ID())
 	}
 
 	return fmt.Sprintf("%s %s", path.(string), analysis.ID())
@@ -96,20 +105,24 @@ func NewScanFileCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			s := &fileScanner{scanner: client.NewFileScanner()}
+			s := &fileScanner{
+				scanner:  client.NewFileScanner(),
+				showInVT: viper.GetBool("open")}
 			c.DoWithStringsFromReader(s, argReader)
 			return nil
 		},
 	}
 
 	addThreadsFlag(cmd.Flags())
+	addOpenInVTFlag(cmd.Flags())
 	cmd.MarkZshCompPositionalArgumentFile(1)
 
 	return cmd
 }
 
 type urlScanner struct {
-	scanner *vt.URLScanner
+	scanner  *vt.URLScanner
+	showInVT bool
 }
 
 func (s *urlScanner) Do(url interface{}, ds *utils.DoerState) string {
@@ -117,6 +130,12 @@ func (s *urlScanner) Do(url interface{}, ds *utils.DoerState) string {
 	if err != nil {
 		return fmt.Sprintf("%s", err)
 	}
+
+	if s.showInVT {
+		return fmt.Sprintf(
+			"%s https://www.virustotal.com/gui/url-analysis/%s", url, analysis.ID())
+	}
+
 	return fmt.Sprintf("%s %s", url, analysis.ID())
 }
 
@@ -155,13 +174,16 @@ func NewScanURLCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			s := &urlScanner{scanner: client.NewURLScanner()}
+			s := &urlScanner{
+				scanner:  client.NewURLScanner(),
+				showInVT: viper.GetBool("open")}
 			c.DoWithStringsFromReader(s, argReader)
 			return nil
 		},
 	}
 
 	addThreadsFlag(cmd.Flags())
+	addOpenInVTFlag(cmd.Flags())
 
 	return cmd
 }
@@ -183,4 +205,10 @@ func NewScanCmd() *cobra.Command {
 	cmd.AddCommand(NewScanFileCmd())
 
 	return cmd
+}
+
+func addOpenInVTFlag(flags *pflag.FlagSet) {
+	flags.BoolP(
+		"open", "o", false,
+		"Return an URL to see the analysis report at the VirusTotal web GUI")
 }
