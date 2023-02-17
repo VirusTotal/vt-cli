@@ -17,11 +17,12 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"github.com/VirusTotal/vt-cli/utils"
 	"os"
 	"regexp"
 	"strconv"
 	"sync"
+
+	"github.com/VirusTotal/vt-cli/utils"
 
 	vt "github.com/VirusTotal/vt-go"
 	"github.com/spf13/cobra"
@@ -243,7 +244,7 @@ func NewHuntingRulesetSetLimitCmd() *cobra.Command {
 func NewHuntingRulesetUpdateCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "update [ruleset id] [rules file]",
-		Short: "Change the rules for a ruleset.",
+		Short: "Change the rules for a ruleset",
 		Args:  cobra.MinimumNArgs(2),
 
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -341,6 +342,21 @@ func NewHuntingRulesetAddCmd() *cobra.Command {
 
 }
 
+// NewHuntingRulesetSetNotificationEmailsCmd returns a command for setting
+// notification emails to a ruleset.
+func NewHuntingRulesetSetNotificationEmailsCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "notification_emails [ruleset id] [email]...",
+		Short: "Set ruleset notification emails",
+		Args:  cobra.MinimumNArgs(1),
+
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return patchRuleset(args[0], "notification_emails", args[1:])
+		},
+	}
+	return cmd
+}
+
 // NewHuntingRulesetCmd returns a new instance of the 'rulesets' command.
 func NewHuntingRulesetCmd() *cobra.Command {
 
@@ -371,6 +387,7 @@ func NewHuntingRulesetCmd() *cobra.Command {
 	cmd.AddCommand(NewHuntingRulesetDeleteCmd())
 	cmd.AddCommand(NewHuntingRulesetDisableCmd())
 	cmd.AddCommand(NewHuntingRulesetEnableCmd())
+	cmd.AddCommand(NewHuntingRulesetSetNotificationEmailsCmd())
 	cmd.AddCommand(NewHuntingRulesetListCmd())
 	cmd.AddCommand(NewHuntingRulesetRenameCmd())
 	cmd.AddCommand(NewHuntingRulesetSetLimitCmd())
