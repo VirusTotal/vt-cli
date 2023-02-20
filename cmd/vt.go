@@ -72,6 +72,7 @@ func NewVTCommand() *cobra.Command {
 	cmd.AddCommand(NewGenDocCmd())
 	cmd.AddCommand(NewGroupCmd())
 	cmd.AddCommand(NewHuntingCmd())
+	cmd.AddCommand(NewIOCStreamCmd())
 	cmd.AddCommand(NewInitCmd())
 	cmd.AddCommand(NewIPCmd())
 	cmd.AddCommand(NewMetaCmd())
