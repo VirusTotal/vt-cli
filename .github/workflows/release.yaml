@@ -18,6 +18,8 @@ jobs:
         run: |
           go install github.com/mitchellh/gox@latest
           go install github.com/tcnksm/ghr@latest
+      - name: Add GOPATH to search path
+        run: echo `go env GOPATH`/bin >> $GITHUB_PATH
       - name: Build
         run: make all
         env:
