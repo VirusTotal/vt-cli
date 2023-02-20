@@ -15,12 +15,11 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"strings"
-	"sync"
 
 	"github.com/spf13/viper"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/VirusTotal/vt-go"
 
@@ -104,18 +103,16 @@ func NewIOCStreamDeleteCmd() *cobra.Command {
 				return err
 			}
 			if len(args) > 0 {
-				var wg sync.WaitGroup
+				eg := &errgroup.Group{}
 				for _, arg := range args {
-					wg.Add(1)
-					go func(notificationID string) {
-						targetUrl := vt.URL("ioc_stream_notifications/%s", notificationID)
-						if _, err := client.Delete(targetUrl); err != nil {
-							fmt.Fprintf(os.Stderr, "%v\n", err)
-						}
-						wg.Done()
-					}(arg)
+					notificationId := arg
+					eg.Go(func() error {
+						targetUrl := vt.URL("ioc_stream_notifications/%s", notificationId)
+						_, err := client.Delete(targetUrl)
+						return err
+					})
 				}
-				wg.Wait()
+				return eg.Wait()
 			} else {
 				filterFlag := viper.GetString("filter")
 				targetUrl := vt.URL("ioc_stream")
@@ -136,7 +133,7 @@ func NewIOCStreamDeleteCmd() *cobra.Command {
 					return err
 				}
 			}
-			return err
+			return nil
 		},
 	}
 
