@@ -16,7 +16,7 @@ jobs:
         run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
       - name: Install dependencies
         run: |
-          go get github.com/mitchellh/gox
+          go install github.com/mitchellh/gox@latest
           go get github.com/tcnksm/ghr
       - name: Add GOPATH to search path
         run: echo `go env GOPATH`/bin >> $GITHUB_PATH
