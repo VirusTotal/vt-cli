@@ -80,6 +80,15 @@ func ObjectToMap(obj *vt.Object) map[string]interface{} {
 	m := make(map[string]interface{})
 	m["_id"] = obj.ID()
 	m["_type"] = obj.Type()
+
+	contextAttributes := make(map[string]interface{})
+	for _, attr := range obj.ContextAttributes() {
+		contextAttributes[attr], _ = obj.GetContext(attr)
+	}
+	if len(contextAttributes) > 0 {
+		m["_context_attributes"] = contextAttributes
+	}
+
 	for _, attr := range obj.Attributes() {
 		m[attr], _ = obj.Get(attr)
 	}
