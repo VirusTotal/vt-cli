@@ -28,12 +28,53 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var iocStreamCmdExamples = `List examples:
+# List notifications from a hunting rule by name
+vt iocstream list -f "origin:hunting tag:my_rule"
+# List notifications from a hunting ruleset by name
+vt iocstream list -f "origin:hunting tag:myRuleset"
+# List just the entity IDs of your IoC Stream matches
+vt iocstream list -I
+# List ALL the entity IDs in your IoC Stream and store them in a csv file (this might take a while)
+vt iocstream list -I –limit 9999999 > results.csv
+# List the first IoC Stream notifications including the hash, last_analysis_stats, size and file type
+vt iocstream list -i "_id,last_analysis_stats,size,type_tag"
+# Check if a hash is in your IoC Stream matches
+vt iocstream list -f "entity_type:file entity_id:hash"
+
+Delete examples:
+# Delete all notifications matching a filter, e.g. all matches for a Yara rule/ruleset
+vt iocstream delete -f "origin:hunting tag:my_rule"
+# Delete a single notification with ID 1234568. The notification ID is displayed in the context_attributes.
+vt iocstream delete 1234568
+`
+
+var iocStreamListCmdExamples = `# List notifications from a hunting rule by name
+vt iocstream list -f "origin:hunting tag:my_rule"
+# List notifications from a hunting ruleset by name
+vt iocstream list -f "origin:hunting tag:myRuleset"
+# List just the entity IDs of your IoC Stream matches
+vt iocstream list -I
+# List ALL the entity IDs in your IoC Stream and store them in a csv file (this might take a while)
+vt iocstream list -I –limit 9999999 > results.csv
+# List the first IoC Stream notifications including the hash, last_analysis_stats, size and file type
+vt iocstream list -i "_id,last_analysis_stats,size,type_tag"
+# Check if a hash is in your IoC Stream matches
+vt iocstream list -f "entity_type:file entity_id:hash"
+`
+
+var iocStreamDeleteCmdExamples = `# Delete all notifications matching a filter, e.g. all matches for a Yara rule/ruleset
+vt iocstream delete -f "origin:hunting tag:my_rule"
+# Delete a single notification with ID 1234568. The notification ID is displayed in the context_attributes.
+vt iocstream delete 1234568`
+
 // NewIOCStreamCmd returns a new instance of the `ioc
 func NewIOCStreamCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Aliases: []string{"is"},
-		Use:     "iocstream [id]...",
+		Use:     "iocstream [notification_id]...",
 		Short:   "Manage IoC Stream notifications",
+		Example: iocStreamCmdExamples,
 		Args:    cobra.ExactArgs(1),
 
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -65,6 +106,7 @@ func NewIOCStreamListCmd() *cobra.Command {
 		Aliases: []string{"il"},
 		Use:     "list",
 		Short:   "List IoCs from notifications",
+		Example: iocStreamListCmdExamples,
 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			p, err := NewPrinter(cmd)
@@ -93,9 +135,10 @@ then all the IoC Stream notifications matching the given filter are deleted.
 // NewIOCStreamDeleteCmd returns a new instance of the `ioc_stream delete` command.
 func NewIOCStreamDeleteCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "delete [notification id]...",
-		Short: "Deletes notifications from the IoC Stream",
-		Long:  iocStreamNotificationsDeleteCmdHelp,
+		Use:     "delete [notification id]...",
+		Short:   "Deletes notifications from the IoC Stream",
+		Long:    iocStreamNotificationsDeleteCmdHelp,
+		Example: iocStreamDeleteCmdExamples,
 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := NewAPIClient()
@@ -132,6 +175,7 @@ func NewIOCStreamDeleteCmd() *cobra.Command {
 				if _, err := client.Delete(targetUrl); err != nil {
 					return err
 				}
+				fmt.Println("Notifications being deleted. This can take a while depending on the number of notifications.")
 			}
 			return nil
 		},

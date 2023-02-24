@@ -31,7 +31,7 @@ the standard input, one per line.`
 
 var collectionCmdExample = `  vt collection malpedia_win_emotet
   vt collection malpedia_win_emotet alienvault_603eb1abdd4812819c64e197
-  cat list_of_collections | vt collection -`
+  cat list_of_collections | vt collection -n [collection_name] -d [collection_description] -`
 
 // NewCollectionCmd returns a new instance of the 'collection' command.
 func NewCollectionCmd() *cobra.Command {
