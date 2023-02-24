@@ -28,7 +28,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var iocStreamCmdExamples = `List examples:
+var iocStreamCmdExamples = `## List:
 # List notifications from a hunting rule by name
 vt iocstream list -f "origin:hunting tag:my_rule"
 # List notifications from a hunting ruleset by name
@@ -42,7 +42,7 @@ vt iocstream list -i "_id,last_analysis_stats,size,type_tag"
 # Check if a hash is in your IoC Stream matches
 vt iocstream list -f "entity_type:file entity_id:hash"
 
-Delete examples:
+## Delete:
 # Delete all notifications matching a filter, e.g. all matches for a Yara rule/ruleset
 vt iocstream delete -f "origin:hunting tag:my_rule"
 # Delete a single notification with ID 1234568. The notification ID is displayed in the context_attributes.
