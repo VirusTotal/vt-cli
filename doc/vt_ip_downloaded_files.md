@@ -2,10 +2,6 @@
 
 Files downloaded from the ip.
 
-### Synopsis
-
-Files downloaded from the ip.
-
 ```
 vt ip downloaded_files [ip] [flags]
 ```
@@ -24,7 +20,8 @@ vt ip downloaded_files [ip] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

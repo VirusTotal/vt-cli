@@ -2,10 +2,6 @@
 
 Files containing the domain.
 
-### Synopsis
-
-Files containing the domain.
-
 ```
 vt domain referrer_files [domain] [flags]
 ```
@@ -24,7 +20,8 @@ vt domain referrer_files [domain] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

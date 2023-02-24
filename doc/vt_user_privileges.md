@@ -2,10 +2,6 @@
 
 Change user privileges
 
-### Synopsis
-
-Change user privileges
-
 ### Options
 
 ```
@@ -15,7 +11,8 @@ Change user privileges
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

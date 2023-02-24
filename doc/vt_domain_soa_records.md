@@ -2,10 +2,6 @@
 
 Records SOA for the domain.
 
-### Synopsis
-
-Records SOA for the domain.
-
 ```
 vt domain soa_records [domain] [flags]
 ```
@@ -24,7 +20,8 @@ vt domain soa_records [domain] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

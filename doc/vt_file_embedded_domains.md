@@ -2,10 +2,6 @@
 
 Domain names embedded in the file.
 
-### Synopsis
-
-Domain names embedded in the file.
-
 ```
 vt file embedded_domains [hash] [flags]
 ```
@@ -24,7 +20,8 @@ vt file embedded_domains [hash] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

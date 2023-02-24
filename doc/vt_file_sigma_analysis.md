@@ -2,10 +2,6 @@
 
 Sigma analysis for the file.
 
-### Synopsis
-
-Sigma analysis for the file.
-
 ```
 vt file sigma_analysis [hash] [flags]
 ```
@@ -24,7 +20,8 @@ vt file sigma_analysis [hash] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

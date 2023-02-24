@@ -2,10 +2,6 @@
 
 Files derived from the file according to Carbon Black.
 
-### Synopsis
-
-Files derived from the file according to Carbon Black.
-
 ```
 vt file carbonblack_children [hash] [flags]
 ```
@@ -24,7 +20,8 @@ vt file carbonblack_children [hash] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

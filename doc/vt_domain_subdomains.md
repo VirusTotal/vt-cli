@@ -2,10 +2,6 @@
 
 Subdomains of the domain.
 
-### Synopsis
-
-Subdomains of the domain.
-
 ```
 vt domain subdomains [domain] [flags]
 ```
@@ -24,7 +20,8 @@ vt domain subdomains [domain] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

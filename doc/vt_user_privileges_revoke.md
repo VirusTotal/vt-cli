@@ -2,10 +2,6 @@
 
 Revoke privileges from a user
 
-### Synopsis
-
-Revoke privileges from a user
-
 ```
 vt user privileges revoke [username] [privilege]... [flags]
 ```
@@ -25,7 +21,8 @@ vt user privileges revoke [username] [privilege]... [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

@@ -2,10 +2,6 @@
 
 Get all relationships.
 
-### Synopsis
-
-Get all relationships.
-
 ```
 vt url relationships [url] [flags]
 ```
@@ -22,7 +18,8 @@ vt url relationships [url] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

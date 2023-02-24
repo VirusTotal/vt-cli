@@ -2,10 +2,6 @@
 
 Comments for the domain or IP address.
 
-### Synopsis
-
-Comments for the domain or IP address.
-
 ```
 vt domain comments [domain] [flags]
 ```
@@ -24,7 +20,8 @@ vt domain comments [domain] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

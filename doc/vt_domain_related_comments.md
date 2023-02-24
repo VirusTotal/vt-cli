@@ -2,10 +2,6 @@
 
 Comments for the Domain or IP's related entities.
 
-### Synopsis
-
-Comments for the Domain or IP's related entities.
-
 ```
 vt domain related_comments [domain] [flags]
 ```
@@ -24,7 +20,8 @@ vt domain related_comments [domain] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

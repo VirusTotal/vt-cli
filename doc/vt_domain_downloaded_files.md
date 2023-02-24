@@ -2,10 +2,6 @@
 
 Files downloaded from the domain.
 
-### Synopsis
-
-Files downloaded from the domain.
-
 ```
 vt domain downloaded_files [domain] [flags]
 ```
@@ -24,7 +20,8 @@ vt domain downloaded_files [domain] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

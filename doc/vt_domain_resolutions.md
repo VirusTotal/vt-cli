@@ -2,10 +2,6 @@
 
 DNS resolutions for the domain.
 
-### Synopsis
-
-DNS resolutions for the domain.
-
 ```
 vt domain resolutions [domain] [flags]
 ```
@@ -24,7 +20,8 @@ vt domain resolutions [domain] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

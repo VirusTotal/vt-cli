@@ -2,10 +2,6 @@
 
 List monitor in your account
 
-### Synopsis
-
-List monitor in your account
-
 ```
 vt monitor list [flags]
 ```
@@ -32,7 +28,8 @@ vt monitor list [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

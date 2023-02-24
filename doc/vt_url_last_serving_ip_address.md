@@ -2,10 +2,6 @@
 
 Last IP address that served the URL.
 
-### Synopsis
-
-Last IP address that served the URL.
-
 ```
 vt url last_serving_ip_address [url] [flags]
 ```
@@ -24,7 +20,8 @@ vt url last_serving_ip_address [url] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

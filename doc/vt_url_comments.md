@@ -2,10 +2,6 @@
 
 Comments for the URL.
 
-### Synopsis
-
-Comments for the URL.
-
 ```
 vt url comments [url] [flags]
 ```
@@ -24,7 +20,8 @@ vt url comments [url] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

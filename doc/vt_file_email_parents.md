@@ -2,10 +2,6 @@
 
 Email files that contained the file.
 
-### Synopsis
-
-Email files that contained the file.
-
 ```
 vt file email_parents [hash] [flags]
 ```
@@ -24,7 +20,8 @@ vt file email_parents [hash] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

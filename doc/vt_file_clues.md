@@ -2,10 +2,6 @@
 
 Clues for the file.
 
-### Synopsis
-
-Clues for the file.
-
 ```
 vt file clues [hash] [flags]
 ```
@@ -24,7 +20,8 @@ vt file clues [hash] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 
