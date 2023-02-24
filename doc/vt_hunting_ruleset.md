@@ -2,10 +2,6 @@
 
 Manage hunting rulesets
 
-### Synopsis
-
-Manage hunting rulesets
-
 ```
 vt hunting ruleset [id]... [flags]
 ```
@@ -23,7 +19,8 @@ vt hunting ruleset [id]... [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 
@@ -35,7 +32,8 @@ vt hunting ruleset [id]... [flags]
 * [vt hunting ruleset disable](vt_hunting_ruleset_disable.md)	 - Disable ruleset
 * [vt hunting ruleset enable](vt_hunting_ruleset_enable.md)	 - Enable ruleset
 * [vt hunting ruleset list](vt_hunting_ruleset_list.md)	 - List rulesets
+* [vt hunting ruleset notification_emails](vt_hunting_ruleset_notification_emails.md)	 - Set ruleset notification emails
 * [vt hunting ruleset rename](vt_hunting_ruleset_rename.md)	 - Rename ruleset
 * [vt hunting ruleset setlimit](vt_hunting_ruleset_setlimit.md)	 - Set ruleset limit
-* [vt hunting ruleset update](vt_hunting_ruleset_update.md)	 - Change the rules for a ruleset.
+* [vt hunting ruleset update](vt_hunting_ruleset_update.md)	 - Change the rules for a ruleset
 

@@ -2,10 +2,6 @@
 
 IP addresses contacted by the file.
 
-### Synopsis
-
-IP addresses contacted by the file.
-
 ```
 vt file contacted_ips [hash] [flags]
 ```
@@ -24,7 +20,8 @@ vt file contacted_ips [hash] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

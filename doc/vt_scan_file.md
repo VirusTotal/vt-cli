@@ -14,8 +14,10 @@ analyses.
 If the command receives a single hypen (-) the file paths are read from the standard
 input, one per line.
 
+The command can also receive a directory to scan all files contained on it.
+
 ```
-vt scan file [file]... [flags]
+vt scan file [[dir] | [file]...] [flags]
 ```
 
 ### Examples
@@ -23,6 +25,7 @@ vt scan file [file]... [flags]
 ```
   vt scan file foo.exe
   vt scan file foo.exe bar.exe
+	vt scan file foo/
   cat list_of_file_paths | vt scan file -
 ```
 
@@ -30,13 +33,15 @@ vt scan file [file]... [flags]
 
 ```
   -h, --help          help for file
+  -o, --open          Return an URL to see the analysis report at the VirusTotal web GUI
   -t, --threads int   number of threads working in parallel (default 5)
 ```
 
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

@@ -2,10 +2,6 @@
 
 Manage malware hunting notifications
 
-### Synopsis
-
-Manage malware hunting notifications
-
 ```
 vt hunting notification [id]... [flags]
 ```
@@ -23,7 +19,8 @@ vt hunting notification [id]... [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

@@ -2,10 +2,6 @@
 
 Screenshots obtained from the execution of the file.
 
-### Synopsis
-
-Screenshots obtained from the execution of the file.
-
 ```
 vt file screenshots [hash] [flags]
 ```
@@ -24,7 +20,8 @@ vt file screenshots [hash] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

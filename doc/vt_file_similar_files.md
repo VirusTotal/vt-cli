@@ -2,10 +2,6 @@
 
 Files that are similar to the file.
 
-### Synopsis
-
-Files that are similar to the file.
-
 ```
 vt file similar_files [hash] [flags]
 ```
@@ -24,7 +20,8 @@ vt file similar_files [hash] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

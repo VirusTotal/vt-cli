@@ -2,10 +2,6 @@
 
 Files that communicate with the domain.
 
-### Synopsis
-
-Files that communicate with the domain.
-
 ```
 vt domain communicating_files [domain] [flags]
 ```
@@ -24,7 +20,8 @@ vt domain communicating_files [domain] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

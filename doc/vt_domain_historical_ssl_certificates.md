@@ -2,10 +2,6 @@
 
 SSL certificate history.
 
-### Synopsis
-
-SSL certificate history.
-
 ```
 vt domain historical_ssl_certificates [domain] [flags]
 ```
@@ -24,7 +20,8 @@ vt domain historical_ssl_certificates [domain] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

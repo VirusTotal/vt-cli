@@ -2,10 +2,6 @@
 
 Immediate parent domain.
 
-### Synopsis
-
-Immediate parent domain.
-
 ```
 vt domain immediate_parent [domain] [flags]
 ```
@@ -24,7 +20,8 @@ vt domain immediate_parent [domain] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

@@ -2,10 +2,6 @@
 
 PE files containing the file as a resource.
 
-### Synopsis
-
-PE files containing the file as a resource.
-
 ```
 vt file pe_resource_parents [hash] [flags]
 ```
@@ -24,7 +20,8 @@ vt file pe_resource_parents [hash] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

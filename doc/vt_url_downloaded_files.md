@@ -2,10 +2,6 @@
 
 Files downloaded from the URL.
 
-### Synopsis
-
-Files downloaded from the URL.
-
 ```
 vt url downloaded_files [url] [flags]
 ```
@@ -24,7 +20,8 @@ vt url downloaded_files [url] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

@@ -1,10 +1,6 @@
 ## vt domain votes
 
-Votes for the file/URL.
-
-### Synopsis
-
-Votes for the file/URL.
+Item's votes.
 
 ```
 vt domain votes [domain] [flags]
@@ -24,7 +20,8 @@ vt domain votes [domain] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

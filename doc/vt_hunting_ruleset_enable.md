@@ -2,10 +2,6 @@
 
 Enable ruleset
 
-### Synopsis
-
-Enable ruleset
-
 ```
 vt hunting ruleset enable [ruleset id] [flags]
 ```
@@ -19,7 +15,8 @@ vt hunting ruleset enable [ruleset id] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

@@ -2,10 +2,6 @@
 
 Graphs that include the URL.
 
-### Synopsis
-
-Graphs that include the URL.
-
 ```
 vt url graphs [url] [flags]
 ```
@@ -24,7 +20,8 @@ vt url graphs [url] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

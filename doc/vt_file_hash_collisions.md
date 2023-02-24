@@ -2,10 +2,6 @@
 
 Files with the same MD5 or SHA1 than the file.
 
-### Synopsis
-
-Files with the same MD5 or SHA1 than the file.
-
 ```
 vt file hash_collisions [hash] [flags]
 ```
@@ -24,7 +20,8 @@ vt file hash_collisions [hash] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

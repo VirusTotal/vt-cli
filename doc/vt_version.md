@@ -2,10 +2,6 @@
 
 Show version number
 
-### Synopsis
-
-Show version number
-
 ```
 vt version [flags]
 ```
@@ -19,7 +15,8 @@ vt version [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

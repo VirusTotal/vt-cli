@@ -2,10 +2,6 @@
 
 URLs that this url redirects to.
 
-### Synopsis
-
-URLs that this url redirects to.
-
 ```
 vt url redirects_to [url] [flags]
 ```
@@ -24,7 +20,8 @@ vt url redirects_to [url] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

@@ -2,10 +2,6 @@
 
 Distinct IP addresses from which the URL loads some kind of resource.
 
-### Synopsis
-
-Distinct IP addresses from which the URL loads some kind of resource.
-
 ```
 vt url contacted_ips [url] [flags]
 ```
@@ -24,7 +20,8 @@ vt url contacted_ips [url] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

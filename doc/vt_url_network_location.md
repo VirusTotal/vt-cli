@@ -2,10 +2,6 @@
 
 Domain or IP address for the URL.
 
-### Synopsis
-
-Domain or IP address for the URL.
-
 ```
 vt url network_location [url] [flags]
 ```
@@ -24,7 +20,8 @@ vt url network_location [url] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

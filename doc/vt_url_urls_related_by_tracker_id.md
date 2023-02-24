@@ -1,10 +1,6 @@
 ## vt url urls_related_by_tracker_id
 
-
-
-### Synopsis
-
-
+URLs that share the same tracker ID.
 
 ```
 vt url urls_related_by_tracker_id [url] [flags]
@@ -24,7 +20,8 @@ vt url urls_related_by_tracker_id [url] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

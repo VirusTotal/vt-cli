@@ -2,10 +2,6 @@
 
 Abort a retrohunt job
 
-### Synopsis
-
-Abort a retrohunt job
-
 ```
 vt retrohunt abort [job id] [flags]
 ```
@@ -19,7 +15,8 @@ vt retrohunt abort [job id] [flags]
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 

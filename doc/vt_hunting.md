@@ -2,10 +2,6 @@
 
 Manage malware hunting rules and notifications
 
-### Synopsis
-
-Manage malware hunting rules and notifications
-
 ### Options
 
 ```
@@ -15,7 +11,8 @@ Manage malware hunting rules and notifications
 ### Options inherited from parent commands
 
 ```
-  -k, --apikey string   api key
+  -k, --apikey string   API key
+      --proxy string    HTTP proxy
   -v, --verbose         verbose output
 ```
 
