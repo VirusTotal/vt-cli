@@ -43,7 +43,7 @@ vt iocstream list -i "_id,last_analysis_stats,size,type_tag"
 vt iocstream list -f "entity_type:file entity_id:hash"
 
 ## Delete:
-# Delete all notifications matching a filter, e.g. all matches for a Yara rule/ruleset. This process is
+# Delete all notifications matching a filter, e.g. all matches for a YARA rule/ruleset. This process is
 # asynchronous, so it can take a while to delete all the notifications.
 vt iocstream delete -f "origin:hunting tag:my_rule"
 # Delete a single notification with ID 1234568. The notification ID is displayed in the context_attributes.
