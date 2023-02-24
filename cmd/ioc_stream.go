@@ -43,11 +43,11 @@ vt iocstream list -i "_id,last_analysis_stats,size,type_tag"
 vt iocstream list -f "entity_type:file entity_id:hash"
 
 ## Delete:
-# Delete all notifications matching a filter, e.g. all matches for a Yara rule/ruleset
+# Delete all notifications matching a filter, e.g. all matches for a Yara rule/ruleset. This process is
+# asynchronous, so it can take a while to delete all the notifications.
 vt iocstream delete -f "origin:hunting tag:my_rule"
 # Delete a single notification with ID 1234568. The notification ID is displayed in the context_attributes.
-vt iocstream delete 1234568
-`
+vt iocstream delete 1234568`
 
 var iocStreamListCmdExamples = `# List notifications from a hunting rule by name
 vt iocstream list -f "origin:hunting tag:my_rule"
@@ -60,8 +60,7 @@ vt iocstream list -I –limit 9999999 > results.csv
 # List the first IoC Stream notifications including the hash, last_analysis_stats, size and file type
 vt iocstream list -i "_id,last_analysis_stats,size,type_tag"
 # Check if a hash is in your IoC Stream matches
-vt iocstream list -f "entity_type:file entity_id:hash"
-`
+vt iocstream list -f "entity_type:file entity_id:hash"`
 
 var iocStreamDeleteCmdExamples = `# Delete all notifications matching a filter, e.g. all matches for a Yara rule/ruleset
 vt iocstream delete -f "origin:hunting tag:my_rule"
