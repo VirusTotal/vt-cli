@@ -28,6 +28,18 @@ $ cd vt-cli
 $ make install
 ```
 
+NOTE: in order to use the `vt` binary, make sure the `GOBIN` is part of your `PATH` env variable:
+```
+$ export GOBIN=`go env GOPATH`/bin
+$ export PATH=$PATH:$GOBIN
+```
+
+#### Mac OS
+For Mac OS users, there's a [brew formula](https://formulae.brew.sh/formula/virustotal-cli) available. Please note this is not maintained by VirusTotal.
+```
+$ brew install virustotal-cli
+```
+
 ### A note on Window's console
 
 If you plan to use vt-cli in Windows on a regular basis we highly recommend you to avoid the standard Windows's console and use [Cygwin](https://www.cygwin.com/) instead. The Windows's console is *very* slow when printing large amounts of text (as vt-cli usually does) while Cygwin performs much better. Additionally, you can benefit of Cygwin's support for command auto-completion, a handy feature that Window's console doesn't offer. In order to take advantage of auto-completion make sure to include the `bash-completion` package while installing Cygwin.
