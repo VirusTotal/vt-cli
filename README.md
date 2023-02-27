@@ -28,6 +28,18 @@ $ cd vt-cli
 $ make install
 ```
 
+NOTE: in order to use the `vt` binary, make sure the `GOBIN` is part of your `PATH` env variable:
+```
+$ export GOBIN=`go env GOPATH`/bin
+$ export PATH=$PATH:$GOBIN
+```
+
+#### Mac OS
+For Mac OS users, there's a [brew formula](https://formulae.brew.sh/formula/virustotal-cli) available. Please note this is not maintained by VirusTotal.
+```
+$ brew install virustotal-cli
+```
+
 ### A note on Window's console
 
 If you plan to use vt-cli in Windows on a regular basis we highly recommend you to avoid the standard Windows's console and use [Cygwin](https://www.cygwin.com/) instead. The Windows's console is *very* slow when printing large amounts of text (as vt-cli usually does) while Cygwin performs much better. Additionally, you can benefit of Cygwin's support for command auto-completion, a handy feature that Window's console doesn't offer. In order to take advantage of auto-completion make sure to include the `bash-completion` package while installing Cygwin.
@@ -144,6 +156,25 @@ Restart the shell.
 * Search for files:
   ```
   $ vt search "positives:5+ type:pdf"
+  ```
+  
+* Scan a file:
+  ```
+  $ vt scan file <yourfile>
+  <yourfile> ZDZiOTcxY2JhNDE0MWU5ZWRjN2JjNGQ2NTdhN2VjODU6MTU3MDE3Mjg1NQ==
+  $ vt analysis ZDZiOTcxY2JhNDE0MWU5ZWRjN2JjNGQ2NTdhN2VjODU6MTU3MDE3Mjg1NQ==
+  - _id: "ZDZiOTcxY2JhNDE0MWU5ZWRjN2JjNGQ2NTdhN2VjODU6MTU3MDE3Mjg1NQ=="
+    _type: "analysis"
+    date: 1570172855  # 2019-10-04 09:07:35 +0200 CEST
+    stats:
+      failure: 0
+      harmless: 0
+      malicious: 0
+      suspicious: 0
+      timeout: 0
+      type-unsupported: 0
+      undetected: 0
+    status: "queued"
   ```
 
 ## Getting only what you want
