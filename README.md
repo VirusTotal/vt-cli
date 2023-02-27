@@ -157,6 +157,25 @@ Restart the shell.
   ```
   $ vt search "positives:5+ type:pdf"
   ```
+  
+* Scan a file:
+  ```
+  $ vt scan file <yourfile>
+  <yourfile> ZDZiOTcxY2JhNDE0MWU5ZWRjN2JjNGQ2NTdhN2VjODU6MTU3MDE3Mjg1NQ==
+  $ vt analysis ZDZiOTcxY2JhNDE0MWU5ZWRjN2JjNGQ2NTdhN2VjODU6MTU3MDE3Mjg1NQ==
+  - _id: "ZDZiOTcxY2JhNDE0MWU5ZWRjN2JjNGQ2NTdhN2VjODU6MTU3MDE3Mjg1NQ=="
+    _type: "analysis"
+    date: 1570172855  # 2019-10-04 09:07:35 +0200 CEST
+    stats:
+      failure: 0
+      harmless: 0
+      malicious: 0
+      suspicious: 0
+      timeout: 0
+      type-unsupported: 0
+      undetected: 0
+    status: "queued"
+  ```
 
 ## Getting only what you want
 
