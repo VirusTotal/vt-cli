@@ -116,6 +116,11 @@ Restart the shell.
   $ vt file 8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85
   ```
 
+* Get information about a file in JSON format:
+  ```
+  $ vt file 8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85 --format json
+  ```
+
 * Get a specific analysis report for a file:
   ```
   $ # File analysis IDs can be given as `f-<file_SHA256_hash>-<UNIX timestamp>`...
@@ -175,6 +180,16 @@ Restart the shell.
       type-unsupported: 0
       undetected: 0
     status: "queued"
+  ```
+
+* Export detections and tags of files from a search in CSV format:
+  ```
+  $ vt search "positives:5+ type:pdf" -i sha256,last_analysis_stats.malicious,tags --format csv
+  ```
+
+* Export detections and tags of files from a search in JSON format:
+  ```
+  $ vt search "positives:5+ type:pdf" -i sha256,last_analysis_stats.malicious,tags --format json
   ```
 
 ## Getting only what you want
