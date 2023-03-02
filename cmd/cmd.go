@@ -38,6 +38,12 @@ func addAPIKeyFlag(flags *pflag.FlagSet) {
 		"API key")
 }
 
+func addFormatFlag(flags *pflag.FlagSet) {
+	flags.String(
+		"format", "yaml",
+		"Output format (yaml/json/csv)")
+}
+
 func addHostFlag(flags *pflag.FlagSet) {
 	flags.String(
 		"host", "www.virustotal.com",

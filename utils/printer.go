@@ -14,6 +14,8 @@
 package utils
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -21,6 +23,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/VirusTotal/vt-cli/csv"
 	"github.com/VirusTotal/vt-cli/yaml"
 	vt "github.com/VirusTotal/vt-go"
 	"github.com/fatih/color"
@@ -45,15 +48,26 @@ func NewPrinter(client *APIClient, cmd *cobra.Command, colors *yaml.Colors) (*Pr
 
 // Print prints the provided data to stdout.
 func (p *Printer) Print(data interface{}) error {
-	return yaml.NewEncoder(
-		ansi.NewAnsiStdout(),
-		yaml.EncoderColors(p.colors),
-		yaml.EncoderDateKeys([]glob.Glob{
-			glob.MustCompile("last_login"),
-			glob.MustCompile("user_since"),
-			glob.MustCompile("date"),
-			glob.MustCompile("*_date"),
-		})).Encode(data)
+	format := strings.ToLower(viper.GetString("format"))
+	if format == "" || format == "yaml" {
+		return yaml.NewEncoder(
+			ansi.NewAnsiStdout(),
+			yaml.EncoderColors(p.colors),
+			yaml.EncoderDateKeys([]glob.Glob{
+				glob.MustCompile("last_login"),
+				glob.MustCompile("user_since"),
+				glob.MustCompile("date"),
+				glob.MustCompile("*_date"),
+			})).Encode(data)
+	} else if format == "json" {
+		encoder := json.NewEncoder(ansi.NewAnsiStdout())
+		encoder.SetIndent("", "  ")
+		return encoder.Encode(data)
+	} else if format == "csv" {
+		return csv.NewEncoder(ansi.NewAnsiStdout()).Encode(data)
+	} else {
+		return errors.New("unknown format")
+	}
 }
 
 // PrintSyncMap prints a sync.Map.
@@ -159,13 +173,21 @@ func (p *Printer) GetAndPrintObjects(endpoint string, r StringReader, argRe *reg
 
 	go p.client.RetrieveObjects(endpoint, filteredArgs, objectsCh, errorsCh)
 
-	for obj := range objectsCh {
-		if viper.GetBool("identifiers-only") {
-			fmt.Printf("%s\n", obj.ID())
-		} else {
-			if err := p.PrintObject(obj); err != nil {
-				return err
-			}
+	if viper.GetBool("identifiers-only") {
+		var objectIds []string
+		for obj := range objectsCh {
+			objectIds = append(objectIds, obj.ID())
+		}
+		if err := p.Print(objectIds); err != nil {
+			return err
+		}
+	} else {
+		var objects []*vt.Object
+		for obj := range objectsCh {
+			objects = append(objects, obj)
+		}
+		if err := p.PrintObjects(objects); err != nil {
+			return err
 		}
 	}
 
@@ -191,18 +213,28 @@ func (p *Printer) PrintCollection(collection *url.URL) error {
 
 // PrintIterator prints the objects returned by an object iterator.
 func (p *Printer) PrintIterator(it *vt.Iterator) error {
+	var objs []*vt.Object
+	var ids []string
 	for it.Next() {
 		obj := it.Get()
 		if viper.GetBool("identifiers-only") {
-			fmt.Printf("%s\n", obj.ID())
+			ids = append(ids, obj.ID())
 		} else {
-			if err := p.PrintObject(obj); err != nil {
-				return err
-			}
+			objs = append(objs, obj)
 		}
 	}
 	if err := it.Error(); err != nil {
 		return err
+	}
+
+	if viper.GetBool("identifiers-only") {
+		if err := p.Print(ids); err != nil {
+			return err
+		}
+	} else {
+		if err := p.PrintObjects(objs); err != nil {
+			return err
+		}
 	}
 	p.PrintCommandLineWithCursor(it)
 	return nil

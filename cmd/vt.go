@@ -59,6 +59,7 @@ func NewVTCommand() *cobra.Command {
 	}
 
 	addAPIKeyFlag(cmd.PersistentFlags())
+	addFormatFlag(cmd.PersistentFlags())
 	addHostFlag(cmd.PersistentFlags())
 	addProxyFlag(cmd.PersistentFlags())
 	addVerboseFlag(cmd.PersistentFlags())
