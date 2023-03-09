@@ -50,7 +50,14 @@ func waitForAnalysisResults(cli *utils.APIClient, analysisId string) (*vt.Object
 			return nil, ctx.Err()
 		case <-ticker.C:
 			if obj, err := cli.GetObject(vt.URL(fmt.Sprintf("analyses/%s", analysisId))); err != nil {
-				return nil, fmt.Errorf("error retrieving analysis result: %v", err)
+				// if the API returned an error 503 (transient error) retry; otherwise just return
+				//the error to the user
+				if e, ok := err.(*vt.Error); ok && e.Code == "TransientError" {
+					time.Sleep(1 * time.Second)
+				} else {
+					return nil, fmt.Errorf("error retrieving analysis result: %v", err)
+				}
+
 			} else if status, _ := obj.Get("status"); status == "completed" {
 				return obj, nil
 			}
@@ -83,13 +90,13 @@ func (s *fileScanner) Do(path interface{}, ds *utils.DoerState) string {
 
 	f, err := os.Open(path.(string))
 	if err != nil {
-		return fmt.Sprintf("%s", err)
+		return err.Error()
 	}
 	defer f.Close()
 
 	analysis, err := s.scanner.ScanFile(f, progressCh)
 	if err != nil {
-		return fmt.Sprintf("%s", err)
+		return err.Error()
 	}
 
 	if s.showInVT {
@@ -102,7 +109,7 @@ func (s *fileScanner) Do(path interface{}, ds *utils.DoerState) string {
 	if s.waitForCompletion {
 		analysisResult, err := waitForAnalysisResults(s.cli, analysis.ID())
 		if err != nil {
-			return fmt.Sprintf("%s", err)
+			return err.Error()
 		}
 		s.printer.PrintObject(analysisResult)
 		return ""
@@ -186,7 +193,7 @@ type urlScanner struct {
 func (s *urlScanner) Do(url interface{}, ds *utils.DoerState) string {
 	analysis, err := s.scanner.Scan(url.(string))
 	if err != nil {
-		return fmt.Sprintf("%s", err)
+		return err.Error()
 	}
 
 	if s.showInVT {
@@ -197,7 +204,7 @@ func (s *urlScanner) Do(url interface{}, ds *utils.DoerState) string {
 	if s.waitForCompletion {
 		analysisResult, err := waitForAnalysisResults(s.cli, analysis.ID())
 		if err != nil {
-			return fmt.Sprintf("%s", err)
+			return err.Error()
 		}
 		s.printer.PrintObject(analysisResult)
 		return ""
