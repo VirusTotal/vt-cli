@@ -26,13 +26,22 @@ import (
 	"github.com/spf13/viper"
 )
 
+const (
+	// Poll frequency defines the interval in which requests are sent to the
+	// VT API to check if the analysis is completed.
+	POLL_FREQUENCY = 10 * time.Second
+	// Timeout limit defines the maximum amount of seconds to wait for an
+	// analysis' results
+	TIMEOUT_LIMIT = 120 * time.Second
+)
+
 // waitForAnalysisResults calls every pollFrequency seconds to the VT API and
 // checks whether an analysis is completed or not. When the analysis is completed
 // it is returned.
-func waitForAnalysisResults(cli *utils.APIClient, analysisId string, pollFrequency, timeoutLimit time.Duration) (*vt.Object, error) {
-	ticker := time.NewTicker(pollFrequency * time.Second)
+func waitForAnalysisResults(cli *utils.APIClient, analysisId string) (*vt.Object, error) {
+	ticker := time.NewTicker(POLL_FREQUENCY)
 	defer ticker.Stop()
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutLimit*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT_LIMIT)
 	defer cancel()
 
 	for {
@@ -91,7 +100,7 @@ func (s *fileScanner) Do(path interface{}, ds *utils.DoerState) string {
 	}
 
 	if s.waitForCompletion {
-		analysisResult, err := waitForAnalysisResults(s.cli, analysis.ID(), 1, 120)
+		analysisResult, err := waitForAnalysisResults(s.cli, analysis.ID())
 		if err != nil {
 			return fmt.Sprintf("%s", err)
 		}
@@ -186,7 +195,7 @@ func (s *urlScanner) Do(url interface{}, ds *utils.DoerState) string {
 	}
 
 	if s.waitForCompletion {
-		analysisResult, err := waitForAnalysisResults(s.cli, analysis.ID(), 1, 10)
+		analysisResult, err := waitForAnalysisResults(s.cli, analysis.ID())
 		if err != nil {
 			return fmt.Sprintf("%s", err)
 		}
