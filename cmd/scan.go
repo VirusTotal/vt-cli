@@ -107,7 +107,7 @@ var scanFileCmdHelp = `Scan one or more files.
 This command receives one or more file paths and uploads them to VirusTotal for
 scanning. It returns the file paths followed by their corresponding analysis IDs.
 You can use the "vt analysis" command for retrieving information about the
-analyses or you can use the waitForCompletion flag to see the results when the
+analyses or you can use the --wait flag to see the results when the
 analysis is completed.
 
 If the command receives a single hypen (-) the file paths are read from the standard
@@ -201,7 +201,7 @@ var scanURLCmdHelp = `Scan one or more URLs.
 
 This command receives one or more URLs and scan them. It returns the URLs followed
 by their corresponding analysis IDs. You can use the "vt analysis" command for
-retrieving information about the analyses or you can use the waitForCompletion
+retrieving information about the analyses or you can use the --wait
 flag to see the results when the analysis is completed.
 
 If the command receives a single hypen (-) the URLs are read from the standard
