@@ -14,8 +14,10 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/VirusTotal/vt-cli/utils"
 	vt "github.com/VirusTotal/vt-go"
@@ -24,9 +26,35 @@ import (
 	"github.com/spf13/viper"
 )
 
+// waitForAnalysisResults calls every pollFrequency seconds to the VT API and
+// checks whether an analysis is completed or not. When the analysis is completed
+// it is returned.
+func waitForAnalysisResults(cli *utils.APIClient, analysisId string, pollFrequency, timeoutLimit time.Duration) (*vt.Object, error) {
+	ticker := time.NewTicker(pollFrequency * time.Second)
+	defer ticker.Stop()
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutLimit*time.Second)
+	defer cancel()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		case <-ticker.C:
+			if obj, err := cli.GetObject(vt.URL(fmt.Sprintf("analyses/%s", analysisId))); err != nil {
+				return nil, fmt.Errorf("error retrieving analysis result: %v", err)
+			} else if status, _ := obj.Get("status"); status == "completed" {
+				return obj, nil
+			}
+		}
+	}
+}
+
 type fileScanner struct {
-	scanner  *vt.FileScanner
-	showInVT bool
+	scanner           *vt.FileScanner
+	cli               *utils.APIClient
+	printer           *utils.Printer
+	showInVT          bool
+	waitForCompletion bool
 }
 
 func (s *fileScanner) Do(path interface{}, ds *utils.DoerState) string {
@@ -62,6 +90,15 @@ func (s *fileScanner) Do(path interface{}, ds *utils.DoerState) string {
 			path.(string), analysis.ID())
 	}
 
+	if s.waitForCompletion {
+		analysisResult, err := waitForAnalysisResults(s.cli, analysis.ID(), 1, 120)
+		if err != nil {
+			return fmt.Sprintf("%s", err)
+		}
+		s.printer.PrintObject(analysisResult)
+		return ""
+	}
+
 	return fmt.Sprintf("%s %s", path.(string), analysis.ID())
 }
 
@@ -70,7 +107,8 @@ var scanFileCmdHelp = `Scan one or more files.
 This command receives one or more file paths and uploads them to VirusTotal for
 scanning. It returns the file paths followed by their corresponding analysis IDs.
 You can use the "vt analysis" command for retrieving information about the
-analyses.
+analyses or you can use the waitForCompletion flag to see the results when the
+analysis is completed.
 
 If the command receives a single hypen (-) the file paths are read from the standard
 input, one per line.
@@ -105,9 +143,16 @@ func NewScanFileCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			p, err := NewPrinter(cmd)
+			if err != nil {
+				return err
+			}
 			s := &fileScanner{
-				scanner:  client.NewFileScanner(),
-				showInVT: viper.GetBool("open")}
+				scanner:           client.NewFileScanner(),
+				showInVT:          viper.GetBool("open"),
+				waitForCompletion: viper.GetBool("wait"),
+				printer:           p,
+				cli:               client}
 			c.DoWithStringsFromReader(s, argReader)
 			return nil
 		},
@@ -115,14 +160,18 @@ func NewScanFileCmd() *cobra.Command {
 
 	addThreadsFlag(cmd.Flags())
 	addOpenInVTFlag(cmd.Flags())
+	addWaitForCompletionFlag(cmd.Flags())
 	cmd.MarkZshCompPositionalArgumentFile(1)
 
 	return cmd
 }
 
 type urlScanner struct {
-	scanner  *vt.URLScanner
-	showInVT bool
+	scanner           *vt.URLScanner
+	cli               *utils.APIClient
+	printer           *utils.Printer
+	showInVT          bool
+	waitForCompletion bool
 }
 
 func (s *urlScanner) Do(url interface{}, ds *utils.DoerState) string {
@@ -136,6 +185,15 @@ func (s *urlScanner) Do(url interface{}, ds *utils.DoerState) string {
 			"%s https://www.virustotal.com/gui/url-analysis/%s", url, analysis.ID())
 	}
 
+	if s.waitForCompletion {
+		analysisResult, err := waitForAnalysisResults(s.cli, analysis.ID(), 1, 10)
+		if err != nil {
+			return fmt.Sprintf("%s", err)
+		}
+		s.printer.PrintObject(analysisResult)
+		return ""
+	}
+
 	return fmt.Sprintf("%s %s", url, analysis.ID())
 }
 
@@ -143,7 +201,8 @@ var scanURLCmdHelp = `Scan one or more URLs.
 
 This command receives one or more URLs and scan them. It returns the URLs followed
 by their corresponding analysis IDs. You can use the "vt analysis" command for
-retrieving information about the analyses.
+retrieving information about the analyses or you can use the waitForCompletion
+flag to see the results when the analysis is completed.
 
 If the command receives a single hypen (-) the URLs are read from the standard
 input, one per line.`
@@ -174,9 +233,16 @@ func NewScanURLCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			p, err := NewPrinter(cmd)
+			if err != nil {
+				return err
+			}
 			s := &urlScanner{
-				scanner:  client.NewURLScanner(),
-				showInVT: viper.GetBool("open")}
+				scanner:           client.NewURLScanner(),
+				showInVT:          viper.GetBool("open"),
+				waitForCompletion: viper.GetBool("wait"),
+				printer:           p,
+				cli:               client}
 			c.DoWithStringsFromReader(s, argReader)
 			return nil
 		},
@@ -184,6 +250,7 @@ func NewScanURLCmd() *cobra.Command {
 
 	addThreadsFlag(cmd.Flags())
 	addOpenInVTFlag(cmd.Flags())
+	addWaitForCompletionFlag(cmd.Flags())
 
 	return cmd
 }
@@ -211,4 +278,10 @@ func addOpenInVTFlag(flags *pflag.FlagSet) {
 	flags.BoolP(
 		"open", "o", false,
 		"Return an URL to see the analysis report at the VirusTotal web GUI")
+}
+
+func addWaitForCompletionFlag(flags *pflag.FlagSet) {
+	flags.BoolP(
+		"wait", "w", false,
+		"Wait until the analysis is completed and show the analysis results")
 }
