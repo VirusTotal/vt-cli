@@ -39,6 +39,7 @@ const (
 // checks whether an analysis is completed or not. When the analysis is completed
 // it is returned.
 func waitForAnalysisResults(cli *utils.APIClient, analysisId string) (*vt.Object, error) {
+	fmt.Print("Waiting for analysis completion...")
 	ticker := time.NewTicker(POLL_FREQUENCY)
 	defer ticker.Stop()
 	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT_LIMIT)
@@ -64,7 +65,11 @@ func waitForAnalysisResults(cli *utils.APIClient, analysisId string) (*vt.Object
 
 			} else if status, _ := obj.Get("status"); status == "completed" {
 				fmt.Print("\n")
-				return obj, nil
+				if report, e := cli.GetObject(vt.URL(fmt.Sprintf("analyses/%s/item", analysisId))); e != nil {
+					return nil, e
+				} else {
+					return report, nil
+				}
 			}
 		}
 	}
