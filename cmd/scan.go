@@ -43,22 +43,27 @@ func waitForAnalysisResults(cli *utils.APIClient, analysisId string) (*vt.Object
 	defer ticker.Stop()
 	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT_LIMIT)
 	defer cancel()
+	i := 0
 
 	for {
 		select {
 		case <-ctx.Done():
 			return nil, ctx.Err()
 		case <-ticker.C:
+			fmt.Printf("\rWaiting for analysis completion... %d", i)
+			i += 1
 			if obj, err := cli.GetObject(vt.URL(fmt.Sprintf("analyses/%s", analysisId))); err != nil {
 				// if the API returned an error 503 (transient error) retry; otherwise just return
 				//the error to the user
 				if e, ok := err.(*vt.Error); ok && e.Code == "TransientError" {
 					time.Sleep(1 * time.Second)
 				} else {
+					fmt.Print("\n")
 					return nil, fmt.Errorf("error retrieving analysis result: %v", err)
 				}
 
 			} else if status, _ := obj.Get("status"); status == "completed" {
+				fmt.Print("\n")
 				return obj, nil
 			}
 		}
