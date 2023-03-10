@@ -28,22 +28,22 @@ import (
 )
 
 const (
-	// Poll frequency defines the interval in which requests are sent to the
+	// PollFrequency defines the interval in which requests are sent to the
 	// VT API to check if the analysis is completed.
-	POLL_FREQUENCY = 10 * time.Second
-	// Timeout limit defines the maximum amount of minutes to wait for an
-	// analysis' results
-	TIMEOUT_LIMIT = 10 * time.Minute
+	PollFrequency = 10 * time.Second
+	// TimeoutLimit defines the maximum amount of minutes to wait for an
+	// analysis' results.
+	TimeoutLimit = 10 * time.Minute
 )
 
-// waitForAnalysisResults calls every pollFrequency seconds to the VT API and
+// waitForAnalysisResults calls every PollFrequency seconds to the VT API and
 // checks whether an analysis is completed or not. When the analysis is completed
 // it is returned.
 func waitForAnalysisResults(cli *utils.APIClient, analysisId string, ds *utils.DoerState) (*vt.Object, error) {
 	ds.Progress = "Waiting for analysis completion..."
-	ticker := time.NewTicker(POLL_FREQUENCY)
+	ticker := time.NewTicker(PollFrequency)
 	defer ticker.Stop()
-	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT_LIMIT)
+	ctx, cancel := context.WithTimeout(context.Background(), TimeoutLimit)
 	defer cancel()
 	i := 1
 
@@ -55,19 +55,17 @@ func waitForAnalysisResults(cli *utils.APIClient, analysisId string, ds *utils.D
 			ds.Progress = fmt.Sprintf("Waiting for analysis completion...%s", strings.Repeat(".", i))
 			i += 1
 			if obj, err := cli.GetObject(vt.URL(fmt.Sprintf("analyses/%s", analysisId))); err != nil {
-				// if the API returned an error 503 (transient error) retry; otherwise just return
-				//the error to the user
-				if e, ok := err.(*vt.Error); ok && e.Code == "TransientError" {
-					time.Sleep(1 * time.Second)
-				} else {
+				// If the API returned an error 503 (transient error) retry; otherwise just return
+				// the error to the user.
+				if e, ok := err.(*vt.Error); !ok || e.Code != "TransientError" {
 					ds.Progress = ""
 					return nil, fmt.Errorf("error retrieving analysis result: %v", err)
 				}
 
 			} else if status, _ := obj.Get("status"); status == "completed" {
 				ds.Progress = ""
-				// request the full object report and return it instead of just
-				// the analysis results
+				// Request the full object report and return it instead of just
+				// the analysis results.
 				if report, e := cli.GetObject(vt.URL(fmt.Sprintf("analyses/%s/item", analysisId))); e != nil {
 					return nil, e
 				} else {
@@ -113,7 +111,7 @@ func (s *fileScanner) Do(path interface{}, ds *utils.DoerState) string {
 	}
 
 	if s.showInVT {
-		// Return the analysis URL in VT so users can visit it
+		// Return the analysis URL in VT so users can visit it.
 		return fmt.Sprintf(
 			"%s https://www.virustotal.com/gui/file-analysis/%s",
 			path.(string), analysis.ID())
