@@ -30,9 +30,9 @@ const (
 	// Poll frequency defines the interval in which requests are sent to the
 	// VT API to check if the analysis is completed.
 	POLL_FREQUENCY = 10 * time.Second
-	// Timeout limit defines the maximum amount of seconds to wait for an
+	// Timeout limit defines the maximum amount of minutes to wait for an
 	// analysis' results
-	TIMEOUT_LIMIT = 120 * time.Second
+	TIMEOUT_LIMIT = 10 * time.Minute
 )
 
 // waitForAnalysisResults calls every pollFrequency seconds to the VT API and
