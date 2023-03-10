@@ -39,8 +39,8 @@ const (
 // waitForAnalysisResults calls every pollFrequency seconds to the VT API and
 // checks whether an analysis is completed or not. When the analysis is completed
 // it is returned.
-func waitForAnalysisResults(cli *utils.APIClient, analysisId string) (*vt.Object, error) {
-	fmt.Print("\rWaiting for analysis completion...")
+func waitForAnalysisResults(cli *utils.APIClient, analysisId string, ds *utils.DoerState) (*vt.Object, error) {
+	ds.Progress = "Waiting for analysis completion..."
 	ticker := time.NewTicker(POLL_FREQUENCY)
 	defer ticker.Stop()
 	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT_LIMIT)
@@ -52,7 +52,7 @@ func waitForAnalysisResults(cli *utils.APIClient, analysisId string) (*vt.Object
 		case <-ctx.Done():
 			return nil, ctx.Err()
 		case <-ticker.C:
-			fmt.Printf("\rWaiting for analysis completion...%s", strings.Repeat(".", i))
+			ds.Progress = fmt.Sprintf("Waiting for analysis completion...%s", strings.Repeat(".", i))
 			i += 1
 			if obj, err := cli.GetObject(vt.URL(fmt.Sprintf("analyses/%s", analysisId))); err != nil {
 				// if the API returned an error 503 (transient error) retry; otherwise just return
@@ -60,12 +60,12 @@ func waitForAnalysisResults(cli *utils.APIClient, analysisId string) (*vt.Object
 				if e, ok := err.(*vt.Error); ok && e.Code == "TransientError" {
 					time.Sleep(1 * time.Second)
 				} else {
-					fmt.Print("\n")
+					ds.Progress = ""
 					return nil, fmt.Errorf("error retrieving analysis result: %v", err)
 				}
 
 			} else if status, _ := obj.Get("status"); status == "completed" {
-				fmt.Print("\n")
+				ds.Progress = ""
 				return obj, nil
 			}
 		}
@@ -114,7 +114,7 @@ func (s *fileScanner) Do(path interface{}, ds *utils.DoerState) string {
 	}
 
 	if s.waitForCompletion {
-		analysisResult, err := waitForAnalysisResults(s.cli, analysis.ID())
+		analysisResult, err := waitForAnalysisResults(s.cli, analysis.ID(), ds)
 		if err != nil {
 			return err.Error()
 		}
@@ -210,7 +210,7 @@ func (s *urlScanner) Do(url interface{}, ds *utils.DoerState) string {
 	}
 
 	if s.waitForCompletion {
-		analysisResult, err := waitForAnalysisResults(s.cli, analysis.ID())
+		analysisResult, err := waitForAnalysisResults(s.cli, analysis.ID(), ds)
 		if err != nil {
 			return err.Error()
 		}
