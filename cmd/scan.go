@@ -53,7 +53,7 @@ func waitForAnalysisResults(cli *utils.APIClient, analysisId string, ds *utils.D
 			return nil, ctx.Err()
 		case <-ticker.C:
 			ds.Progress = fmt.Sprintf("Waiting for analysis completion...%s", strings.Repeat(".", i))
-			i += 1
+			i++
 			if obj, err := cli.GetObject(vt.URL(fmt.Sprintf("analyses/%s", analysisId))); err != nil {
 				// If the API returned an error 503 (transient error) retry; otherwise just return
 				// the error to the user.
@@ -61,16 +61,11 @@ func waitForAnalysisResults(cli *utils.APIClient, analysisId string, ds *utils.D
 					ds.Progress = ""
 					return nil, fmt.Errorf("error retrieving analysis result: %v", err)
 				}
-
 			} else if status, _ := obj.Get("status"); status == "completed" {
 				ds.Progress = ""
 				// Request the full object report and return it instead of just
 				// the analysis results.
-				if report, e := cli.GetObject(vt.URL(fmt.Sprintf("analyses/%s/item", analysisId))); e != nil {
-					return nil, e
-				} else {
-					return report, nil
-				}
+				return cli.GetObject(vt.URL(fmt.Sprintf("analyses/%s/item", analysisId)))
 			}
 		}
 	}
