@@ -182,6 +182,7 @@ func NewScanFileCmd() *cobra.Command {
 	addThreadsFlag(cmd.Flags())
 	addOpenInVTFlag(cmd.Flags())
 	addWaitForCompletionFlag(cmd.Flags())
+	addIncludeExcludeFlags(cmd.Flags())
 	cmd.MarkZshCompPositionalArgumentFile(1)
 
 	return cmd
