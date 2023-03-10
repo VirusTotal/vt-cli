@@ -17,6 +17,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/VirusTotal/vt-cli/utils"
@@ -39,18 +40,19 @@ const (
 // checks whether an analysis is completed or not. When the analysis is completed
 // it is returned.
 func waitForAnalysisResults(cli *utils.APIClient, analysisId string) (*vt.Object, error) {
+	fmt.Print("\rWaiting for analysis completion...")
 	ticker := time.NewTicker(POLL_FREQUENCY)
 	defer ticker.Stop()
 	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT_LIMIT)
 	defer cancel()
-	i := 0
+	i := 1
 
 	for {
 		select {
 		case <-ctx.Done():
 			return nil, ctx.Err()
 		case <-ticker.C:
-			fmt.Printf("\rWaiting for analysis completion... %d", i)
+			fmt.Printf("\rWaiting for analysis completion...%s", strings.Repeat(".", i))
 			i += 1
 			if obj, err := cli.GetObject(vt.URL(fmt.Sprintf("analyses/%s", analysisId))); err != nil {
 				// if the API returned an error 503 (transient error) retry; otherwise just return
