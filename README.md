@@ -22,21 +22,21 @@ As this tool use the [VirusTotal API](https://developers.virustotal.com/v3.0/ref
 
 For installing the tool you can download one the [pre-compiled binaries](https://github.com/VirusTotal/vt-cli/releases) we offer for Windows, Linux and Mac OS X, or alternatively you can compile it yourself from source code. For compiling the program you'll need Go 1.14.x or higher installed in your system and type the following commands:
 
-```
+```sh
 $ git clone https://github.com/VirusTotal/vt-cli
 $ cd vt-cli
 $ make install
 ```
 
 NOTE: in order to use the `vt` binary, make sure the `GOBIN` is part of your `PATH` env variable:
-```
+```sh
 $ export GOBIN=`go env GOPATH`/bin
 $ export PATH=$PATH:$GOBIN
 ```
 
 #### Mac OS
 For Mac OS users, there's a [brew formula](https://formulae.brew.sh/formula/virustotal-cli) available. Please note this is not maintained by VirusTotal.
-```
+```sh
 $ brew install virustotal-cli
 ```
 
@@ -49,7 +49,7 @@ If you plan to use vt-cli in Windows on a regular basis we highly recommend you 
 
 Once you have installed the vt-cli tool you may want to configure it with your API key. This is not strictly necessary, as you can provide your API key every time you invoke the tool by using the `--apikey` option (`-k` in short form), but that's a bit of a hassle if you are going to use the tool frequently (and we bet you'll do!). For configuring your API key just type:
 
-```
+```sh
 $ vt init
 ```
 
@@ -59,13 +59,13 @@ This command will ask for your API key, and save it to a config file in your hom
 
 If you are behind a HTTP proxy you can tell `vt-cli` which is the address of your proxy server by multiple ways. One is using the `--proxy` option, like in:
 
-```
+```sh
 $ vt --proxy http://myproxy.com:1234 <command>
 ```
 
 You can also use the `VTCLI_PROXY` environment variable, or add the following line to the config file:
 
-```
+```sh
 proxy="http://myproxy.com:1234"
 ```
 
@@ -74,17 +74,17 @@ proxy="http://myproxy.com:1234"
 If you are going to use this tool frequently you may want to have command auto-completion. It saves both precious time and keystrokes. Notice however that you must configure your API as described in the previous section *before* following the steps listed below. The API is necessary for determining the commands that you will have access to.
 
 * Linux:
-  ```
+  ```sh
   $ vt completion bash > /etc/bash_completion.d/vt
   ```
 
 * Mac OS X:
-  ```
+  ```sh
   $ brew install bash-completion
   $ vt completion bash > $(brew --prefix)/etc/bash_completion.d/vt
   ```
   Add the  following lines to `~/.bash_profile`
-    ```
+  ```sh
   if [ -f $(brew --prefix)/etc/bash_completion ]; then
   . $(brew --prefix)/etc/bash_completion
   fi
@@ -93,7 +93,7 @@ If you are going to use this tool frequently you may want to have command auto-c
 * Cygwin:
 
   Make sure the `bash-completion` package is installed (Cygwin doesn't installed it by default) and type:
-  ```
+  ```sh
   $ vt completion bash > /usr/share/bash-completion/completions/vt
   ```
 
@@ -112,17 +112,17 @@ Restart the shell.
 ## Usage examples
 
 * Get information about a file:
-  ```
+  ```sh
   $ vt file 8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85
   ```
 
 * Get information about a file in JSON format:
-  ```
+  ```sh
   $ vt file 8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85 --format json
   ```
 
 * Get a specific analysis report for a file:
-  ```
+  ```sh
   $ # File analysis IDs can be given as `f-<file_SHA256_hash>-<UNIX timestamp>`...
   $ vt analysis f-8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85-1546309359
   $ # ...or as a Base64 encoded string, retrieved from the `vt scan file` command:
@@ -144,27 +144,27 @@ Restart the shell.
   ```
 
 * Download files given a list of hashes in a text file, one hash per line:
-  ```
+  ```sh
   $ cat /path/list_of_hashes.txt | vt download -
   ```
 
 * Get information about a URL:
-  ```
+  ```sh
   $ vt url http://www.virustotal.com
   ```
 
 * Get the IP address that served a URL:
-  ```
+  ```sh
   $ vt url last_serving_ip_address http://www.virustotal.com
   ```
 
 * Search for files:
-  ```
+  ```sh
   $ vt search "positives:5+ type:pdf"
   ```
   
 * Scan a file:
-  ```
+  ```sh
   $ vt scan file <yourfile>
   <yourfile> ZDZiOTcxY2JhNDE0MWU5ZWRjN2JjNGQ2NTdhN2VjODU6MTU3MDE3Mjg1NQ==
   $ vt analysis ZDZiOTcxY2JhNDE0MWU5ZWRjN2JjNGQ2NTdhN2VjODU6MTU3MDE3Mjg1NQ==
@@ -183,12 +183,12 @@ Restart the shell.
   ```
 
 * Export detections and tags of files from a search in CSV format:
-  ```
+  ```sh
   $ vt search "positives:5+ type:pdf" -i sha256,last_analysis_stats.malicious,tags --format csv
   ```
 
 * Export detections and tags of files from a search in JSON format:
-  ```
+  ```sh
   $ vt search "positives:5+ type:pdf" -i sha256,last_analysis_stats.malicious,tags --format json
   ```
 
@@ -198,7 +198,7 @@ When you ask for information about a file, URL, domain, IP address or any other 
 
 These options accept patterns that are matched against the fields composing the data, and allow you to include only a subset of them, or exclude any field that is not interesting for you. Let's see how it works using the data we have about `http://www.virustotal.com` as an example:
 
-```
+```sh
 $ vt url http://www.virustotal.com
 - _id: 1db0ad7dbcec0676710ea0eaacd35d5e471d3e11944d53bcbd31f0cbd11bce31
   _type: "url"
@@ -252,20 +252,20 @@ The filters accepted by both `--include` and `--exclude` are paths in which we c
 
 For cherry-picking only the fields you want, you should use `--include` followed by a path pattern as explained above. You can also include more than one pattern either by using the `--include` argument multiple times, or by using it with a comma-separated list of patterns. The following two options are equivalent:
 
-```
+```sh
 $ vt url http://www.virustotal.com --include=reputation --include=total_votes.*
 $ vt url http://www.virustotal.com --include=reputation,total_votes.*
 ```
 
 Here you have different examples with their outputs (assuming that `vt url http://www.virustotal.com` returns the structure shown above):
 
-```
+```sh
 $ vt url http://www.virustotal.com --include=last_http_response_headers.server
 - last_http_response_headers:
     server: "Google Frontend"
 ```
 
-```
+```sh
 $ vt url http://www.virustotal.com --include=last_http_response_headers.*
 - last_http_response_headers:
     age: "26"
@@ -280,7 +280,7 @@ $ vt url http://www.virustotal.com --include=last_http_response_headers.*
     x-frame-options: "DENY"
 ```
 
-```
+```sh
 $ vt url http://www.virustotal.com --include=last_analysis_results.**
 - last_analysis_results:
     ADMINUSLabs:
@@ -297,7 +297,7 @@ $ vt url http://www.virustotal.com --include=last_analysis_results.**
       result: "clean"
 ```
 
-```
+```sh
 $ vt url http://www.virustotal.com --include=last_analysis_results.*.result
 - last_analysis_results:
     ADMINUSLabs:
@@ -308,7 +308,7 @@ $ vt url http://www.virustotal.com --include=last_analysis_results.*.result
       result: "clean"
 ```
 
-```
+```sh
 $ vt url http://www.virustotal.com --include=**.result
 - last_analysis_results:
     ADMINUSLabs:
@@ -321,7 +321,7 @@ $ vt url http://www.virustotal.com --include=**.result
 
 Also notice that `_id` and `_type` are also field names and therefore you can use them in your filters:
 
-```
+```sh
 $ vt url http://www.virustotal.com --include=_id,_type,**.result
 - _id: "1db0ad7dbcec0676710ea0eaacd35d5e471d3e11944d53bcbd31f0cbd11bce31"
   _type: "file"
