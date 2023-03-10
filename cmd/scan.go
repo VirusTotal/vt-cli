@@ -66,7 +66,13 @@ func waitForAnalysisResults(cli *utils.APIClient, analysisId string, ds *utils.D
 
 			} else if status, _ := obj.Get("status"); status == "completed" {
 				ds.Progress = ""
-				return obj, nil
+				// request the full object report and return it instead of just
+				// the analysis results
+				if report, e := cli.GetObject(vt.URL(fmt.Sprintf("analyses/%s/item", analysisId))); e != nil {
+					return nil, e
+				} else {
+					return report, nil
+				}
 			}
 		}
 	}
