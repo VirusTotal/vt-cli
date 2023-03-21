@@ -20,7 +20,7 @@ As this tool use the [VirusTotal API](https://developers.virustotal.com/v3.0/ref
 
 ### Installing the tool
 
-For installing the tool you can download one the [pre-compiled binaries](https://github.com/VirusTotal/vt-cli/releases) we offer for Windows, Linux and Mac OS X, or alternatively you can compile it yourself from source code. For compiling the program you'll need Go 1.14.x or higher installed in your system and type the following commands:
+For installing the tool you can download one the [pre-compiled binaries](https://github.com/VirusTotal/vt-cli/releases) we offer for Windows, Linux and Mac OS X, or alternatively you can compile it yourself from source code. To compile the program you'll need [Go 1.14.x or higher installed in your system](https://go.dev/doc/install) and type the following commands:
 
 ```sh
 $ git clone https://github.com/VirusTotal/vt-cli
