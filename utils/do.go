@@ -22,6 +22,7 @@ import (
 	vt "github.com/VirusTotal/vt-go"
 	"github.com/briandowns/spinner"
 	"github.com/plusvic/go-ansi"
+	"github.com/spf13/viper"
 )
 
 // Coordinator coordinates the work of multiple instances of a Doer that run
@@ -115,7 +116,7 @@ func (c *Coordinator) DoWithItemsFromChannel(doer Doer, ch <-chan interface{}) {
 	// stdout is being redirected to a file and we don't want escape sequences
 	// in the output, in that case print only the final results from the doers,
 	// without any progress indication.
-	if color.NoColor {
+	if color.NoColor || viper.GetBool("silent") {
 		go c.printResultsOnly()
 	} else {
 		go c.printProgressAndResults()

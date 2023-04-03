@@ -110,6 +110,12 @@ func addVerboseFlag(flags *pflag.FlagSet) {
 		"verbose output")
 }
 
+func addSilentFlag(flags *pflag.FlagSet) {
+	flags.BoolP(
+		"silent", "s", false,
+		"Silent or quiet mode. Do not show progress meter")
+}
+
 func addHumanFlag(flags *pflag.FlagSet) {
 	flags.BoolP(
 		"human", "H", false,
