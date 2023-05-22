@@ -35,9 +35,19 @@ $ export PATH=$PATH:$GOBIN
 ```
 
 #### Mac OS
+
 For Mac OS users, there's a [brew formula](https://formulae.brew.sh/formula/virustotal-cli) available. Please note this is not maintained by VirusTotal.
+
 ```sh
 $ brew install virustotal-cli
+```
+
+#### Windows
+
+For Windows uses, there's a [Winget manifest](https://github.com/microsoft/winget-pkgs/tree/master/manifests/v/VirusTotal/vt-cli) available. Please note this is not maintained by VirusTotal.
+
+```powershell
+winget install VirusTotal.vt-cli
 ```
 
 ### A note on Window's console
