@@ -3,7 +3,7 @@ module github.com/VirusTotal/vt-cli
 go 1.14
 
 require (
-	github.com/VirusTotal/vt-go v0.0.0-20220413144842-e010bf48aaee
+	github.com/VirusTotal/vt-go v0.0.0-20230717142150-8431ff2cc00f
 	github.com/briandowns/spinner v1.7.0
 	github.com/cavaliercoder/grab v2.0.0+incompatible
 	github.com/dustin/go-humanize v1.0.0
