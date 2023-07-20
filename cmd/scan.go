@@ -78,7 +78,6 @@ type fileScanner struct {
 	showInVT          bool
 	waitForCompletion bool
 	password          string
-	hasPassword       bool
 }
 
 func (s *fileScanner) Do(path interface{}, ds *utils.DoerState) string {
@@ -103,7 +102,7 @@ func (s *fileScanner) Do(path interface{}, ds *utils.DoerState) string {
 	defer f.Close()
 
 	var analysis *vt.Object
-	if s.hasPassword {
+	if s.password != "" {
 		analysis, err = s.scanner.ScanFileWithParameters(
 			f, progressCh, map[string]string{"password": s.password})
 	} else {
@@ -184,12 +183,6 @@ func NewScanFileCmd() *cobra.Command {
 				password:          viper.GetString("password"),
 				printer:           p,
 				cli:               client}
-			// Do not use password if it wasn't set.
-			cmd.Flags().Visit(func(f *pflag.Flag) {
-				if f.Name == "password" {
-					s.hasPassword = true
-				}
-			})
 			c.DoWithStringsFromReader(s, argReader)
 			return nil
 		},
