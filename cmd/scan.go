@@ -77,6 +77,7 @@ type fileScanner struct {
 	printer           *utils.Printer
 	showInVT          bool
 	waitForCompletion bool
+	password          string
 }
 
 func (s *fileScanner) Do(path interface{}, ds *utils.DoerState) string {
@@ -100,7 +101,13 @@ func (s *fileScanner) Do(path interface{}, ds *utils.DoerState) string {
 	}
 	defer f.Close()
 
-	analysis, err := s.scanner.ScanFile(f, progressCh)
+	var analysis *vt.Object
+	if s.password != "" {
+		analysis, err = s.scanner.ScanFileWithParameters(
+			f, progressCh, map[string]string{"password": s.password})
+	} else {
+		analysis, err = s.scanner.ScanFile(f, progressCh)
+	}
 	if err != nil {
 		return err.Error()
 	}
@@ -173,6 +180,7 @@ func NewScanFileCmd() *cobra.Command {
 				scanner:           client.NewFileScanner(),
 				showInVT:          viper.GetBool("open"),
 				waitForCompletion: viper.GetBool("wait"),
+				password:          viper.GetString("password"),
 				printer:           p,
 				cli:               client}
 			c.DoWithStringsFromReader(s, argReader)
@@ -182,6 +190,7 @@ func NewScanFileCmd() *cobra.Command {
 
 	addThreadsFlag(cmd.Flags())
 	addOpenInVTFlag(cmd.Flags())
+	addPasswordFlag(cmd.Flags())
 	addWaitForCompletionFlag(cmd.Flags())
 	addIncludeExcludeFlags(cmd.Flags())
 	cmd.MarkZshCompPositionalArgumentFile(1)
@@ -307,4 +316,10 @@ func addWaitForCompletionFlag(flags *pflag.FlagSet) {
 	flags.BoolP(
 		"wait", "w", false,
 		"Wait until the analysis is completed and show the analysis results")
+}
+
+func addPasswordFlag(flags *pflag.FlagSet) {
+	flags.StringP(
+		"password", "p", "",
+		"Password of the protected file")
 }
