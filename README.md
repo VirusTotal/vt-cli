@@ -20,7 +20,13 @@ As this tool use the [VirusTotal API](https://developers.virustotal.com/v3.0/ref
 
 ### Installing the tool
 
-For installing the tool you can download one the [pre-compiled binaries](https://github.com/VirusTotal/vt-cli/releases) we offer for Windows, Linux and Mac OS X, or alternatively you can compile it yourself from source code. To compile the program you'll need [Go 1.14.x or higher installed in your system](https://go.dev/doc/install) and type the following commands:
+There are two ways of installing the tool: by using one of our pre-compiled binaries or by building it by yourself.
+
+#### Pre-compiled binaries
+The pre-compiled binaries can be found at [the releases page](https://github.com/VirusTotal/vt-cli/releases). There are binaries for Windows, Linux and Mac OS X. To use them, just download the file, decompress it and place it in a directory where you think is more convenient to be used.
+
+#### Manual building
+To compile the program you'll need [Go 1.14.x or higher installed in your system](https://go.dev/doc/install) and type the following commands:
 
 ```sh
 $ git clone https://github.com/VirusTotal/vt-cli
@@ -34,7 +40,7 @@ $ export GOBIN=`go env GOPATH`/bin
 $ export PATH=$PATH:$GOBIN
 ```
 
-#### Mac OS
+##### Mac OS
 
 For Mac OS users, there's a [brew formula](https://formulae.brew.sh/formula/virustotal-cli) available. Please note this is not maintained by VirusTotal.
 
@@ -42,7 +48,7 @@ For Mac OS users, there's a [brew formula](https://formulae.brew.sh/formula/viru
 $ brew install virustotal-cli
 ```
 
-#### Windows
+##### Windows
 
 For Windows uses, there's a [Winget manifest](https://github.com/microsoft/winget-pkgs/tree/master/manifests/v/VirusTotal/vt-cli) available. Please note this is not maintained by VirusTotal.
 
