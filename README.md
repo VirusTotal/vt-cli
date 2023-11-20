@@ -16,7 +16,7 @@ And much [more](doc/vt.md)...
 
 ## Getting started
 
-As this tool use the [VirusTotal API](https://developers.virustotal.com/v3.0/reference) under the hood, you will need a VirusTotal API key. By [signing-up](https://www.virustotal.com/#/join-us) with VirusTotal you will receive a free API key, however free API keys have a limited amount of requests per minute, and they don't have access to some premium features like searches and file downloads. If you are interested in using those premium features please [contact us](https://support.virustotal.com/hc/en-us/requests/new).
+As this tool use the [VirusTotal API](https://developers.virustotal.com/v3.0/reference) under the hood, you will need a VirusTotal API key. By [signing-up](https://www.virustotal.com/#/join-us) with VirusTotal you will receive a free API key, however free API keys have a limited amount of requests per minute, and they don't have access to some premium features like searches and file downloads. If you are interested in using those premium features please [contact us](https://www.virustotal.com/gui/contact-us/).
 
 ### Installing the tool
 
