@@ -442,7 +442,7 @@ This command allows you to manage the contents of your account and retrieve
 information about analyses performed to your collection.
 
 Reference:
-  https://developers.virustotal.com/v3.0/reference#monitor`
+  https://docs.virustotal.com/reference/monitor`
 
 // NewMonitorCmd returns a new instance of the 'monitor_item' command.
 func NewMonitorCmd() *cobra.Command {
