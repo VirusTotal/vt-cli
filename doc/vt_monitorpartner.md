@@ -9,7 +9,7 @@ Manage your VirusTotal Monitor Partner account.
 This command allows you to list and retrieve files detected by your engine.
 
 Reference:
-  https://developers.virustotal.com/v3.0/reference#monitor-partner
+  https://docs.virustotal.com/reference/monitor-partner
 
 ### Options
 
