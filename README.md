@@ -107,9 +107,9 @@ If you are going to use this tool frequently you may want to have command auto-c
   Add the  following lines to `~/.bash_profile`:
 
   ```sh
-    if [ -f $(brew --prefix)/etc/bash_completion ]; then
-    . $(brew --prefix)/etc/bash_completion
-    fi
+  if [ -f $(brew --prefix)/etc/bash_completion ]; then
+  . $(brew --prefix)/etc/bash_completion
+  fi
   ```
 
 * Cygwin:
