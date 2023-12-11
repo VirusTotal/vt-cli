@@ -1,6 +1,6 @@
 # VirusTotal CLI
 
-Welcome to the VirusTotal CLI, a tool designed for those who love both VirusTotal and command-line interfaces. With this tool you can do everything you'd normally do using the VirusTotal's web page, including:
+Welcome to the VirusTotal CLI, a tool designed for those who love both VirusTotal and command-line interfaces. With this tool you can do everything you'd normally do using VirusTotal's web page, including:
 
 * Retrieve information about a [file](doc/vt_file.md), [URL](doc/vt_url.md), [domain name](doc/vt_domain.md), [IP address](doc/vt_ip.md), etc.
 * [Search](doc/vt_search.md) for files and URLs using VirusTotal Intelligence query syntax.
@@ -16,7 +16,7 @@ And much [more](doc/vt.md)...
 
 ## Getting started
 
-As this tool use the [VirusTotal API](https://docs.virustotal.com/reference) under the hood, you will need a VirusTotal API key. By [signing-up](https://www.virustotal.com/#/join-us) with VirusTotal you will receive a free API key, however free API keys have a limited amount of requests per minute, and they don't have access to some premium features like searches and file downloads. If you are interested in using those premium features please [contact us](https://www.virustotal.com/gui/contact-us/).
+As this tool uses the [VirusTotal API](https://docs.virustotal.com/reference) under the hood, you will need a VirusTotal API key. By [signing up](https://www.virustotal.com/#/join-us) with VirusTotal you will receive a free API key however, free API keys have a limited amount of requests per minute, and they don't have access to some premium features like searches and file downloads. If you are interested in using those premium features please [contact us](https://www.virustotal.com/gui/contact-us/).
 
 ### Installing the tool
 
@@ -24,7 +24,7 @@ There are two ways of installing the tool: by using one of our pre-compiled bina
 
 #### Pre-compiled binaries
 
-The pre-compiled binaries can be found at [the releases page](https://github.com/VirusTotal/vt-cli/releases). There are binaries for Windows, Linux and Mac OS X. To use them, just download the file, decompress it and place it in a directory where you think is more convenient to be used.
+The pre-compiled binaries can be found on [the releases page](https://github.com/VirusTotal/vt-cli/releases). There are binaries for Windows, Linux and Mac OS X. To use them, just download the file, decompress it and place it in a directory where you think is more convenient to use.
 
 #### Manual building
 
@@ -53,7 +53,7 @@ $ brew install virustotal-cli
 
 ##### Windows
 
-For Windows uses, there's a [Winget manifest](https://github.com/microsoft/winget-pkgs/tree/master/manifests/v/VirusTotal/vt-cli) available. Please note this is not maintained by VirusTotal.
+For Windows users, there's a [Winget manifest](https://github.com/microsoft/winget-pkgs/tree/master/manifests/v/VirusTotal/vt-cli) available. Please note this is not maintained by VirusTotal.
 
 ```powershell
 winget install VirusTotal.vt-cli
@@ -61,7 +61,7 @@ winget install VirusTotal.vt-cli
 
 ### A note on Window's console
 
-If you plan to use vt-cli in Windows on a regular basis we highly recommend you to avoid the standard Windows's console and use [Cygwin](https://www.cygwin.com/) instead. The Windows's console is *very* slow when printing large amounts of text (as vt-cli usually does) while Cygwin performs much better. Additionally, you can benefit of Cygwin's support for command auto-completion, a handy feature that Window's console doesn't offer. In order to take advantage of auto-completion make sure to include the `bash-completion` package while installing Cygwin.
+If you plan to use `vt-cli` in Windows on a regular basis we highly recommend you avoid the standard Windows console and use [Cygwin](https://www.cygwin.com/) instead. The Windows console is *very* slow when printing large amounts of text (as `vt-cli` usually does) while Cygwin performs much better. Additionally, you can benefit from Cygwin's support for command auto-completion, a handy feature that the Windows console doesn't offer. In order to take advantage of auto-completion make sure to include the `bash-completion` package while installing Cygwin.
 
 ### Configuring your API key
 
@@ -75,7 +75,7 @@ This command will ask for your API key, and save it to a config file in your hom
 
 ### Use with a proxy
 
-If you are behind a HTTP proxy you can tell `vt-cli` which is the address of your proxy server by multiple ways. One is using the `--proxy` option, like in:
+If you are behind an HTTP proxy you can tell `vt-cli` which is the address of your proxy server in multiple ways. One is using the `--proxy` option, like in:
 
 ```sh
 $ vt --proxy http://myproxy.com:1234 <command>
@@ -114,11 +114,11 @@ If you are going to use this tool frequently you may want to have command auto-c
 
 * Cygwin:
 
-Make sure the `bash-completion` package is installed (Cygwin doesn't installed it by default) and type:
+  Make sure the `bash-completion` package is installed (Cygwin doesn't install it by default) and type:
 
-```sh
-$ vt completion bash > /usr/share/bash-completion/completions/vt
-```
+  ```sh
+  $ vt completion bash > /usr/share/bash-completion/completions/vt
+  ```
 
 :heavy_exclamation_mark: You may need to restart your shell in order for autocompletion to start working.
 
@@ -274,7 +274,7 @@ $ vt url http://www.virustotal.com
     malicious: 197
 ```
 
-Notice that the returned data usually follows a hierarchical structure, with some top-level fields that may contain subfields which in turn can contain their own subfields. In the example above `last_http_response_headers` has subfields `age`, `cache-control`, `content-length` and so on, while `total_votes` has `harmless` and `malicious`. For refering to a particular field within the hierarchy we can use a path, similarly to how we identify a file in our computers, but in this case we are going to use a dot character (.) as the separator for path components, instead of the slashes (or backslashes) used by most file systems. The following ones are valid paths for our example structure:
+Notice that the returned data usually follows a hierarchical structure, with some top-level fields that may contain subfields which in turn can contain their own subfields. In the example above `last_http_response_headers` has subfields `age`, `cache-control`, `content-length` and so on, while `total_votes` has `harmless` and `malicious`. For referring to a particular field within the hierarchy we can use a path, similar to how we identify a file in our computers, but in this case, we are going to use a dot character (.) as the separator for path components, instead of the slashes (or backslashes) used by most file systems. The following ones are valid paths for our example structure:
 
 * `last_http_response_headers.age`
 * `total_votes.harmless`
