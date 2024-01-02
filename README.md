@@ -1,6 +1,6 @@
 # VirusTotal CLI
 
-Welcome to the VirusTotal CLI, a tool designed for those who love both VirusTotal and command-line interfaces. With this tool you can do everything you'd normally do using the VirusTotal's web page, including:
+Welcome to the VirusTotal CLI, a tool designed for those who love both VirusTotal and command-line interfaces. With this tool you can do everything you'd normally do using VirusTotal's web page, including:
 
 * Retrieve information about a [file](doc/vt_file.md), [URL](doc/vt_url.md), [domain name](doc/vt_domain.md), [IP address](doc/vt_ip.md), etc.
 * [Search](doc/vt_search.md) for files and URLs using VirusTotal Intelligence query syntax.
@@ -16,16 +16,18 @@ And much [more](doc/vt.md)...
 
 ## Getting started
 
-As this tool use the [VirusTotal API](https://docs.virustotal.com/reference) under the hood, you will need a VirusTotal API key. By [signing-up](https://www.virustotal.com/#/join-us) with VirusTotal you will receive a free API key, however free API keys have a limited amount of requests per minute, and they don't have access to some premium features like searches and file downloads. If you are interested in using those premium features please [contact us](https://www.virustotal.com/gui/contact-us/).
+As this tool uses the [VirusTotal API](https://docs.virustotal.com/reference) under the hood, you will need a VirusTotal API key. By [signing up](https://www.virustotal.com/#/join-us) with VirusTotal you will receive a free API key however, free API keys have a limited amount of requests per minute, and they don't have access to some premium features like searches and file downloads. If you are interested in using those premium features please [contact us](https://www.virustotal.com/gui/contact-us/).
 
 ### Installing the tool
 
 There are two ways of installing the tool: by using one of our pre-compiled binaries or by building it by yourself.
 
 #### Pre-compiled binaries
-The pre-compiled binaries can be found at [the releases page](https://github.com/VirusTotal/vt-cli/releases). There are binaries for Windows, Linux and Mac OS X. To use them, just download the file, decompress it and place it in a directory where you think is more convenient to be used.
+
+The pre-compiled binaries can be found on [the releases page](https://github.com/VirusTotal/vt-cli/releases). There are binaries for Windows, Linux and Mac OS X. To use them, just download the file, decompress it and place it in a directory where you think is more convenient to use.
 
 #### Manual building
+
 To compile the program you'll need [Go 1.14.x or higher installed in your system](https://go.dev/doc/install) and type the following commands:
 
 ```sh
@@ -35,6 +37,7 @@ $ make install
 ```
 
 NOTE: in order to use the `vt` binary, make sure the `GOBIN` is part of your `PATH` env variable:
+
 ```sh
 $ export GOBIN=`go env GOPATH`/bin
 $ export PATH=$PATH:$GOBIN
@@ -50,7 +53,7 @@ $ brew install virustotal-cli
 
 ##### Windows
 
-For Windows uses, there's a [Winget manifest](https://github.com/microsoft/winget-pkgs/tree/master/manifests/v/VirusTotal/vt-cli) available. Please note this is not maintained by VirusTotal.
+For Windows users, there's a [Winget manifest](https://github.com/microsoft/winget-pkgs/tree/master/manifests/v/VirusTotal/vt-cli) available. Please note this is not maintained by VirusTotal.
 
 ```powershell
 winget install VirusTotal.vt-cli
@@ -58,8 +61,7 @@ winget install VirusTotal.vt-cli
 
 ### A note on Window's console
 
-If you plan to use vt-cli in Windows on a regular basis we highly recommend you to avoid the standard Windows's console and use [Cygwin](https://www.cygwin.com/) instead. The Windows's console is *very* slow when printing large amounts of text (as vt-cli usually does) while Cygwin performs much better. Additionally, you can benefit of Cygwin's support for command auto-completion, a handy feature that Window's console doesn't offer. In order to take advantage of auto-completion make sure to include the `bash-completion` package while installing Cygwin.
-
+If you plan to use `vt-cli` in Windows on a regular basis we highly recommend you avoid the standard Windows console and use [Cygwin](https://www.cygwin.com/) instead. The Windows console is *very* slow when printing large amounts of text (as `vt-cli` usually does) while Cygwin performs much better. Additionally, you can benefit from Cygwin's support for command auto-completion, a handy feature that the Windows console doesn't offer. In order to take advantage of auto-completion make sure to include the `bash-completion` package while installing Cygwin.
 
 ### Configuring your API key
 
@@ -73,7 +75,7 @@ This command will ask for your API key, and save it to a config file in your hom
 
 ### Use with a proxy
 
-If you are behind a HTTP proxy you can tell `vt-cli` which is the address of your proxy server by multiple ways. One is using the `--proxy` option, like in:
+If you are behind an HTTP proxy you can tell `vt-cli` which is the address of your proxy server in multiple ways. One is using the `--proxy` option, like in:
 
 ```sh
 $ vt --proxy http://myproxy.com:1234 <command>
@@ -90,16 +92,20 @@ proxy="http://myproxy.com:1234"
 If you are going to use this tool frequently you may want to have command auto-completion. It saves both precious time and keystrokes. Notice however that you must configure your API as described in the previous section *before* following the steps listed below. The API is necessary for determining the commands that you will have access to.
 
 * Linux:
+
   ```sh
   $ vt completion bash > /etc/bash_completion.d/vt
   ```
 
 * Mac OS X:
+
   ```sh
   $ brew install bash-completion
   $ vt completion bash > $(brew --prefix)/etc/bash_completion.d/vt
   ```
-  Add the  following lines to `~/.bash_profile`
+
+  Add the  following lines to `~/.bash_profile`:
+
   ```sh
   if [ -f $(brew --prefix)/etc/bash_completion ]; then
   . $(brew --prefix)/etc/bash_completion
@@ -108,7 +114,8 @@ If you are going to use this tool frequently you may want to have command auto-c
 
 * Cygwin:
 
-  Make sure the `bash-completion` package is installed (Cygwin doesn't installed it by default) and type:
+  Make sure the `bash-completion` package is installed (Cygwin doesn't install it by default) and type:
+
   ```sh
   $ vt completion bash > /usr/share/bash-completion/completions/vt
   ```
@@ -118,6 +125,7 @@ If you are going to use this tool frequently you may want to have command auto-c
 ### Setup ZSH completion
 
 The output script from `vt completion zsh` needs to be put somewhere under the `$fpath` directory. For example, `.oh-my-zsh/completions` directory:
+
 ```shellsession
 $ mkdir /Users/$USERNAME/.oh-my-zsh/completions
 $ vt completion zsh > /Users/$USERNAME/.oh-my-zsh/completions/_vt
@@ -128,16 +136,19 @@ Restart the shell.
 ## Usage examples
 
 * Get information about a file:
+
   ```sh
   $ vt file 8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85
   ```
 
 * Get information about a file in JSON format:
+
   ```sh
   $ vt file 8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85 --format json
   ```
 
 * Get a specific analysis report for a file:
+
   ```sh
   $ # File analysis IDs can be given as `f-<file_SHA256_hash>-<UNIX timestamp>`...
   $ vt analysis f-8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85-1546309359
@@ -160,26 +171,31 @@ Restart the shell.
   ```
 
 * Download files given a list of hashes in a text file, one hash per line:
+
   ```sh
   $ cat /path/list_of_hashes.txt | vt download -
   ```
 
 * Get information about a URL:
+
   ```sh
   $ vt url http://www.virustotal.com
   ```
 
 * Get the IP address that served a URL:
+
   ```sh
   $ vt url last_serving_ip_address http://www.virustotal.com
   ```
 
 * Search for files:
+
   ```sh
   $ vt search "positives:5+ type:pdf"
   ```
   
 * Scan a file:
+
   ```sh
   $ vt scan file <yourfile>
   <yourfile> ZDZiOTcxY2JhNDE0MWU5ZWRjN2JjNGQ2NTdhN2VjODU6MTU3MDE3Mjg1NQ==
@@ -199,11 +215,13 @@ Restart the shell.
   ```
 
 * Export detections and tags of files from a search in CSV format:
+
   ```sh
   $ vt search "positives:5+ type:pdf" -i sha256,last_analysis_stats.malicious,tags --format csv
   ```
 
 * Export detections and tags of files from a search in JSON format:
+
   ```sh
   $ vt search "positives:5+ type:pdf" -i sha256,last_analysis_stats.malicious,tags --format json
   ```
@@ -256,7 +274,7 @@ $ vt url http://www.virustotal.com
     malicious: 197
 ```
 
-Notice that the returned data usually follows a hierarchical structure, with some top-level fields that may contain subfields which in turn can contain their own subfields. In the example above `last_http_response_headers` has subfields `age`, `cache-control`, `content-length` and so on, while `total_votes` has `harmless` and `malicious`. For refering to a particular field within the hierarchy we can use a path, similarly to how we identify a file in our computers, but in this case we are going to use a dot character (.) as the separator for path components, instead of the slashes (or backslashes) used by most file systems. The following ones are valid paths for our example structure:
+Notice that the returned data usually follows a hierarchical structure, with some top-level fields that may contain subfields which in turn can contain their own subfields. In the example above `last_http_response_headers` has subfields `age`, `cache-control`, `content-length` and so on, while `total_votes` has `harmless` and `malicious`. For referring to a particular field within the hierarchy we can use a path, similar to how we identify a file in our computers, but in this case, we are going to use a dot character (.) as the separator for path components, instead of the slashes (or backslashes) used by most file systems. The following ones are valid paths for our example structure:
 
 * `last_http_response_headers.age`
 * `total_votes.harmless`
