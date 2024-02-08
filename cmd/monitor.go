@@ -16,7 +16,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"path"
 	"path/filepath"
@@ -187,7 +187,7 @@ func NewMonitorItemsSetDetailsCmd() *cobra.Command {
 			if len(args) == 0 {
 				return errors.New("No item provided")
 			} else if len(args) == 1 {
-				detailsBytes, err := ioutil.ReadAll(os.Stdin)
+				detailsBytes, err := io.ReadAll(os.Stdin)
 				details = string(detailsBytes)
 				if err != nil {
 					return err
