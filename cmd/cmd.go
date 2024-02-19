@@ -15,7 +15,7 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -126,9 +126,9 @@ func addHumanFlag(flags *pflag.FlagSet) {
 // the data is read from stdin.
 func ReadFile(filename string) ([]byte, error) {
 	if filename == "-" {
-		return ioutil.ReadAll(os.Stdin)
+		return io.ReadAll(os.Stdin)
 	}
-	return ioutil.ReadFile(filename)
+	return os.ReadFile(filename)
 }
 
 // NewAPIClient returns a new utils.APIClient.

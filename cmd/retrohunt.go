@@ -16,7 +16,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/VirusTotal/vt-cli/utils"
-	"io/ioutil"
+	"io"
 	"os"
 	"regexp"
 	"strings"
@@ -165,9 +165,9 @@ func NewRetrohuntStartCmd() *cobra.Command {
 
 			var rules []byte
 			if args[0] == "-" {
-				rules, err = ioutil.ReadAll(os.Stdin)
+				rules, err = io.ReadAll(os.Stdin)
 			} else {
-				rules, err = ioutil.ReadFile(args[0])
+				rules, err = os.ReadFile(args[0])
 			}
 			if err != nil {
 				return err
