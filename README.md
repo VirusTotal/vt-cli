@@ -59,6 +59,12 @@ For Windows users, there's a [Winget manifest](https://github.com/microsoft/wing
 winget install VirusTotal.vt-cli
 ```
 
+Chocolatey is [also supported](https://community.chocolatey.org/packages/vt-cli) (Also not maintained by VirusTotal):
+
+```powershell
+choco install vt-cli
+```
+
 ### A note on Window's console
 
 If you plan to use `vt-cli` in Windows on a regular basis we highly recommend you avoid the standard Windows console and use [Cygwin](https://www.cygwin.com/) instead. The Windows console is *very* slow when printing large amounts of text (as `vt-cli` usually does) while Cygwin performs much better. Additionally, you can benefit from Cygwin's support for command auto-completion, a handy feature that the Windows console doesn't offer. In order to take advantage of auto-completion make sure to include the `bash-completion` package while installing Cygwin.
