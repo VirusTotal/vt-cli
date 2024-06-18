@@ -1,4 +1,4 @@
-# VirusTotal CLI
+1# VirusTotal CLI
 
 Welcome to the VirusTotal CLI, a tool designed for those who love both VirusTotal and command-line interfaces. With this tool you can do everything you'd normally do using VirusTotal's web page, including:
 
