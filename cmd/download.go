@@ -25,7 +25,7 @@ import (
 	"github.com/VirusTotal/vt-cli/utils"
 	vt "github.com/VirusTotal/vt-go"
 	"github.com/briandowns/spinner"
-	"github.com/cavaliercoder/grab"
+	grab "github.com/cavaliergopher/grab/v3"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
