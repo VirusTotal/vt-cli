@@ -25,19 +25,18 @@ import (
 // excluding keys matching any of the patterns in "exclude". The logic for
 // determining if a key matches the pattern goes as follow:
 //
-// * The path for the key is computed. If the key is in the top-level map its
-//   path is the key itself, if the key is contained within a nested map its
-//   path is the concatenation of the parent's path and the key, using a dot (.)
-//   as a separator. The path for "key" in {a:{b:{key:val}}} is a.b.key.
+//   - The path for the key is computed. If the key is in the top-level map its
+//     path is the key itself, if the key is contained within a nested map its
+//     path is the concatenation of the parent's path and the key, using a dot (.)
+//     as a separator. The path for "key" in {a:{b:{key:val}}} is a.b.key.
 //
-// * The path is matched against the pattern, which can contain asterisks (*)
-//   as a placeholder for any character different from a dot (.) and ** as a
-//   placeholder for any character including a dot. For more information go to:
-//   https://godoc.org/github.com/gobwas/glob#Compile
+//   - The path is matched against the pattern, which can contain asterisks (*)
+//     as a placeholder for any character different from a dot (.) and ** as a
+//     placeholder for any character including a dot. For more information go to:
+//     https://godoc.org/github.com/gobwas/glob#Compile
 //
-// * If the path matches any pattern in "include" the key is included in the
-//   resulting map, as long as it doesn't match a pattern in "exclude".
-//
+//   - If the path matches any pattern in "include" the key is included in the
+//     resulting map, as long as it doesn't match a pattern in "exclude".
 func FilterMap(m map[string]interface{}, include, exclude []string) map[string]interface{} {
 	includeGlob := make([]glob.Glob, len(include))
 	excludeGlob := make([]glob.Glob, len(exclude))

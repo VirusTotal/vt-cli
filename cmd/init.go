@@ -20,7 +20,6 @@ import (
 	"path"
 
 	vt "github.com/VirusTotal/vt-go"
-	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 )
 
@@ -51,7 +50,7 @@ func NewInitCmd() *cobra.Command {
 
 		Run: func(cmd *cobra.Command, args []string) {
 
-			fmt.Printf(vtBanner)
+			fmt.Print(vtBanner)
 
 			apiKey := cmd.Flags().Lookup("apikey").Value.String()
 
@@ -68,13 +67,15 @@ func NewInitCmd() *cobra.Command {
 				os.Exit(1)
 			}
 
-			dir, err := homedir.Dir()
+			cacheDir, err := os.UserCacheDir()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
 			}
 
-			relCacheFile, err := os.Create(path.Join(dir, ".vt.relationships.cache"))
+			relCache := path.Join(cacheDir, "vt-cli", "relationships")
+
+			relCacheFile, err := os.Create(relCache)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
@@ -88,7 +89,13 @@ func NewInitCmd() *cobra.Command {
 				os.Exit(1)
 			}
 
-			configFilePath := path.Join(dir, ".vt.toml")
+			configDir, err := os.UserConfigDir()
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				os.Exit(1)
+			}
+
+			configFilePath := path.Join(configDir, "vt-cli", "vt.toml")
 			configFile, err := os.Create(configFilePath)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)

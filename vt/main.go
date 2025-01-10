@@ -14,11 +14,10 @@
 package main
 
 import (
-	"fmt"
 	"os"
+	"path"
 
 	"github.com/VirusTotal/vt-cli/cmd"
-	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -26,18 +25,16 @@ import (
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
 
-	// Find home directory.
-	home, err := homedir.Dir()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+	// Find config directory.
+	configDir, err := os.UserConfigDir()
+	if err == nil {
+		viper.AddConfigPath(path.Join(configDir, "vt-cli"))
 	}
 
 	// Search config in home directory and current directory
-	viper.AddConfigPath(home)
 	viper.AddConfigPath(".")
-	// Config file must be named .vt + format extension (.toml, .json, etc)
-	viper.SetConfigName(".vt")
+	// Config file must be named vt + format extension (.toml, .json, etc)
+	viper.SetConfigName("vt")
 
 	// The prefix for all environment variables will be VTCLI_. Examples:
 	// VTCLI_PROXY, VTCLI_APIKEY.
