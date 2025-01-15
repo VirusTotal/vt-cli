@@ -14,6 +14,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path"
 
@@ -22,16 +23,45 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Migrate old ~/.vt.* configuration files.
+func migrateConfig(configDir string) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return
+	}
+
+	for _, ext := range viper.SupportedExts {
+		oldPath := path.Join(home, ".vt."+ext)
+
+		f, err := os.Open(oldPath)
+		if f != nil {
+			f.Close()
+		}
+		if err != nil {
+			continue
+		}
+
+		newPath := path.Join(configDir, path.Base(oldPath))
+		err = os.Rename(oldPath, newPath)
+		if err != nil {
+			fmt.Printf("Migrated %s to %s\n", oldPath, newPath)
+		} else {
+			fmt.Printf("Failed to migrate %s to %s: %v\n", oldPath, newPath, err)
+		}
+	}
+}
+
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-
 	// Find config directory.
 	configDir, err := os.UserConfigDir()
 	if err == nil {
-		viper.AddConfigPath(path.Join(configDir, "vt-cli"))
-	}
+		configDir = path.Join(configDir, "vt-cli")
+		migrateConfig(configDir)
 
-	// Search config in home directory and current directory
+		viper.AddConfigPath(configDir)
+	}
+	// Search config in current directory
 	viper.AddConfigPath(".")
 	// Config file must be named vt + format extension (.toml, .json, etc)
 	viper.SetConfigName("vt")
