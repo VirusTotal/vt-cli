@@ -55,7 +55,7 @@ func addProxyFlag(flags *pflag.FlagSet) {
 	flags.String(
 		"proxy", "",
 		"HTTP proxy")
-	flags.MarkHidden("host")
+	flags.MarkHidden("proxy")
 }
 
 func addIncludeExcludeFlags(flags *pflag.FlagSet) {
