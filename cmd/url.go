@@ -35,7 +35,6 @@ var urlCmdExample = `  vt url https://www.virustotal.com
   vt url f1177df4692356280844e1d5af67cc4a9eccecf77aa61c229d483b7082c70a8e
   cat list_of_urls | vt url -`
 
-
 // Regular expressions used for validating a URL identifier.
 var urlID = regexp.MustCompile(`[0-9a-fA-F]{64}`)
 
@@ -55,7 +54,7 @@ func NewURLCmd() *cobra.Command {
 			}
 			r := utils.NewMappedStringReader(
 				utils.StringReaderFromCmdArgs(args),
-				func (url string) string {
+				func(url string) string {
 					if urlID.MatchString(url) {
 						// The user provided a URL identifier as returned by
 						// VirusTotal's API, which consists in the URL's SHA-256.
