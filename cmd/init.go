@@ -51,7 +51,7 @@ func NewInitCmd() *cobra.Command {
 
 		Run: func(cmd *cobra.Command, args []string) {
 
-			fmt.Printf(vtBanner)
+			fmt.Print(vtBanner)
 
 			apiKey := cmd.Flags().Lookup("apikey").Value.String()
 
