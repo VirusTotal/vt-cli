@@ -86,6 +86,7 @@ func NewVTCommand() *cobra.Command {
 	cmd.AddCommand(NewVersionCmd())
 	cmd.AddCommand(NewMonitorCmd())
 	cmd.AddCommand(NewMonitorPartnerCmd())
+	cmd.AddCommand(NewThreatProfileCmd())
 
 	return cmd
 }
