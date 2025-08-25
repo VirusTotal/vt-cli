@@ -44,8 +44,17 @@ $ export PATH=$PATH:$GOBIN
 ```
 
 ##### Mac OS
+Download the MacOS package from [the releases page](https://github.com/VirusTotal/vt-cli/releases).  Copy the file to a location in your PATH, then remove the quarantine flag. 
 
-For Mac OS users, there's a [brew formula](https://formulae.brew.sh/formula/virustotal-cli) available. Please note this is not maintained by VirusTotal.
+```sh
+$ unzip MacOSX.zip
+$ mkdir -p $HOME/bin
+$ mv vt $HOME/bin
+$ export PATH=$PATH:$HOME/bin
+$ xattr -d com.apple.quarantine $HOME/bin/vt
+```
+
+Alternative solution for Mac OS users, there's a [brew formula](https://formulae.brew.sh/formula/virustotal-cli) available. Please note this is not maintained by VirusTotal.
 
 ```sh
 $ brew install virustotal-cli
