@@ -37,7 +37,7 @@ func NewMonitorPartnerHashesListCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "list",
 		Short:   "List available monitor partner hashes",
-		Example: monitorItemsCmdExample,
+		Example: monitorPartnerItemsCmdExample,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			p, err := NewPrinter(cmd)
 			if err != nil {
