@@ -9,9 +9,8 @@ vt monitorpartner list [flags]
 ### Examples
 
 ```
-  vt monitor list
-  vt monitor list --filter "path:/myfolder/" --include path
-  vt monitor list --filter "tag:detected" --include path,last_analysis_results.*.result,last_detections_count
+  vt monitorpartner list
+  vt monitorpartner list --filter "engine:<EngineName>" --include sha256,first_detection_date
 ```
 
 ### Options
@@ -29,7 +28,8 @@ vt monitorpartner list [flags]
 
 ```
   -k, --apikey string   API key
-      --proxy string    HTTP proxy
+      --format string   Output format (yaml/json/csv) (default "yaml")
+  -s, --silent          Silent or quiet mode. Do not show progress meter
   -v, --verbose         verbose output
 ```
 

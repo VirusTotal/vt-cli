@@ -1,6 +1,6 @@
 ## vt file related_references
 
-Returns the References of the Collections containing this File.
+Returns Direct References plus References of the Collections containing     this File.
 
 ```
 vt file related_references [hash] [flags]
@@ -21,7 +21,8 @@ vt file related_references [hash] [flags]
 
 ```
   -k, --apikey string   API key
-      --proxy string    HTTP proxy
+      --format string   Output format (yaml/json/csv) (default "yaml")
+  -s, --silent          Silent or quiet mode. Do not show progress meter
   -v, --verbose         verbose output
 ```
 

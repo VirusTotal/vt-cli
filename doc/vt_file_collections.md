@@ -1,6 +1,6 @@
 ## vt file collections
 
-Returns the collections related to the file.
+Returns the collections related to the IOC.
 
 ```
 vt file collections [hash] [flags]
@@ -21,7 +21,8 @@ vt file collections [hash] [flags]
 
 ```
   -k, --apikey string   API key
-      --proxy string    HTTP proxy
+      --format string   Output format (yaml/json/csv) (default "yaml")
+  -s, --silent          Silent or quiet mode. Do not show progress meter
   -v, --verbose         verbose output
 ```
 

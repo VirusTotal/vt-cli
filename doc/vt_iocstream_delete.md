@@ -17,7 +17,7 @@ vt iocstream delete [notification id]... [flags]
 ### Examples
 
 ```
-# Delete all notifications matching a filter, e.g. all matches for a Yara rule/ruleset
+# Delete all notifications matching a filter, e.g. all matches for a YARA rule/ruleset
 vt iocstream delete -f "origin:hunting tag:my_rule"
 # Delete a single notification with ID 1234568. The notification ID is displayed in the context_attributes.
 vt iocstream delete 1234568
@@ -34,7 +34,8 @@ vt iocstream delete 1234568
 
 ```
   -k, --apikey string   API key
-      --proxy string    HTTP proxy
+      --format string   Output format (yaml/json/csv) (default "yaml")
+  -s, --silent          Silent or quiet mode. Do not show progress meter
   -v, --verbose         verbose output
 ```
 

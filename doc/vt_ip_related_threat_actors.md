@@ -1,6 +1,6 @@
 ## vt ip related_threat_actors
 
-Returns the Threat Actors of the Collections containing this IP.
+IOC's related threat actors.
 
 ```
 vt ip related_threat_actors [ip] [flags]
@@ -21,7 +21,8 @@ vt ip related_threat_actors [ip] [flags]
 
 ```
   -k, --apikey string   API key
-      --proxy string    HTTP proxy
+      --format string   Output format (yaml/json/csv) (default "yaml")
+  -s, --silent          Silent or quiet mode. Do not show progress meter
   -v, --verbose         verbose output
 ```
 

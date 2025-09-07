@@ -1,6 +1,6 @@
 ## vt domain related_references
 
-Returns the References of the Collections containing this Domain.
+Returns the direct and related references containing this domain.
 
 ```
 vt domain related_references [domain] [flags]
@@ -21,7 +21,8 @@ vt domain related_references [domain] [flags]
 
 ```
   -k, --apikey string   API key
-      --proxy string    HTTP proxy
+      --format string   Output format (yaml/json/csv) (default "yaml")
+  -s, --silent          Silent or quiet mode. Do not show progress meter
   -v, --verbose         verbose output
 ```
 

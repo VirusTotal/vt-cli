@@ -1,6 +1,6 @@
 ## vt ip collections
 
-Returns the collections related to the IP Address.
+Returns the collections related to the IOC.
 
 ```
 vt ip collections [ip] [flags]
@@ -21,7 +21,8 @@ vt ip collections [ip] [flags]
 
 ```
   -k, --apikey string   API key
-      --proxy string    HTTP proxy
+      --format string   Output format (yaml/json/csv) (default "yaml")
+  -s, --silent          Silent or quiet mode. Do not show progress meter
   -v, --verbose         verbose output
 ```
 

@@ -21,7 +21,6 @@ vt iocstream list -I –limit 9999999 > results.csv
 vt iocstream list -i "_id,last_analysis_stats,size,type_tag"
 # Check if a hash is in your IoC Stream matches
 vt iocstream list -f "entity_type:file entity_id:hash"
-
 ```
 
 ### Options
@@ -40,7 +39,8 @@ vt iocstream list -f "entity_type:file entity_id:hash"
 
 ```
   -k, --apikey string   API key
-      --proxy string    HTTP proxy
+      --format string   Output format (yaml/json/csv) (default "yaml")
+  -s, --silent          Silent or quiet mode. Do not show progress meter
   -v, --verbose         verbose output
 ```
 

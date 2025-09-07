@@ -1,6 +1,6 @@
 ## vt url collections
 
-Returns the collections related to the URL.
+Returns the collections related to the IOC.
 
 ```
 vt url collections [url] [flags]
@@ -21,7 +21,8 @@ vt url collections [url] [flags]
 
 ```
   -k, --apikey string   API key
-      --proxy string    HTTP proxy
+      --format string   Output format (yaml/json/csv) (default "yaml")
+  -s, --silent          Silent or quiet mode. Do not show progress meter
   -v, --verbose         verbose output
 ```
 

@@ -4,10 +4,10 @@ Download files from your monitor account
 
 ### Synopsis
 
-Set details metadata for a file.
+Delete details metadata from files.
 
-This command sets details metadata for a file in your monitor account
-referenced by a MonitorItemID.
+This command delete details metadata from a file or files in your monitor
+account that was previously set.
 
 ```
 vt monitor deletedetails [monitor_id]... [flags]
@@ -23,7 +23,8 @@ vt monitor deletedetails [monitor_id]... [flags]
 
 ```
   -k, --apikey string   API key
-      --proxy string    HTTP proxy
+      --format string   Output format (yaml/json/csv) (default "yaml")
+  -s, --silent          Silent or quiet mode. Do not show progress meter
   -v, --verbose         verbose output
 ```
 

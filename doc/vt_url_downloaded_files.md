@@ -1,6 +1,6 @@
 ## vt url downloaded_files
 
-Files downloaded from the URL.
+Interesting files downloaded from the URL.
 
 ```
 vt url downloaded_files [url] [flags]
@@ -21,7 +21,8 @@ vt url downloaded_files [url] [flags]
 
 ```
   -k, --apikey string   API key
-      --proxy string    HTTP proxy
+      --format string   Output format (yaml/json/csv) (default "yaml")
+  -s, --silent          Silent or quiet mode. Do not show progress meter
   -v, --verbose         verbose output
 ```
 

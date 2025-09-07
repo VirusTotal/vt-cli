@@ -29,14 +29,14 @@ vt monitor [monitor_id]... [flags]
 
 ```
   -k, --apikey string   API key
-      --proxy string    HTTP proxy
+      --format string   Output format (yaml/json/csv) (default "yaml")
+  -s, --silent          Silent or quiet mode. Do not show progress meter
   -v, --verbose         verbose output
 ```
 
 ### SEE ALSO
 
 * [vt](vt.md)	 - A command-line tool for interacting with VirusTotal
-* [vt monitor analyses](vt_monitor_analyses.md)	 - Analyses for the hash.
 * [vt monitor delete](vt_monitor_delete.md)	 - Delete monitor files
 * [vt monitor deletedetails](vt_monitor_deletedetails.md)	 - Download files from your monitor account
 * [vt monitor download](vt_monitor_download.md)	 - Download files from your monitor account

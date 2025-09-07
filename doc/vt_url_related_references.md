@@ -1,6 +1,6 @@
 ## vt url related_references
 
-Returns the References of the Collections containing this URL.
+Returns the direct and related references containing this URL.
 
 ```
 vt url related_references [url] [flags]
@@ -21,7 +21,8 @@ vt url related_references [url] [flags]
 
 ```
   -k, --apikey string   API key
-      --proxy string    HTTP proxy
+      --format string   Output format (yaml/json/csv) (default "yaml")
+  -s, --silent          Silent or quiet mode. Do not show progress meter
   -v, --verbose         verbose output
 ```
 

@@ -10,8 +10,9 @@ A command-line tool for interacting with VirusTotal.
 
 ```
   -k, --apikey string   API key
+      --format string   Output format (yaml/json/csv) (default "yaml")
   -h, --help            help for vt
-      --proxy string    HTTP proxy
+  -s, --silent          Silent or quiet mode. Do not show progress meter
   -v, --verbose         verbose output
 ```
 
@@ -34,6 +35,7 @@ A command-line tool for interacting with VirusTotal.
 * [vt retrohunt](vt_retrohunt.md)	 - Manage retrohunt jobs
 * [vt scan](vt_scan.md)	 - Scan files or URLs
 * [vt search](vt_search.md)	 - Search for files in VirusTotal Intelligence
+* [vt threatprofile](vt_threatprofile.md)	 - Get information about Threat Profiles
 * [vt url](vt_url.md)	 - Get information about URLs
 * [vt user](vt_user.md)	 - Get information about VirusTotal users
 * [vt version](vt_version.md)	 - Show version number

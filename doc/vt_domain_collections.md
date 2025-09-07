@@ -1,6 +1,6 @@
 ## vt domain collections
 
-Returns the collections related to the domain.
+Returns the collections related to the IOC.
 
 ```
 vt domain collections [domain] [flags]
@@ -21,7 +21,8 @@ vt domain collections [domain] [flags]
 
 ```
   -k, --apikey string   API key
-      --proxy string    HTTP proxy
+      --format string   Output format (yaml/json/csv) (default "yaml")
+  -s, --silent          Silent or quiet mode. Do not show progress meter
   -v, --verbose         verbose output
 ```
 
