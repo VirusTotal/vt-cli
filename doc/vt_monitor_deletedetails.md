@@ -1,6 +1,6 @@
 ## vt monitor deletedetails
 
-Download files from your monitor account
+Delete details metadata from files
 
 ### Synopsis
 

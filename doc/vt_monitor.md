@@ -38,7 +38,7 @@ vt monitor [monitor_id]... [flags]
 
 * [vt](vt.md)	 - A command-line tool for interacting with VirusTotal
 * [vt monitor delete](vt_monitor_delete.md)	 - Delete monitor files
-* [vt monitor deletedetails](vt_monitor_deletedetails.md)	 - Download files from your monitor account
+* [vt monitor deletedetails](vt_monitor_deletedetails.md)	 - Delete details metadata from files
 * [vt monitor download](vt_monitor_download.md)	 - Download files from your monitor account
 * [vt monitor list](vt_monitor_list.md)	 - List monitor in your account
 * [vt monitor relationships](vt_monitor_relationships.md)	 - Get all relationships.
