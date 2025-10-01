@@ -46,15 +46,15 @@ func NewAPIClient(agent string) (*APIClient, error) {
 // must contain a %s placeholder that will be replaced with items from the args
 // slice. The objects are put into the outCh as they are retrieved.
 func (c *APIClient) RetrieveObjects(endpoint string, args []string, outCh chan *vt.Object, errCh chan error) error {
-	return c.RetrieveObjectsWithRetry([]string{endpoint}, args, outCh, errCh)
+	return c.RetrieveObjectsWithFallback([]string{endpoint}, args, outCh, errCh)
 }
 
-// RetrieveObjectsWithRetry retrieves objects from the specified endpoints. It
+// RetrieveObjectsWithFallback retrieves objects from the specified endpoints. It
 // tries the endpoints in the order they are provided until one of them returns
 // the object. The endpoint strings must contain a %s placeholder that will be
 // replaced with items from the args slice. The objects are put into the outCh
 // as they are retrieved.
-func (c *APIClient) RetrieveObjectsWithRetry(endpoints []string, args []string, outCh chan *vt.Object, errCh chan error) error {
+func (c *APIClient) RetrieveObjectsWithFallback(endpoints []string, args []string, outCh chan *vt.Object, errCh chan error) error {
 
 	// Make sure outCh and errCh are closed
 	defer close(outCh)

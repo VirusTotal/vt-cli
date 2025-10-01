@@ -69,7 +69,7 @@ func NewURLCmd() *cobra.Command {
 				})
 
 			if viper.GetBool("private") {
-				return p.GetAndPrintObjectsWithRetry(
+				return p.GetAndPrintObjectsWithFallback(
 					[]string{"urls/%s", "private/urls/%s"},
 					r,
 					nil)

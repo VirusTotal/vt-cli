@@ -159,16 +159,16 @@ func (p *Printer) PrintObject(obj *vt.Object) error {
 // read from stdin one per line. If argRe is non-nil, only args that match the
 // regular expression are used and the rest are discarded.
 func (p *Printer) GetAndPrintObjects(endpoint string, r StringReader, argRe *regexp.Regexp) error {
-	return p.GetAndPrintObjectsWithRetry([]string{endpoint}, r, argRe)
+	return p.GetAndPrintObjectsWithFallback([]string{endpoint}, r, argRe)
 }
 
-// GetAndPrintObjectsWithRetry retrieves objects from the specified endpoints and
+// GetAndPrintObjectsWithFallback retrieves objects from the specified endpoints and
 // prints them. The function tries the endpoints in the order they are provided
 // until one of them returns the object. The endpoint must contain a %s placeholder
 // that will be replaced with items from the args slice. If args contains a single
 // "-" string, the args are read from stdin one per line. If argRe is non-nil, only
 // args that match the regular expression are used and the rest are discarded.
-func (p *Printer) GetAndPrintObjectsWithRetry(endpoints []string, r StringReader, argRe *regexp.Regexp) error {
+func (p *Printer) GetAndPrintObjectsWithFallback(endpoints []string, r StringReader, argRe *regexp.Regexp) error {
 	if argRe != nil {
 		r = NewFilteredStringReader(r, argRe)
 	}
@@ -181,7 +181,7 @@ func (p *Printer) GetAndPrintObjectsWithRetry(endpoints []string, r StringReader
 	objectsCh := make(chan *vt.Object)
 	errorsCh := make(chan error, len(filteredArgs))
 
-	go p.client.RetrieveObjectsWithRetry(endpoints, filteredArgs, objectsCh, errorsCh)
+	go p.client.RetrieveObjectsWithFallback(endpoints, filteredArgs, objectsCh, errorsCh)
 
 	if viper.GetBool("identifiers-only") {
 		var objectIds []string

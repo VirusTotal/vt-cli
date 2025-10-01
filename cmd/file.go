@@ -52,7 +52,7 @@ func NewFileCmd() *cobra.Command {
 				return err
 			}
 			if viper.GetBool("private") {
-				return p.GetAndPrintObjectsWithRetry(
+				return p.GetAndPrintObjectsWithFallback(
 					[]string{"files/%s", "private/files/%s"},
 					utils.StringReaderFromCmdArgs(args),
 					re)
