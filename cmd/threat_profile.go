@@ -43,7 +43,7 @@ func NewThreatProfileCmd() *cobra.Command {
 		},
 	}
 
-	addRelationshipCmds(cmd, "threat_profiles", "threat_profile", "[id]")
+	addRelationshipCmds(cmd, "threat_profiles", "threat_profile", "[id]", false)
 	addThreadsFlag(cmd.Flags())
 	addIncludeExcludeFlags(cmd.Flags())
 	addIDOnlyFlag(cmd.Flags())

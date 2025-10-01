@@ -46,6 +46,15 @@ func NewAPIClient(agent string) (*APIClient, error) {
 // must contain a %s placeholder that will be replaced with items from the args
 // slice. The objects are put into the outCh as they are retrieved.
 func (c *APIClient) RetrieveObjects(endpoint string, args []string, outCh chan *vt.Object, errCh chan error) error {
+	return c.RetrieveObjectsWithRetry([]string{endpoint}, args, outCh, errCh)
+}
+
+// RetrieveObjectsWithRetry retrieves objects from the specified endpoints. It
+// tries the endpoints in the order they are provided until one of them returns
+// the object. The endpoint strings must contain a %s placeholder that will be
+// replaced with items from the args slice. The objects are put into the outCh
+// as they are retrieved.
+func (c *APIClient) RetrieveObjectsWithRetry(endpoints []string, args []string, outCh chan *vt.Object, errCh chan error) error {
 
 	// Make sure outCh and errCh are closed
 	defer close(outCh)
@@ -75,16 +84,23 @@ func (c *APIClient) RetrieveObjects(endpoint string, args []string, outCh chan *
 		getWg.Add(1)
 		go func(order int, arg string) {
 			throttler <- nil
-			obj, err := c.GetObject(vt.URL(endpoint, arg))
-			if err == nil {
-				objCh <- PQueueNode{Priority: order, Data: obj}
-			} else {
+			var obj *vt.Object
+			var err error
+			for _, endpoint := range endpoints {
+				obj, err = c.GetObject(vt.URL(endpoint, arg))
+				if err == nil {
+					objCh <- PQueueNode{Priority: order, Data: obj}
+					break
+				}
 				if apiErr, ok := err.(vt.Error); ok && apiErr.Code == "NotFoundError" {
-					objCh <- PQueueNode{Priority: order, Data: err}
+					// Try the next endpoint
 				} else {
 					fmt.Fprintln(os.Stderr, err)
 					os.Exit(1)
 				}
+			}
+			if err != nil {
+				objCh <- PQueueNode{Priority: order, Data: err}
 			}
 			getWg.Done()
 			<-throttler

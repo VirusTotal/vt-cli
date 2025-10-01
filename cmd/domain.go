@@ -54,7 +54,7 @@ func NewDomainCmd() *cobra.Command {
 		},
 	}
 
-	addRelationshipCmds(cmd, "domains", "domain", "[domain]")
+	addRelationshipCmds(cmd, "domains", "domain", "[domain]", false)
 
 	addThreadsFlag(cmd.Flags())
 	addIncludeExcludeFlags(cmd.Flags())

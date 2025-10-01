@@ -165,7 +165,7 @@ func NewMonitorPartnerCmd() *cobra.Command {
 	cmd.AddCommand(NewMonitorPartnerHashesListCmd())
 	cmd.AddCommand(NewMonitorPartnerHashDownloadCmd())
 
-	addRelationshipCmds(cmd, "monitor_partner/hashes", "monitor_hash", "[sha256]")
+	addRelationshipCmds(cmd, "monitor_partner/hashes", "monitor_hash", "[sha256]", false)
 
 	return cmd
 }

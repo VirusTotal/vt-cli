@@ -98,6 +98,12 @@ func addOutputFlag(flags *pflag.FlagSet) {
 		"directory where downloaded files are put")
 }
 
+func addPrivateFlag(flags *pflag.FlagSet) {
+	flags.BoolP(
+		"private", "P", false,
+		"include private ones (requires private scanning privileges)")
+}
+
 func addFilterFlag(flags *pflag.FlagSet) {
 	flags.StringP(
 		"filter", "f", "",

@@ -15,9 +15,11 @@ package cmd
 
 import (
 	"encoding/base64"
+	"regexp"
+
 	"github.com/VirusTotal/vt-cli/utils"
 	"github.com/spf13/cobra"
-	"regexp"
+	"github.com/spf13/viper"
 )
 
 var urlCmdHelp = `Get information about one or more URLs.
@@ -34,7 +36,6 @@ input, one per line.
 var urlCmdExample = `  vt url https://www.virustotal.com
   vt url f1177df4692356280844e1d5af67cc4a9eccecf77aa61c229d483b7082c70a8e
   cat list_of_urls | vt url -`
-
 
 // Regular expressions used for validating a URL identifier.
 var urlID = regexp.MustCompile(`[0-9a-fA-F]{64}`)
@@ -55,7 +56,7 @@ func NewURLCmd() *cobra.Command {
 			}
 			r := utils.NewMappedStringReader(
 				utils.StringReaderFromCmdArgs(args),
-				func (url string) string {
+				func(url string) string {
 					if urlID.MatchString(url) {
 						// The user provided a URL identifier as returned by
 						// VirusTotal's API, which consists in the URL's SHA-256.
@@ -66,15 +67,27 @@ func NewURLCmd() *cobra.Command {
 					// encoded as base64 before being used.
 					return base64.RawURLEncoding.EncodeToString([]byte(url))
 				})
-			return p.GetAndPrintObjects("urls/%s", r, nil)
+
+			if viper.GetBool("private") {
+				return p.GetAndPrintObjectsWithRetry(
+					[]string{"urls/%s", "private/urls/%s"},
+					r,
+					nil)
+			} else {
+				return p.GetAndPrintObjects(
+					"urls/%s",
+					r,
+					nil)
+			}
 		},
 	}
 
-	addRelationshipCmds(cmd, "urls", "url", "[url]")
+	addRelationshipCmds(cmd, "urls", "url", "[url]", true)
 
 	addThreadsFlag(cmd.Flags())
 	addIncludeExcludeFlags(cmd.Flags())
 	addIDOnlyFlag(cmd.Flags())
+	addPrivateFlag(cmd.Flags())
 
 	return cmd
 }

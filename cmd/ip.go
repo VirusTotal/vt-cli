@@ -14,8 +14,9 @@
 package cmd
 
 import (
-	"github.com/VirusTotal/vt-cli/utils"
 	"regexp"
+
+	"github.com/VirusTotal/vt-cli/utils"
 
 	"github.com/spf13/cobra"
 )
@@ -55,7 +56,7 @@ func NewIPCmd() *cobra.Command {
 		},
 	}
 
-	addRelationshipCmds(cmd, "ip_addresses", "ip_address", "[ip]")
+	addRelationshipCmds(cmd, "ip_addresses", "ip_address", "[ip]", false)
 
 	addThreadsFlag(cmd.Flags())
 	addIncludeExcludeFlags(cmd.Flags())

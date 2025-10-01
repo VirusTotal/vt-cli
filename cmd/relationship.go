@@ -17,10 +17,11 @@ import (
 	"encoding/base64"
 	"encoding/gob"
 	"fmt"
-	"github.com/VirusTotal/vt-cli/utils"
 	"os"
 	"path"
 	"sync"
+
+	"github.com/VirusTotal/vt-cli/utils"
 
 	vt "github.com/VirusTotal/vt-go"
 	homedir "github.com/mitchellh/go-homedir"
@@ -69,7 +70,7 @@ func getRelatedObjects(collection, objectID, relationship string, limit int) ([]
 }
 
 // NewRelationshipCmd returns a new instance of the 'relationship' command.
-func NewRelationshipCmd(collection, relationship, use, description string) *cobra.Command {
+func NewRelationshipCmd(collection, relationship, use, description string, private_flag bool) *cobra.Command {
 	cmd := &cobra.Command{
 		Args:  cobra.ExactArgs(1),
 		Use:   fmt.Sprintf("%s %s", relationship, use),
@@ -85,6 +86,9 @@ func NewRelationshipCmd(collection, relationship, use, description string) *cobr
 			if err != nil {
 				return err
 			}
+			if viper.GetBool("private") {
+				collection = "private/" + collection
+			}
 			url := vt.URL("%s/%s/%s", collection, objectID, relationship)
 			return p.PrintCollection(url)
 		},
@@ -95,11 +99,15 @@ func NewRelationshipCmd(collection, relationship, use, description string) *cobr
 	addLimitFlag(cmd.Flags())
 	addCursorFlag(cmd.Flags())
 
+	if private_flag {
+		addPrivateFlag(cmd.Flags())
+	}
+
 	return cmd
 }
 
 // NewRelationshipsCmd returns a new instance of the 'relationships' command.
-func NewRelationshipsCmd(collection, objectType, use string) *cobra.Command {
+func NewRelationshipsCmd(collection, objectType, use string, private_flag bool) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   fmt.Sprintf("relationships %s", use),
 		Short: "Get all relationships.",
@@ -107,6 +115,10 @@ func NewRelationshipsCmd(collection, objectType, use string) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var wg sync.WaitGroup
 			var sm sync.Map
+			if viper.GetBool("private") {
+				objectType = "private_" + objectType
+				collection = "private/" + collection
+			}
 			for _, r := range objectRelationshipsMap[objectType] {
 				wg.Add(1)
 				go func(relationshipName string) {
@@ -148,13 +160,17 @@ func NewRelationshipsCmd(collection, objectType, use string) *cobra.Command {
 	addIncludeExcludeFlags(cmd.Flags())
 	addLimitFlag(cmd.Flags())
 
+	if private_flag {
+		addPrivateFlag(cmd.Flags())
+	}
+
 	return cmd
 }
 
-func addRelationshipCmds(cmd *cobra.Command, collection, objectType, use string) {
+func addRelationshipCmds(cmd *cobra.Command, collection, objectType, use string, private_flag bool) {
 	relationships := objectRelationshipsMap[objectType]
 	for _, r := range relationships {
-		cmd.AddCommand(NewRelationshipCmd(collection, r.Name, use, r.Description))
+		cmd.AddCommand(NewRelationshipCmd(collection, r.Name, use, r.Description, private_flag))
 	}
-	cmd.AddCommand(NewRelationshipsCmd(collection, objectType, use))
+	cmd.AddCommand(NewRelationshipsCmd(collection, objectType, use, private_flag))
 }

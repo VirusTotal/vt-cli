@@ -14,10 +14,11 @@
 package cmd
 
 import (
-	"github.com/VirusTotal/vt-cli/utils"
 	"regexp"
 
+	"github.com/VirusTotal/vt-cli/utils"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var fileCmdHelp = `Get information about one or more files.
@@ -50,18 +51,26 @@ func NewFileCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return p.GetAndPrintObjects(
-				"files/%s",
-				utils.StringReaderFromCmdArgs(args),
-				re)
+			if viper.GetBool("private") {
+				return p.GetAndPrintObjectsWithRetry(
+					[]string{"files/%s", "private/files/%s"},
+					utils.StringReaderFromCmdArgs(args),
+					re)
+			} else {
+				return p.GetAndPrintObjects(
+					"files/%s",
+					utils.StringReaderFromCmdArgs(args),
+					re)
+			}
 		},
 	}
 
-	addRelationshipCmds(cmd, "files", "file", "[hash]")
+	addRelationshipCmds(cmd, "files", "file", "[hash]", true)
 
 	addThreadsFlag(cmd.Flags())
 	addIncludeExcludeFlags(cmd.Flags())
 	addIDOnlyFlag(cmd.Flags())
+	addPrivateFlag(cmd.Flags())
 
 	return cmd
 }

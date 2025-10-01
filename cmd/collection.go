@@ -60,7 +60,7 @@ func NewCollectionCmd() *cobra.Command {
 	cmd.AddCommand(NewCollectionDeleteCmd())
 	cmd.AddCommand(NewCollectionRemoveItemsCmd())
 
-	addRelationshipCmds(cmd, "collections", "collection", "[collection]")
+	addRelationshipCmds(cmd, "collections", "collection", "[collection]", false)
 	addThreadsFlag(cmd.Flags())
 	addIncludeExcludeFlags(cmd.Flags())
 	addIDOnlyFlag(cmd.Flags())

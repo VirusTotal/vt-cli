@@ -474,7 +474,7 @@ func NewMonitorCmd() *cobra.Command {
 	cmd.AddCommand(NewMonitorItemsSetDetailsCmd())
 	cmd.AddCommand(NewMonitorItemsDeleteDetailsCmd())
 
-	addRelationshipCmds(cmd, "monitor/items", "monitor_item", "[monitor_id]")
+	addRelationshipCmds(cmd, "monitor/items", "monitor_item", "[monitor_id]", false)
 
 	return cmd
 }
