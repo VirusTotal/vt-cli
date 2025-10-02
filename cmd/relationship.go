@@ -24,7 +24,6 @@ import (
 	"github.com/VirusTotal/vt-cli/utils"
 
 	vt "github.com/VirusTotal/vt-go"
-	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -32,8 +31,13 @@ import (
 var objectRelationshipsMap map[string][]vt.RelationshipMeta
 
 func init() {
-	home, _ := homedir.Dir()
-	f, err := os.Open(path.Join(home, ".vt.relationships.cache"))
+	cacheDir, err := os.UserCacheDir()
+	if err != nil {
+		return
+	}
+
+	cachePath := path.Join(cacheDir, "vt-cli", "relationships")
+	f, err := os.Open(cachePath)
 	if err == nil {
 		defer f.Close()
 		dec := gob.NewDecoder(f)

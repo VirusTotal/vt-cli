@@ -3,7 +3,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//	http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -98,7 +98,7 @@ var tests = []T{
 			"uno":  "1",
 			"dos":  "2",
 			"tres": "3",
-			"": "",
+			"":     "",
 			"#foo": "foo",
 			"|foo": "foo",
 			"_foo": "foo",
@@ -180,7 +180,7 @@ var tests = []T{
 		},
 		yaml: Y(fmt.Sprintf(`
 			Foo_date: 10000  # %v
-			`,  time.Unix(10000, 0))),
+			`, time.Unix(10000, 0))),
 	},
 	{
 		data: struct {
@@ -190,7 +190,7 @@ var tests = []T{
 		},
 		yaml: Y(fmt.Sprintf(`
 			Bar_date: 10000  # %v
-			`,  time.Unix(10000, 0))),
+			`, time.Unix(10000, 0))),
 	},
 	{
 		data: struct {
@@ -200,7 +200,7 @@ var tests = []T{
 		},
 		yaml: Y(fmt.Sprintf(`
 			Baz_date: 1.618312811e+09  # %v
-			`,  time.Unix(1618312811, 0))),
+			`, time.Unix(1618312811, 0))),
 	},
 }
 

@@ -11,7 +11,7 @@ import (
 
 func NewPrivilegeCmd(target string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "privileges",
+		Use:   "privileges",
 		Short: fmt.Sprintf("Change %s privileges", target),
 	}
 
@@ -21,9 +21,8 @@ func NewPrivilegeCmd(target string) *cobra.Command {
 	return cmd
 }
 
-
 type Privilege struct {
-	Granted bool `json:"granted"`
+	Granted        bool  `json:"granted"`
 	ExpirationDate int64 `json:"expiration_date"`
 }
 
@@ -31,13 +30,13 @@ type Privileges map[string]Privilege
 
 func NewPrivilegeGrantCmd(target string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use: fmt.Sprintf("grant [%sname] [privilege]...", target),
-		Short: fmt.Sprintf("Grant privileges to a %s", target),
+		Use:     fmt.Sprintf("grant [%sname] [privilege]...", target),
+		Short:   fmt.Sprintf("Grant privileges to a %s", target),
 		Example: fmt.Sprintf("  vt %s privileges grant my%s intelligence downloads-tier-2", target, target),
-		Args: cobra.MinimumNArgs(2),
+		Args:    cobra.MinimumNArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var expirationDate int64
-			if expiration:= viper.GetString("expiration"); expiration != "" {
+			if expiration := viper.GetString("expiration"); expiration != "" {
 				var err error
 				expirationDate, err = strconv.ParseInt(expiration, 10, 64)
 				if err != nil {
@@ -68,7 +67,7 @@ func NewPrivilegeGrantCmd(target string) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringP("" +
+	cmd.Flags().StringP(""+
 		"expiration", "e", "",
 		"expiration time for the granted privileges (UNIX timestamp or YYYY-MM-DD)")
 	return cmd
@@ -76,10 +75,10 @@ func NewPrivilegeGrantCmd(target string) *cobra.Command {
 
 func NewPrivilegeRevokeCmd(target string) *cobra.Command {
 	return &cobra.Command{
-		Use: fmt.Sprintf("revoke [%sname] [privilege]...", target),
-		Short: fmt.Sprintf("Revoke privileges from a %s", target),
+		Use:     fmt.Sprintf("revoke [%sname] [privilege]...", target),
+		Short:   fmt.Sprintf("Revoke privileges from a %s", target),
 		Example: fmt.Sprintf("  vt %s privileges revoke my%s intelligence downloads-tier-2", target, target),
-		Args: cobra.MinimumNArgs(2),
+		Args:    cobra.MinimumNArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			privileges := Privileges{}
 			for _, arg := range args[1:] {
