@@ -16,6 +16,7 @@ package main
 import (
 	"fmt"
 	"os"
+    "path/filepath"
 
 	"github.com/VirusTotal/vt-cli/cmd"
 	homedir "github.com/mitchellh/go-homedir"
@@ -41,6 +42,7 @@ func initConfig() {
 
 	// The prefix for all environment variables will be VTCLI_. Examples:
 	// VTCLI_PROXY, VTCLI_APIKEY.
+
 	viper.SetEnvPrefix("VTCLI")
 
 	// Read in environment variables that match
@@ -48,6 +50,19 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	viper.ReadInConfig()
+
+    // Ensure mode bits set correctly
+    cfg := viper.ConfigFileUsed()
+    if cfg == "" {
+        cfg = filepath.Join(home, ".vt.toml")
+    }
+
+    if _, err := os.Stat(cfg); os.IsNotExist(err) {
+        f, _ := os.OpenFile(cfg, os.O_CREATE|os.O_WRONLY, 0600)
+        f.Close()
+    } else {
+        os.Chmod(cfg, 0600)
+    }
 }
 
 func init() {
