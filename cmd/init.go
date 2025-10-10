@@ -89,7 +89,7 @@ func NewInitCmd() *cobra.Command {
 			}
 
 			configFilePath := path.Join(dir, ".vt.toml")
-			configFile, err := os.Create(configFilePath)
+			configFile, err := os.OpenFile(configFilePath, os.O_CREATE|os.O_WRONLY, 0600)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
