@@ -41,7 +41,6 @@ func initConfig() {
 
 	// The prefix for all environment variables will be VTCLI_. Examples:
 	// VTCLI_PROXY, VTCLI_APIKEY.
-
 	viper.SetEnvPrefix("VTCLI")
 
 	// Read in environment variables that match
