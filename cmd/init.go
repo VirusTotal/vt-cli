@@ -20,7 +20,6 @@ import (
 	"path"
 
 	vt "github.com/VirusTotal/vt-go"
-	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 )
 
@@ -68,13 +67,19 @@ func NewInitCmd() *cobra.Command {
 				os.Exit(1)
 			}
 
-			dir, err := homedir.Dir()
+			homeDir, err := os.UserHomeDir()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
 			}
 
-			relCacheFile, err := os.Create(path.Join(dir, ".vt.relationships.cache"))
+			cacheDir, err := os.UserCacheDir()
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				os.Exit(1)
+			}
+
+			relCacheFile, err := os.Create(path.Join(cacheDir, ".vt.relationships.cache"))
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
@@ -88,7 +93,7 @@ func NewInitCmd() *cobra.Command {
 				os.Exit(1)
 			}
 
-			configFilePath := path.Join(dir, ".vt.toml")
+			configFilePath := path.Join(homeDir, ".vt.toml")
 			configFile, err := os.OpenFile(configFilePath, os.O_CREATE|os.O_WRONLY, 0600)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
@@ -102,7 +107,8 @@ func NewInitCmd() *cobra.Command {
 				os.Exit(1)
 			}
 
-			fmt.Printf("Your API key has been written to config file %s\n", configFilePath)
+			fmt.Printf("API key written to config file: %s\n", configFilePath)
+			fmt.Printf("Relationships cache written to: %s\n", relCacheFile.Name())
 		},
 	}
 }

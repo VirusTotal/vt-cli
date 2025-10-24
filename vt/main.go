@@ -18,23 +18,21 @@ import (
 	"os"
 
 	"github.com/VirusTotal/vt-cli/cmd"
-	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-
-	// Find home directory.
-	home, err := homedir.Dir()
+	// Find homeDir directory.
+	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
 	// Search config in home directory and current directory
-	viper.AddConfigPath(home)
+	viper.AddConfigPath(homeDir)
 	viper.AddConfigPath(".")
 	// Config file must be named .vt + format extension (.toml, .json, etc)
 	viper.SetConfigName(".vt")

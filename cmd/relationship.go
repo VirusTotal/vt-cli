@@ -24,7 +24,6 @@ import (
 	"github.com/VirusTotal/vt-cli/utils"
 
 	vt "github.com/VirusTotal/vt-go"
-	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -32,12 +31,21 @@ import (
 var objectRelationshipsMap map[string][]vt.RelationshipMeta
 
 func init() {
-	home, _ := homedir.Dir()
-	f, err := os.Open(path.Join(home, ".vt.relationships.cache"))
-	if err == nil {
-		defer f.Close()
-		dec := gob.NewDecoder(f)
-		dec.Decode(&objectRelationshipsMap)
+	if cacheDir, err := os.UserCacheDir(); err == nil {
+		cacheFile := path.Join(cacheDir, ".vt.relationships.cache")
+		// We used to store the cache file in user's home directory. Let's
+		// move it to the cache directory.
+		if homeDir, err := os.UserHomeDir(); err == nil {
+			os.Rename(path.Join(homeDir, ".vt.relationships.cache"), cacheFile)
+		}
+		f, err := os.Open(cacheFile)
+		if err == nil {
+			defer f.Close()
+			dec := gob.NewDecoder(f)
+			dec.Decode(&objectRelationshipsMap)
+		} else {
+
+		}
 	}
 }
 
