@@ -30,6 +30,8 @@ func NewFileDirReader(fileDir string, recursive bool, maxDepth int) (*StringArra
 	var filePaths []string
 	rootDepth := pathDepth(fileDir)
 
+	// filePaths is safely appended within WalkDir because WalkDir executes the callback sequentially.
+	// No race conditions occur in this implementation, even with slice reallocation.
 	err := filepath.WalkDir(fileDir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -57,8 +59,11 @@ func NewFileDirReader(fileDir string, recursive bool, maxDepth int) (*StringArra
 	return &StringArrayReader{strings: filePaths}, nil
 }
 
+// pathDepth returns the depth of a given path by counting its components.
+// It uses filepath.Separator, which ensures correct behavior across all platforms
+// (Windows, macOS, Linux), regardless of the underlying path separator.
 func pathDepth(path string) int {
-	return len(strings.Split(filepath.Clean(path), string(os.PathSeparator)))
+	return len(strings.Split(filepath.Clean(path), string(filepath.Separator)))
 }
 
 // IsDir function returns whether a file is a directory or not
