@@ -166,6 +166,8 @@ func Test_NewFileDirReader(t *testing.T) {
 }
 
 func Test_NewFileDirReader_Error(t *testing.T) {
+	t.Parallel()
+
 	rootDir := t.TempDir()
 	noPerm := os.FileMode(0000)
 	if err := os.WriteFile(filepath.Join(rootDir, "a.txt"), []byte("hello world!"), noPerm); err != nil {
