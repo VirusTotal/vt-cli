@@ -74,6 +74,18 @@ func addThreadsFlag(flags *pflag.FlagSet) {
 		"number of threads working in parallel")
 }
 
+func addRecursive(flags *pflag.FlagSet) {
+	flags.BoolP(
+		"recursive", "r", false,
+		"enable recursive traversal of subdirectories")
+}
+
+func addMaxDepth(flags *pflag.FlagSet) {
+	flags.IntP(
+		"maxDepth", "d", 1,
+		"maximum recursion depth for directory traversal")
+}
+
 func addIDOnlyFlag(flags *pflag.FlagSet) {
 	flags.BoolP(
 		"identifiers-only", "I", false,

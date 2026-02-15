@@ -164,7 +164,9 @@ func NewScanFileCmd() *cobra.Command {
 			if len(args) == 1 && args[0] == "-" {
 				argReader = utils.NewStringIOReader(os.Stdin)
 			} else if len(args) == 1 && utils.IsDir(args[0]) {
-				argReader, _ = utils.NewFileDirReader(args[0])
+				recursive := viper.GetBool("recursive")
+				maxDepth := viper.GetInt("maxDepth")
+				argReader, _ = utils.NewFileDirReader(args[0], recursive, maxDepth)
 			} else {
 				argReader = utils.NewStringArrayReader(args)
 			}
@@ -188,6 +190,8 @@ func NewScanFileCmd() *cobra.Command {
 		},
 	}
 
+	addRecursive(cmd.Flags())
+	addMaxDepth(cmd.Flags())
 	addThreadsFlag(cmd.Flags())
 	addOpenInVTFlag(cmd.Flags())
 	addPasswordFlag(cmd.Flags())
