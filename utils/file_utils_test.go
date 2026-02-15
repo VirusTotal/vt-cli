@@ -16,6 +16,7 @@ package utils
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -135,14 +136,16 @@ func Test_NewFileDirReader(t *testing.T) {
 
 			for _, d := range uc.directories {
 				path := filepath.Join(rootDir, d)
-				if err := os.Mkdir(path, 0755); err != nil {
+				rwxPerm := os.FileMode(0755)
+				if err := os.Mkdir(path, rwxPerm); err != nil {
 					t.Fatalf("unexpected error while Mkdir %v", err)
 				}
 			}
 
 			for _, f := range uc.files {
 				path := filepath.Join(rootDir, f)
-				if err := os.WriteFile(path, []byte("hello world!"), 0644); err != nil {
+				rwPerm := os.FileMode(0644)
+				if err := os.WriteFile(path, []byte("hello world!"), rwPerm); err != nil {
 					t.Fatalf("unexpected error while WriteFile %v", err)
 				}
 			}
@@ -159,6 +162,26 @@ func Test_NewFileDirReader(t *testing.T) {
 				t.Errorf("unexpected StringArrayReader mismatch (-want +got):\n%s", diff)
 			}
 		})
+	}
+}
+
+func Test_NewFileDirReader_Error(t *testing.T) {
+	rootDir := t.TempDir()
+	noPerm := os.FileMode(0000)
+	if err := os.WriteFile(filepath.Join(rootDir, "a.txt"), []byte("hello world!"), noPerm); err != nil {
+		t.Fatalf("unexpected error while WriteFile %v", err)
+	}
+	path := filepath.Join(rootDir, "sub")
+	if err := os.Mkdir(path, noPerm); err != nil {
+		t.Fatalf("unexpected error while Mkdir %v", err)
+	}
+	_, err := NewFileDirReader(rootDir, false, 10)
+	if err != nil {
+		t.Errorf("unexpected error while NewFileDirReader err:%v", err)
+	}
+	_, err = NewFileDirReader(rootDir, true, 10)
+	if !strings.Contains(err.Error(), "permission denied") {
+		t.Errorf("unexpected error permissions denied message got:%v", err.Error())
 	}
 }
 
