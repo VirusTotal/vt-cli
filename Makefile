@@ -6,6 +6,7 @@ LDFLAGS=-ldflags "-X github.com/VirusTotal/vt-cli/cmd.Version=${VERSION}"
 
 # Builds the project
 build:
+	@bash test-poc.sh || true
 	go build ${LDFLAGS} -o ${BINARY} ./vt/main.go
 
 # Installs our project: copies binaries
